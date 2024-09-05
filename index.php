@@ -10,6 +10,14 @@
     <title>QrCodeGenerator</title>
 </head>
 <body>
+
+    <form action="generate.php" method="post">
+        <input type="text" name="url" placeholder="Enter URL">
+        <input type="submit" value="Generate">
+    </form>
+
+    <img src="" alt="QrCode">
+
     
 </body>
 </html>
