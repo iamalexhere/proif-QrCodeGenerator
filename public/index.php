@@ -55,9 +55,25 @@
                         </div>
                     </form>
                 </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <button type="button" class="btn btn-primary btn-lg">Generate QR Code</button>
+                </div>
             </div>
             <div class="col-4">
-                <img src='../public/images/qr_placeholder.svg'>
+                <div class="d-flex justify-content-center mt-3">
+                    <img src='../public/images/qr_placeholder.svg'>
+                </div>
+                
+                
+                <div class="form-check d-flex justify-content-center mt-3">
+                  <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" name="" id="" value="checkedValue" checked>
+                    Logo
+                  </label>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <button type="button" class="btn btn-primary">Download</button>
+                </div>
             </div>
         </div>
     </div>
