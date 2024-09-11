@@ -24,7 +24,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home</a>
+                    <a class="nav-link" href="#">IF UNPAR Qr Code Generator</a>
                 </li>
             </ul>
         </div>
@@ -42,9 +42,7 @@
                         <li class="nav-item px-3">
                             <a class="nav-link" href="#">URL</a>
                         </li>
-                        <li class="nav-item px-3">
-                            <a class="nav-link" href="#">PDF</a>
-                        </li>
+                        
                     </ul>
                 </nav>
                 <div class="container border w-full">
@@ -68,24 +66,23 @@
                 <div class="form-check d-flex justify-content-center mt-3">
                   <label class="form-check-label">
                     <input type="checkbox" class="form-check-input" name="" id="" value="checkedValue" checked>
-                    Logo
+                    Gunakan logo IF UNPAR
                   </label>
                 </div>
                 <div class="d-flex justify-content-center mt-3">
-                    <button type="button" class="btn btn-primary">Download</button>
+                    <button type="button" class="btn btn-primary">Download PNG</button>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- FOOTER: DEBUG INFO + COPYRIGHTS -->
 
-<footer>
-    <div class="copyrights">
-        <p>&copy; 2024 IF Unpar. All Rights Reserved.
-        </p>
-    </div>
+<footer class="bg-body-tertiary text-center text-lg-start">
+  <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+    © 2024 Copyright:
+    <a class="text-body" >IF UNPAR</a>
+  </div>
 </footer>
 
 </body>
