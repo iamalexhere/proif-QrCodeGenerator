@@ -46,15 +46,15 @@
                     </ul>
                 </nav>
                 <div class="container border w-full">
-                    <form>
+                    <form method="post" action="generate.php">
                         <div class="form-group mt-3">
-                            <label for="exampleInputPassword1">URL</label>
-                            <input type="text" class="form-control" id="url-input" placeholder="https://yoururlhere.com">
+                            <label for="url-input">URL</label>
+                            <input type="text" name="url-input" class="form-control" id="url-input" placeholder="https://yoururlhere.com">
+                        </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <button type="submit" class="btn btn-primary btn-lg">Generate QR Code</button>
                         </div>
                     </form>
-                </div>
-                <div class="d-flex justify-content-center mt-3">
-                    <button type="button" class="btn btn-primary btn-lg">Generate QR Code</button>
                 </div>
             </div>
             <div class="col-4">
@@ -70,7 +70,7 @@
                   </label>
                 </div>
                 <div class="d-flex justify-content-center mt-3">
-                    <button type="button" class="btn btn-primary">Download PNG</button>
+                    <button type="submit" class="btn btn-primary">Download PNG</button>
                 </div>
             </div>
         </div>
