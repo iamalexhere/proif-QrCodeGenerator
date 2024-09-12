@@ -23,7 +23,7 @@ if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
 
 
 
-    $logo = Logo::create("../public/images/Logo.jpg")
+    $logo = Logo::create("images/Logo.jpg")
         ->setResizeToWidth(70)
         ->setPunchoutBackground(true);
 
