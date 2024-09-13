@@ -107,9 +107,6 @@
                 document.getElementById('qrImage').src = 'data:image/png;base64,' + data.image;
 
                 // Update link download
-                //tambah download="generated_qr_code.png" saat link download sudah ada
-
-
                 document.getElementById('download-link').href = data.downloadUrl;
                 document.getElementById('download-link').setAttribute('download', 'generated_qr_code.png');
                 document.getElementById('download-link').classList.remove('disabled');

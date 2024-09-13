@@ -22,7 +22,7 @@ if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
 
     // Periksa apakah checkbox logo dicentang
     if (isset($_POST['use-logo']) && $_POST['use-logo'] == 'yes') {
-        $logo = Logo::create("../public/images/Logo.jpg")
+        $logo = Logo::create("images/Logo.jpg")
             ->setResizeToWidth(70)
             ->setPunchoutBackground(true);
         $result = $writer->write($qrCode, logo:$logo);
@@ -36,7 +36,7 @@ if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
     $base64Image = base64_encode($imageData); // Konversi ke base64 agar bisa ditampilkan di HTML
 
     // Simpan file PNG untuk di-download
-    $filename = '../public/images/generated_qr_code.png';
+    $filename = 'images/generated_qr_code.png';
     file_put_contents($filename, $imageData);
 
     echo json_encode([
