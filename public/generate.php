@@ -31,7 +31,7 @@ if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
         $result = $writer->write($qrCode);
     }
 
-    header("Content-Type: " . $result->getMimeType());
+    header("Content-Type: " . $result->getMimeType()); 
     $imageData  = $result->getString(); 
     $base64Image = base64_encode($imageData); // Konversi ke base64 agar bisa ditampilkan di HTML
 
