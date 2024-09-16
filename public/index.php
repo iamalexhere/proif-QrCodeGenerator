@@ -12,11 +12,10 @@
 </head>
 <body>
 <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light p-0">
             <a class="navbar-brand">
-                <img src='images/Logo.jpg' width="50" height="50">
+                <img src='../public/images/logo_small.png' width="50" height="50">
             </a>
-
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
@@ -29,16 +28,15 @@
     <section class="h-100">
         <div class="container">
             <div class="row">
-                <div class="col-8">
+                <div class="col-12 col-md-8">
                     <nav class="navbar">
                         <ul class="navbar-nav navbar-dark bg-light flex-row rounded">
                             <li class="nav-item px-3">
                                 <a class="nav-link" href="#">URL</a>
                             </li>
-
                         </ul>
                     </nav>
-                    <div class="container border w-full">
+                    <div class="container border w-full pb-3">
                         <form id="qrForm" method="post" action="generate.php">
                             <div class="form-group mt-3">
                                 <label for="url-input">URL</label>
@@ -50,33 +48,28 @@
                                     value="yes">
                                 <label class="form-check-label" for="use-logo">Gunakan logo IF UNPAR</label>
                             </div>
-
-                            <div class="d-flex justify-content-center mt-3">
-                                <button type="submit" class="btn btn-primary btn-lg">Generate QR Code</button>
-                            </div>
                         </form>
                     </div>
+                    <div class="d-flex justify-content-center mt-3">
+                        <button type="submit" class="btn btn-primary btn-lg">Generate QR Code</button>
+                    </div>
                 </div>
-                <div class="col-4">
+                <div class="col-12 col-md-4">
                     <h3 class="text-center">Output QR Code</h3>
 
                     <div class="d-flex justify-content-center mt-3">
-                        <img id="qrImage" src='images/qr_placeholder.svg'>
+                        <img id="qrImage" src='../public/images/qr_placeholder.svg'>
                     </div>
-
-
-                    
                     <div class="d-flex justify-content-center mt-3">
                         <a id="download-link" href="#" class="btn btn-primary disabled" >Download
                             PNG</a>
                     </div>
-
                 </div>
             </div>
         </div>
     </section>
 
-<footer class="bg-body-tertiary text-center text-lg-start">
+<footer class="bg-body-tertiary text-center text-lg-start vw-100">
   <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
     © 2024 Copyright:
     <a class="text-body">IF UNPAR</a>
