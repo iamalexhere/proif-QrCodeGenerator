@@ -48,11 +48,12 @@
                                     value="yes">
                                 <label class="form-check-label" for="use-logo">Gunakan logo IF UNPAR</label>
                             </div>
+                             <div class="d-flex justify-content-center mt-3">
+                        <button type="submit" class="btn btn-primary btn-lg">Generate QR Code</button>
+                            </div>
                         </form>
                     </div>
-                    <div class="d-flex justify-content-center mt-3">
-                        <button type="submit" class="btn btn-primary btn-lg">Generate QR Code</button>
-                    </div>
+                   
                 </div>
                 <div class="col-12 col-md-4">
                     <h3 class="text-center">Output QR Code</h3>
