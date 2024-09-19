@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>IF Unpar QR Code Generator</title>
-    <meta name="description" content="The small framework with powerful features">
+    <meta name="description" content="IF UNPAR QR Code Generator">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
