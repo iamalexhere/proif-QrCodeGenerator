@@ -84,41 +84,43 @@
     </footer>
 
     <script>
-        document.getElementById('qrForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Mencegah pengiriman formulir secara default
-            const formData = new FormData(this);
+    document.getElementById('qrForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // tidak boleh posisi default
+    const formData = new FormData(this);
 
-            // Validasi input URL
-            if (document.getElementById('url-input').value === '') {
-                alert('URL tidak boleh kosong!');
-                return;
+    // memvalidasi input URL
+    if (document.getElementById('url-input').value === '') {
+        alert('URL tidak boleh kosong!');
+        return;
+    }
+
+    fetch('generate.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                // mengupdate gambar qr code pada halaman
+                const qrImage = document.getElementById('qrImage');
+                qrImage.src = 'data:image/png;base64,' + data.image;
+                
+                // Membuat download link buat image
+                const downloadLink = document.getElementById('download-link');
+                downloadLink.href = 'data:image/png;base64,' + data.image;
+                downloadLink.setAttribute('download', 'generated_qr_code.png');
+                downloadLink.classList.remove('disabled');
+                qrImage.style.opacity = 1;
             }
-
-            fetch('generate.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                    } else {
-                        // Update gambar QR Code
-                        document.getElementById('qrImage').src = 'data:image/png;base64,' + data.image;
-
-                        // Update link download
-                        document.getElementById('download-link').href = data.downloadUrl;
-                        document.getElementById('download-link').setAttribute('download', 'generated_qr_code.png');
-                        document.getElementById('download-link').classList.remove('disabled');
-                        document.getElementById('qrImage').style.opacity = 1;
-                    }
-                })
-                .catch(error => {
-                    alert('Terjadi kesalahan saat mengirim data!', error);
-                    
-                    console.error('Error:', error);
-                });
+        })
+        .catch(error => {
+            alert('Terjadi kesalahan saat mengirim data!');
+            console.error('Error:', error);
         });
+});
+
     </script>
 </body>
 
