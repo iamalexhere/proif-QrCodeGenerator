@@ -8,18 +8,14 @@ use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\ErrorCorrectionLevel;
 
 header('Content-Type: application/json'); // Set header as JSON
+ini_set('display_errors', 0); // Nonaktifkan tampilan error HTML
+error_reporting(E_ALL); // Tetap laporkan semua jenis error
+ini_set('log_errors', 1);
+ini_set('error_log', 'php-error.log'); // Gantikan dengan path log yang valid
 
-try{
-    //periksa apakah vendor autoload sudah di load
-    if (!class_exists('Endroid\QrCode\QrCode')) {
-        echo json_encode(['error' => 'Endroid\QrCode\QrCode class not found. Make sure you run composer install']);
-        throw new Exception('Endroid\QrCode\QrCode class not found. Make sure you run composer install');
-    } else {
-        echo json_encode(['error' => 'Endroid\QrCode\QrCode class found.']);
-    }
-    
+ob_start(); // Mulai output buffering
 
-
+try {
     if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
         $text = $_POST['url-input'];
         $qrCode = new QrCode($text);
@@ -49,15 +45,21 @@ try{
         $filename = 'images/generated_qr_code.png';
         file_put_contents($filename, $imageData);
     
+        // Hapus output buffer sebelum mengirim respons JSON
+        ob_end_clean();
         echo json_encode([
             'image' => $base64Image,
             'downloadUrl' => $filename // URL untuk di-download
         ]);
     } else {
+        // Hapus output buffer sebelum mengirim respons JSON
+        ob_end_clean();
         echo json_encode(['error' => 'No URL provided!']);
         exit; // Stop jika tidak ada URL diberikan
     }
 }
-catch(Exception $e){
+catch(Exception $e) {
+    // Hapus output buffer sebelum mengirim respons JSON
+    ob_end_clean();
     echo json_encode(['error' => $e->getMessage()]);
 }
