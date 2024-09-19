@@ -49,6 +49,7 @@ try{
         echo json_encode(['error' => 'No URL provided!']);
         exit; // Stop jika tidak ada URL diberikan
     }
-}catch(Exception $e){
+}
+catch(Exception $e){
     echo json_encode(['error' => $e->getMessage()]);
 }

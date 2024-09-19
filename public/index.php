@@ -113,6 +113,8 @@
                     }
                 })
                 .catch(error => {
+                    alert('Terjadi kesalahan saat mengirim data!', error);
+                    
                     console.error('Error:', error);
                 });
         });
