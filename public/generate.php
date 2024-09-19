@@ -7,13 +7,6 @@ use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\ErrorCorrectionLevel;
 
-header('Content-Type: application/json'); // Set header as JSON
-ini_set('display_errors', 0); // Nonaktifkan tampilan error HTML
-error_reporting(E_ALL); // Tetap laporkan semua jenis error
-ini_set('log_errors', 1);
-ini_set('error_log', 'php-error.log'); // Gantikan dengan path log yang valid
-
-ob_start(); // Mulai output buffering
 
 try {
     if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
@@ -37,7 +30,7 @@ try {
             $result = $writer->write($qrCode);
         }
     
-        // header("Content-Type: " . $result->getMimeType()); 
+        header("Content-Type: " . $result->getMimeType()); 
         $imageData  = $result->getString(); 
         $base64Image = base64_encode($imageData); // Konversi ke base64 agar bisa ditampilkan di HTML
     
