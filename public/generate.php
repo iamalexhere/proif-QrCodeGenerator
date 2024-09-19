@@ -30,7 +30,7 @@ try {
             $result = $writer->write($qrCode);
         }
     
-        header("Content-Type: " . $result->getMimeType()); 
+        // header("Content-Type: " . $result->getMimeType()); 
         $imageData  = $result->getString(); 
         $base64Image = base64_encode($imageData); // Konversi ke base64 agar bisa ditampilkan di HTML
     
@@ -39,6 +39,7 @@ try {
         file_put_contents($filename, $imageData);
     
         // Hapus output buffer sebelum mengirim respons JSON
+        ob_end_clean();
         echo json_encode([
             'image' => $base64Image,
             'downloadUrl' => $filename // URL untuk di-download
