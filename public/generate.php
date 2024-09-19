@@ -39,20 +39,17 @@ try {
         file_put_contents($filename, $imageData);
     
         // Hapus output buffer sebelum mengirim respons JSON
-        ob_end_clean();
         echo json_encode([
             'image' => $base64Image,
             'downloadUrl' => $filename // URL untuk di-download
         ]);
     } else {
         // Hapus output buffer sebelum mengirim respons JSON
-        ob_end_clean();
         echo json_encode(['error' => 'No URL provided!']);
         exit; // Stop jika tidak ada URL diberikan
     }
 }
 catch(Exception $e) {
     // Hapus output buffer sebelum mengirim respons JSON
-    ob_end_clean();
     echo json_encode(['error' => $e->getMessage()]);
 }
