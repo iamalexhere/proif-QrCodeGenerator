@@ -16,7 +16,7 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-light p-0">
             <a class="navbar-brand">
-                <img src='../public/images/logo_small.png' width="50" height="50">
+                <img src='images/logo_small.png' width="50" height="50">
             </a>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
@@ -60,12 +60,12 @@
                     <h3 class="text-center">Output QR Code</h3>
 
                     <div class=" d-flex justify-content-center mt-3  ">
-                        <img id="qrImage" src='../public/images/qr_placeholder.svg' style="opacity: 0.25">
+                        <img id="qrImage" src='images/qr_placeholder.svg' style="opacity: 0.25">
                     </div>
                     <div class="d-flex justify-content-center mt-3">
                         <a id="download-link" href="#" class="btn btn-primary disabled d-flex align-items-center justify-content-center">
                             Download PNG
-                            <img src="../public/images/apps.png" alt="Icon" width="20" height="20" class="mr-2">
+                            <img src="images/apps.png" alt="Icon" width="20" height="20" class="mr-2">
                         </a>
                     </div>
                 </div>
