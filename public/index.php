@@ -55,9 +55,11 @@
                             </div>
                         </form>
                     </div>
+
                 </div>
                 <div class="col-12 col-md-4">
                     <h3 class="text-center">Output QR Code</h3>
+
 
                     <div class=" d-flex justify-content-center mt-3  ">
                         <img id="qrImage" src='images/qr_placeholder.svg' style="opacity: 0.25">
