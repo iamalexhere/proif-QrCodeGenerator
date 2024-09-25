@@ -14,7 +14,7 @@
     <header>
         <nav class="navbar">
             <a class="navbar-brand">
-                <img src='images/logo_small.png' width="50" height="50">
+                <img src='images/logoif.png' >
             </a>
             <div>
                 <ul class="navbar-nav">
@@ -60,12 +60,12 @@
 
 
                     <div class=" d-flex justify-content-center mt-3">
-                        <img id="qrImage" src='images/placeholder.png' style="opacity: 0.25" height="250" width="250">
+                        <img id="qrImage" src='images/placeholder.png'  >
                     </div>
                     <div class="d-flex justify-content-center mt-3">
                         <a id="download-link" href="#" class="btn disabled d-flex">
+                            <img src="images/download.png" alt="Icon" class="mr-2">
                             Download PNG
-                            <img src="images/apps.png" alt="Icon" width="20" height="20" class="mr-2">
                         </a>
                     </div>
                 </div>

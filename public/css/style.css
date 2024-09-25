@@ -16,6 +16,7 @@ body {
 .container {
     width: 100%;
     max-width: 1140px; /* Max width for large screens */
+    padding-top: 15px;
     padding-right: 15px;
     padding-left: 15px;
     margin-right: auto;
@@ -65,14 +66,14 @@ body {
     margin: 0;
 }
 
-.navbar-light .navbar-brand {
+.navbar-brand {
     display: flex;
     align-items: center;
 }
 
-.navbar-light .navbar-brand img {
+.navbar-brand>img {
     width: 50px;
-    height: 50px;
+    height: auto;
 }
 
 .navbar-nav {
@@ -97,6 +98,14 @@ body {
 /* Form Styles */
 h3{
     font-size: 25px;
+}
+
+#qrForm{
+    padding: 15px;
+}
+
+#qrForm div:not(:last-child){
+    padding-bottom: 15px;
 }
 
 .form-group *{
@@ -140,7 +149,8 @@ h3{
 
 /* Button Styles */
 .btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     font-weight: 400;
     font-size: 20px;
     color: #fff;
@@ -149,13 +159,24 @@ h3{
     vertical-align: middle;
     cursor: pointer;
     border: 1px solid transparent;
-    padding: 0.75rem 0.5rem;
+    padding: 10px 20px;
     border-radius: 0.25rem;
     background-color: #007bff;
 }
 
 .btn:hover {
     background-color: #0056b3;
+}
+
+#download-link {
+    font-size: 16px;
+    padding: 7px 10px;
+}
+
+#download-link img {
+    height: 24px;
+    width: auto;
+    margin-right: 10px;
 }
 
 /* Output Section */
@@ -166,7 +187,8 @@ h3 {
 #qrImage {
     max-width: 100%;
     height: auto;
-    opacity: 0.25; /* Initial opacity */
+    width: 250px;
+    opacity: 0.35;
     transition: opacity 0.3s;
 }
 
@@ -188,9 +210,7 @@ h3 {
 }
 
 /* Margin Utilities */
-.mt-3 {
-    margin-top: 1rem !important;
-}
+
 
 .pb-3 {
     padding-bottom: 1rem !important;
