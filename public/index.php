@@ -4,8 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <title>IF Unpar QR Code Generator</title>
-    <meta name="description" content="IF UNPAR QR Code Generator">
+    <meta name="title" content="IF Unpar QR Code Generator">
+    <meta name="description" content="Website ini untuk membuat QR Code IF Unpar">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:image" content="https://qrcode.ifunpar.id/images/logoif.png">
+    <!-- <meta property="og:image:width" content="width_in_pixels">
+    <meta property="og:image:height" content="height_in_pixels"> -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="images/logo_small.png" type="image/x-icon">
 </head>
@@ -19,7 +23,7 @@
             <div>
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">QR Code Generator</a>
+                        <a class="nav-link">QR Code Generator</a>
                     </li>
                 </ul>
             </div>
@@ -29,18 +33,11 @@
         <div class="container">
             <div class="row">
                 <div class="col-12 col-md-8">
-                    <nav class="navbar url">
-                        <ul class="navbar-nav">
-                            <li class="nav-item url">
-                                <a class="nav-link" href="#">URL</a>
-                            </li>
-                        </ul>
-                    </nav>
                     <div class="container border pb-3">
                         <form id="qrForm" method="post" action="generate.php">
                             <div class="form-group mt-3">
                                 <label class="url-input" for="url-input">URL</label>
-                                <input type="text" name="url-input" class="form-control" id="url-input"
+                                <input type="url" name="url-input" class="form-control" id="url-input"
                                     placeholder="Tulis URL anda di sini">
                             </div>
                             <div class="form-check">
@@ -57,14 +54,12 @@
                 </div>
                 <div class="col-12 col-md-4">
                     <h3 class="text-center">Output QR Code</h3>
-
-
                     <div class=" d-flex justify-content-center mt-3">
-                        <img id="qrImage" src='images/placeholder.png'  >
+                        <img id="qrImage" src=''>
                     </div>
                     <div class="d-flex justify-content-center mt-3">
-                        <a id="download-link" href="#" class="btn disabled d-flex">
-                            <img src="images/download.png" alt="Icon" class="mr-2">
+                        <a id="download-link" class="btn disabled d-flex">
+                            <img src="images/download.svg" alt="Icon" class="mr-2">
                             Download PNG
                         </a>
                     </div>
