@@ -14,11 +14,11 @@ try {
         $qrCode->setSize(300);
         $qrCode->setMargin(10);
         $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::High)
-                ->setBackgroundColor(new \Endroid\QrCode\Color\Color(255, 255, 255)); // White background
+                ->setBackgroundColor(new \Endroid\QrCode\Color\Color(255, 255, 255));
 
         $writer = new PngWriter;
 
-        // Cek apakah gunakan logo IF unpar dicentang
+
         if (isset($_POST['use-logo']) && $_POST['use-logo'] == 'yes') {
             $logo = Logo::create("images/Logo.jpg")
                         ->setResizeToWidth(70)
@@ -28,11 +28,9 @@ try {
             $result = $writer->write($qrCode);
         }
 
-        // mengirim kembali gambar base64 tanpa menyimpannya
         $imageData  = $result->getString();
         $base64Image = base64_encode($imageData);
 
-        // Clear output buffer sebelum dikirim kembali ke JSON untuk response
         ob_end_clean();
         echo json_encode([
             'image' => $base64Image,

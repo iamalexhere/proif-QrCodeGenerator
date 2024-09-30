@@ -8,8 +8,6 @@
     <meta name="description" content="Website untuk membuat QR Code IF Unpar">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:image" content="https://qrcode.ifunpar.id/images/logoif.png">
-    <!-- <meta property="og:image:width" content="width_in_pixels">
-    <meta property="og:image:height" content="height_in_pixels"> -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="images/logo_small.png" type="image/x-icon">
 </head>
@@ -64,7 +62,7 @@
 
     <script>
     document.getElementById('qrForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // tidak boleh posisi default
+    event.preventDefault();
     const formData = new FormData(this);
 
 
@@ -77,11 +75,8 @@
             if (data.error) {
                 alert(data.error);
             } else {
-                // mengupdate gambar qr code pada halaman
                 const qrImage = document.getElementById('qrImage');
                 qrImage.src = 'data:image/png;base64,' + data.image;
-                
-                // Membuat download link buat image
                 const downloadLink = document.getElementById('download-link');
                 downloadLink.href = 'data:image/png;base64,' + data.image;
                 downloadLink.setAttribute('download', 'generated_qr_code.png');
