@@ -24,15 +24,17 @@
     <section>
         <div class="container">
             <div class="content">
-                <div class="inputsection">
+                < class="inputsection">
                     <form id="qrForm" method="post" action="generate.php">
                         <div class="url-input" for="url-input">URL</div>
                         <div>
                             <input type="url" name="url-input" id="url-input" class="form-control" placeholder="Tulis URL anda di sini">
                         </div>
                         <div class="form-check">
-                            <input type="checkbox" name="use-logo" id="use-logo" value="yes" checked>
-                            <label class="form-check-label" for="use-logo">Gunakan logo IF UNPAR</label>                        </div>
+                                <input type="checkbox" class="form-check-input" id="use-logo" name="use-logo"
+                                value="yes" checked>
+                                <label class="form-check-label" for="use-logo">Gunakan logo IF UNPAR</label>
+                        </div>
                         <div class="form-submit"> 
                             <button type="submit" class="btn">Generate QR Code</button>
                         </div>
