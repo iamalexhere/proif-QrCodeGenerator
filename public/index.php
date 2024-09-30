@@ -24,7 +24,7 @@
     <section>
         <div class="container">
             <div class="content">
-                < class="inputsection">
+                <div class="inputsection">
                     <form id="qrForm" method="post" action="generate.php">
                         <div class="url-input" for="url-input">URL</div>
                         <div>
