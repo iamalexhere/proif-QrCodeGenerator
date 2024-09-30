@@ -31,7 +31,7 @@
                             <input type="url" name="url-input" class="form-control" placeholder="Tulis URL anda di sini">
                         </div>
                         <div class="form-check">
-                            <input type="checkbox" value="yes" checked>Gunakan logo IF UNPAR
+                            <input type="checkbox" name="use-logo" value="yes" checked>Gunakan logo IF UNPAR
                         </div>
                         <div class="form-submit"> 
                             <button type="submit" class="btn">Generate QR Code</button>
