@@ -26,8 +26,8 @@
             <div class="content">
                 <div class="inputsection">
                     <form id="qrForm" method="post" action="generate.php">
-                        <div class="url-input" for="url-input">URL</div>
                         <div>
+                            <label class="url-input" for="url-input">URL</label>
                             <input type="url" name="url-input" id="url-input" class="form-control" placeholder="Tulis URL anda di sini">
                         </div>
                         <div class="form-check">
