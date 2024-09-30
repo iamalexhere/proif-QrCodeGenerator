@@ -4,7 +4,6 @@
 *::after {
     box-sizing: border-box;
     margin: 0;
-    padding: 0;
 }
 
 /* Body */
@@ -12,106 +11,60 @@ body {
     font-family: Arial, sans-serif;
 }
 
+
 /* Container */
 .container {
     width: 100%;
-    max-width: 1140px; /* Max width for large screens */
-    padding-top: 15px;
-    padding-right: 15px;
-    padding-left: 15px;
+    max-width: 1140px;
+    padding: 15px;
     margin-right: auto;
     margin-left: auto;
 }
 
-/* Rows */
-.row {
+
+/* Content */
+.content {
     display: flex;
     flex-wrap: wrap;
-    margin-right: -15px;
-    margin-left: -15px;
 }
 
-/* Columns */
-.col-12 {
-    flex: 0 0 100%;
-    max-width: 100%;
-}
-
-.col-md-8 {
+.inputsection{
     flex: 0 0 66.66667%;
     max-width: 66.66667%;
+    border: 1px solid rgb(222, 226, 230);
+    padding: 15px;
 }
 
-.col-md-4 {
-    flex: 0 0 33.33333%;
-    max-width: 33.33333%;
-}
 
 /* Navbar */
 .navbar {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     padding: 0.5rem 1rem;
-    background-color: #f8f9fa;
+    background-color: #ebedf0;
 }
 
-.navbar.url{
-    margin: 10px 40px;
-    width: min-content;
-}
-
-.nav-item.url{
-    padding: 0;
-    margin: 0;
-}
-
-.navbar-brand {
-    display: flex;
-    align-items: center;
-}
-
-.navbar-brand>img {
+.navbar>img {
     width: 50px;
     height: auto;
 }
 
-.navbar-nav {
-    display: flex;
-    list-style: none;
-    padding: 0;
-}
-
-.nav-item {
-    padding: 0 15px;
-}
-
-.nav-link {
+.navbar>a{
     color: #000;
     text-decoration: none;
+    padding-left: 15px;
+    display: flex;
 }
 
-.nav-link:hover {
-    color: #0056b3;
-}
 
 /* Form Styles */
-h3{
-    font-size: 25px;
-}
-
 #qrForm{
     padding: 15px;
 }
 
-#qrForm div:not(:last-child){
+#qrForm *:not(:last-child){
     padding-bottom: 15px;
 }
-
-.form-group *{
-    margin: 1rem 0;
-}
-
 
 .form-control {
     display: block;
@@ -125,27 +78,22 @@ h3{
     border-radius: 0.25rem;
 }
 
-.form-control:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
 .form-check {
     display: flex;
     align-items: center;
 }
 
-.form-check-input {
+input[type="checkbox"] {
     margin-right: 0.5rem;
+    display: flex;
+    justify-content: center;
 }
 
-.form-check-label {
-    margin-bottom: 0;
+.form-submit{
+    display: flex;
+    justify-content: center;
 }
 
-.border{
-    border: 1px solid rgb(222, 226, 230);
-}
 
 /* Button Styles */
 .btn {
@@ -173,58 +121,41 @@ h3{
     padding: 7px 10px;
 }
 
-#download-link img {
-    height: 24px;
-    width: auto;
-    margin-right: 10px;
+.disabled{
+    opacity: 0.65;
+    pointer-events: none;
 }
 
+
 /* Output Section */
+.outputsection{
+    flex: 0 0 33.33333%;
+    max-width: 33.33333%;
+}
+
 h3 {
     text-align: center;
+    font-size: 25px;
 }
 
 #qrImage {
     max-width: 100%;
     height: auto;
     width: 250px;
-    opacity: 0.35;
-    transition: opacity 0.3s;
+    opacity: 1;
 }
 
-#qrImage.visible {
-    opacity: 1; /* Fully visible when generated */
-}
 
 /* Flex Utility Classes */
-.d-flex {
+.outputsection>div{
     display: flex;
-}
-
-.justify-content-center {
     justify-content: center;
 }
 
-.align-items-center {
-    align-items: center;
-}
-
-/* Margin Utilities */
-
-
-.pb-3 {
-    padding-bottom: 1rem !important;
-}
-
-/* Disabled Button Styles */
-.disabled {
-    opacity: 0.65;
-    pointer-events: none;
-}
 
 /* Footer */
 footer {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: #ebedf0;
     text-align: center;
     bottom: 0;
     position: absolute;
@@ -233,4 +164,65 @@ footer {
 
 footer div{
     padding: 1rem;
+}
+
+/* for Responsive */
+
+/* Laptop View */
+@media (max-width: 992px) {
+    .inputsection {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .outputsection {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-top: 20px;
+    }
+}
+
+/* Mobile View */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .navbar > img {
+        margin-bottom: 10px;
+    }
+
+    .content {
+        flex-direction: column;
+    }
+
+    .inputsection, .outputsection {
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+    
+    #qrImage {
+        width: 200px;
+    }
+
+    .btn {
+        font-size: 18px;
+    }
+}
+
+/* Small Mobile View */
+@media (max-width: 576px) {
+    #qrImage {
+        width: 150px;
+    }
+
+    .btn {
+        font-size: 16px;
+        padding: 8px 15px;
+    }
 }

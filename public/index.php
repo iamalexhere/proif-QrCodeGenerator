@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>IF Unpar QR Code Generator</title>
-    <meta name="description" content="IF UNPAR QR Code Generator">
+    <meta name="title" content="IF Unpar QR Code Generator">
+    <meta name="description" content="Website untuk membuat QR Code IF Unpar">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:image" content="https://qrcode.ifunpar.id/images/logoif.png">
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="images/logo_small.png" type="image/x-icon">
 </head>
@@ -13,58 +15,35 @@
 <body>
     <header>
         <nav class="navbar">
-            <a class="navbar-brand">
-                <img src='images/logoif.png' >
-            </a>
-            <div>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">QR Code Generator</a>
-                    </li>
-                </ul>
-            </div>
+            <img src='images/logoif.png' >
+            <a class="nav-link">QR Code Generator</a>
         </nav>
     </header>
     <section>
         <div class="container">
-            <div class="row">
-                <div class="col-12 col-md-8">
-                    <nav class="navbar url">
-                        <ul class="navbar-nav">
-                            <li class="nav-item url">
-                                <a class="nav-link" href="#">URL</a>
-                            </li>
-                        </ul>
-                    </nav>
-                    <div class="container border pb-3">
-                        <form id="qrForm" method="post" action="generate.php">
-                            <div class="form-group mt-3">
-                                <label class="url-input" for="url-input">URL</label>
-                                <input type="text" name="url-input" class="form-control" id="url-input"
-                                    placeholder="Tulis URL anda di sini">
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="use-logo" name="use-logo"
-                                    value="yes" checked>
-                                <label class="form-check-label" for="use-logo">Gunakan logo IF UNPAR</label>
-                            </div>
-                            <div class="d-flex justify-content-center mt-3">
-                                <button type="submit" class="btn btn-primary btn-lg">Generate QR Code</button>
-                            </div>
-                        </form>
-                    </div>
-
+            <div class="content">
+                <div class="inputsection">
+                    <form id="qrForm" method="post" action="generate.php">
+                        <div>
+                            <label class="url-input" for="url-input">URL</label>
+                            <input type="url" name="url-input" id="url-input" class="form-control" placeholder="Tulis URL anda di sini">
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="use-logo" name="use-logo" value="yes" checked>
+                            <label class="form-check-label" for="use-logo">Gunakan logo IF UNPAR</label>
+                        </div>
+                        <div class="form-submit"> 
+                            <button type="submit" class="btn">Generate QR Code</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="col-12 col-md-4">
-                    <h3 class="text-center">Output QR Code</h3>
-
-
-                    <div class=" d-flex justify-content-center mt-3">
-                        <img id="qrImage" src='images/placeholder.png'  >
+                <div class="outputsection">
+                    <h3>Output QR Code</h3>
+                    <div>
+                        <img id="qrImage" src=''>
                     </div>
-                    <div class="d-flex justify-content-center mt-3">
-                        <a id="download-link" href="#" class="btn disabled d-flex">
-                            <img src="images/download.png" alt="Icon" class="mr-2">
+                    <div>
+                        <a id="download-link" class="btn disabled">
                             Download PNG
                         </a>
                     </div>
@@ -82,14 +61,9 @@
 
     <script>
     document.getElementById('qrForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // tidak boleh posisi default
+    event.preventDefault();
     const formData = new FormData(this);
 
-    // memvalidasi input URL
-    if (document.getElementById('url-input').value === '') {
-        alert('URL tidak boleh kosong!');
-        return;
-    }
 
     fetch('generate.php', {
             method: 'POST',
@@ -100,11 +74,8 @@
             if (data.error) {
                 alert(data.error);
             } else {
-                // mengupdate gambar qr code pada halaman
                 const qrImage = document.getElementById('qrImage');
                 qrImage.src = 'data:image/png;base64,' + data.image;
-                
-                // Membuat download link buat image
                 const downloadLink = document.getElementById('download-link');
                 downloadLink.href = 'data:image/png;base64,' + data.image;
                 downloadLink.setAttribute('download', 'generated_qr_code.png');
