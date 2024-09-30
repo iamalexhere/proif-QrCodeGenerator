@@ -43,7 +43,7 @@
                         <img id="qrImage" src=''>
                     </div>
                     <div>
-                        <a id="download-link" class="btn">
+                        <a id="download-link" class="btn disabled">
                             Download PNG
                         </a>
                     </div>
