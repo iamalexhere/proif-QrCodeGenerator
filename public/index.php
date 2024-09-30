@@ -28,10 +28,10 @@
                     <form id="qrForm" method="post" action="generate.php">
                         <div class="url-input" for="url-input">URL</div>
                         <div>
-                            <input type="url" name="url-input" class="form-control" placeholder="Tulis URL anda di sini">
+                            <input type="url" name="url-input" id="url-input" class="form-control" placeholder="Tulis URL anda di sini">
                         </div>
                         <div class="form-check">
-                            <input type="checkbox" name="use-logo" value="yes" checked>Gunakan logo IF UNPAR
+                            <input type="checkbox" name="use-logo" id="use-logo" value="yes" checked>Gunakan logo IF UNPAR
                         </div>
                         <div class="form-submit"> 
                             <button type="submit" class="btn">Generate QR Code</button>
@@ -65,11 +65,6 @@
     event.preventDefault(); // tidak boleh posisi default
     const formData = new FormData(this);
 
-    // memvalidasi input URL
-    if (document.getElementById('url-input').value === '') {
-        alert('URL tidak boleh kosong!');
-        return;
-    }
 
     fetch('generate.php', {
             method: 'POST',
