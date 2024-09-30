@@ -28,7 +28,7 @@
                     <form id="qrForm" method="post" action="generate.php">
                         <div class="url-input" for="url-input">URL</div>
                         <div>
-                            <input type="url" class="form-control" placeholder="Tulis URL anda di sini">
+                            <input type="url" name="url-input" class="form-control" placeholder="Tulis URL anda di sini">
                         </div>
                         <div class="form-check">
                             <input type="checkbox" value="yes" checked>Gunakan logo IF UNPAR
@@ -41,7 +41,7 @@
                 <div class="outputsection">
                     <h3>Output QR Code</h3>
                     <div>
-                        <img id="qrImage">
+                        <img id="qrImage" src=''>
                     </div>
                     <div>
                         <a id="download-link" class="btn">
