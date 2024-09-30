@@ -28,10 +28,10 @@
                     <form id="qrForm" method="post" action="generate.php">
                         <div class="url-input" for="url-input">URL</div>
                         <div>
-                            <input type="url" name="url-input" class="form-control" placeholder="Tulis URL anda di sini">
+                            <input type="url" class="form-control" placeholder="Tulis URL anda di sini">
                         </div>
                         <div class="form-check">
-                            <input type="checkbox" name="use-logo"value="yes" checked>Gunakan logo IF UNPAR
+                            <input type="checkbox" value="yes" checked>Gunakan logo IF UNPAR
                         </div>
                         <div class="form-submit"> 
                             <button type="submit" class="btn">Generate QR Code</button>
@@ -41,11 +41,11 @@
                 <div class="outputsection">
                     <h3>Output QR Code</h3>
                     <div>
-                        <img id="qrImage" src=''>
+                        <img id="qrImage">
                     </div>
                     <div>
                         <a id="download-link" class="btn">
-                            <img src="images/download.svg" alt="Icon">Download PNG
+                            Download PNG
                         </a>
                     </div>
                 </div>

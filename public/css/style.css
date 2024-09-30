@@ -3,12 +3,15 @@
 *::before,
 *::after {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 /* Body */
 body {
     font-family: Arial, sans-serif;
 }
+
 
 /* Container */
 .container {
@@ -19,12 +22,12 @@ body {
     margin-left: auto;
 }
 
+
 /* Content */
 .content {
     display: flex;
     flex-wrap: wrap;
 }
-
 
 .inputsection{
     flex: 0 0 66.66667%;
@@ -48,15 +51,15 @@ body {
     width: 50px;
     height: auto;
 }
+
 .navbar>a{
     color: #000;
     text-decoration: none;
-    padding: 0 15px;
+    padding-left: 15px;
     display: flex;
-    list-style: none;
-    padding: 0;
     
 }
+
 
 /* Form Styles */
 #qrForm{
@@ -79,11 +82,6 @@ body {
     border-radius: 0.25rem;
 }
 
-.form-control:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
 .form-check {
     display: flex;
     align-items: center;
@@ -95,11 +93,11 @@ input[type="checkbox"] {
     justify-content: center;
 }
 
-
 .form-submit{
     display: flex;
     justify-content: center;
 }
+
 
 /* Button Styles */
 .btn {
@@ -129,11 +127,6 @@ input[type="checkbox"] {
     pointer-events: none;
 }
 
-#download-link img {
-    height: 24px;
-    width: auto;
-    margin-right: 10px;
-}
 
 /* Output Section */
 .outputsection{
@@ -150,20 +143,15 @@ h3 {
     max-width: 100%;
     height: auto;
     width: 250px;
-    opacity: 0.35;
-    transition: opacity 0.3s;
+    opacity: 1;
 }
 
-#qrImage.visible {
-    opacity: 1; /* Fully visible when generated */
-}
 
 /* Flex Utility Classes */
 .outputsection>div{
     display: flex;
     justify-content: center;
 }
-
 
 
 /* Footer */
@@ -177,4 +165,65 @@ footer {
 
 footer div{
     padding: 1rem;
+}
+
+/* for Responsiveness */
+
+/* Laptop View */
+@media (max-width: 992px) {
+    .inputsection {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .outputsection {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-top: 20px;
+    }
+}
+
+/* Mobile View */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .navbar > img {
+        margin-bottom: 10px;
+    }
+
+    .content {
+        flex-direction: column;
+    }
+
+    .inputsection, .outputsection {
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+    
+    #qrImage {
+        width: 200px;
+    }
+
+    .btn {
+        font-size: 18px;
+    }
+}
+
+/* Small Mobile View */
+@media (max-width: 576px) {
+    #qrImage {
+        width: 150px;
+    }
+
+    .btn {
+        font-size: 16px;
+        padding: 8px 15px;
+    }
 }
