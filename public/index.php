@@ -54,8 +54,8 @@
 
     <footer>
         <div>
-            © 2024 Copyright:
-            <a class="text-body">IF UNPAR</a>
+        Copyright© 2024:
+            <a class="text-body" href="https://informatika.unpar.ac.id/" >INFORMATIKA UNPAR</a>
         </div>
     </footer>
 

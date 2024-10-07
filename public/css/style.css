@@ -166,6 +166,11 @@ footer div{
     padding: 1rem;
 }
 
+.text-body{
+    text-decoration: none;
+    color: black;
+}
+
 /* for Responsive */
 
 /* Laptop View */
