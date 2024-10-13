@@ -5,17 +5,17 @@
     <meta charset="UTF-8">
     <title>IF Unpar QR Code Generator</title>
     <meta name="title" content="IF Unpar QR Code Generator">
-    <meta name="description" content="Website untuk membuat QR Code IF Unpar">
+    <meta name="description" content="Website untuk membuat QR Code dari URL">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:image" content="https://qrcode.ifunpar.id/images/logoif.png">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" href="images/logo_small.png" type="image/x-icon">
+    <link rel="icon" href="https://qrcode.ifunpar.id/images/logoif.png" type="image/x-icon">
 </head>
 
 <body>
     <header>
         <nav class="navbar">
-            <img src='images/logoif.png' >
+            <img src='/images/logoif.png' >
             <a class="nav-link">QR Code Generator</a>
         </nav>
     </header>
@@ -54,8 +54,8 @@
 
     <footer>
         <div>
-        Copyright© 2024:
-            <a class="text-body" href="https://informatika.unpar.ac.id/" >INFORMATIKA UNPAR</a>
+        Copyright &copy; 2024
+            <a class="text-body" href="https://informatika.unpar.ac.id/" >Informatika  UNPAR</a>
         </div>
     </footer>
 
