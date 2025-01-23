@@ -15,7 +15,7 @@
 <body>
     <header>
         <nav class="navbar">
-            <img src='images/logoif.png' >
+            <img src='/images/logoif.png' >
             <a class="nav-link">QR Code Generator</a>
         </nav>
     </header>
