@@ -1,14 +1,22 @@
 <?php
 require '../vendor/autoload.php';
 
+/*
+Menerima URL dari halam web, 
+mengubah menjadi gambar QR, 
+dan menampilkan gambar kepada user
+*/
+
+//library untuk membuat QR code dari URL
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\ErrorCorrectionLevel;
 
 try {
+    //Menerima input pengguna
     if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
-        $longUrl = trim($_POST['url-input']);
+        $longUrl = trim($_POST['url-input']); //mengambil input URL
 
         // buat shortlink via API v.gd
         $shortUrl = file_get_contents('https://v.gd/create.php?format=simple&url=' . urlencode($longUrl));
@@ -24,8 +32,9 @@ try {
         $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::High)
                ->setBackgroundColor(new \Endroid\QrCode\Color\Color(255, 255, 255));
 
-        $writer = new PngWriter;
+        $writer = new PngWriter; //Mengubah jadi format PNG
 
+        //Jika user mau menggunakan logo IF UNPAR
         if (isset($_POST['use-logo']) && $_POST['use-logo'] == 'yes') {
             $logo = Logo::create("images/Logo.jpg")
                         ->setResizeToWidth(70)
@@ -35,6 +44,7 @@ try {
             $result = $writer->write($qrCode);
         }
 
+        //Gambar QR code dari $result --> diubah menjadi teks #base64Image --> dibungkus dalam paket JSON --> dikirim ke browser
         $imageData  = $result->getString();
         $base64Image = base64_encode($imageData);
 
@@ -49,6 +59,7 @@ try {
         exit;
     }
 } catch (Exception $e) {
+    //Jika terjadi error --> kirim pesan error
     ob_end_clean();
     echo json_encode(['error' => 'An error occurred: '.$e->getMessage()]);
 }
