@@ -1,5 +1,4 @@
 <?php
-
 require '../vendor/autoload.php';
 
 use Endroid\QrCode\QrCode;
@@ -9,15 +8,23 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 
 try {
     if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
-        $text = $_POST['url-input'];
-        $qrCode = new QrCode($text);
+        $longUrl = trim($_POST['url-input']);
+
+        // buat shortlink via API v.gd
+        $shortUrl = file_get_contents('https://v.gd/create.php?format=simple&url=' . urlencode($longUrl));
+        if ($shortUrl === false || empty($shortUrl)) {
+            // akan melakukan fallback jika gagal 
+            $shortUrl = $longUrl;
+        }
+
+        // buat QR Code dari shortlink
+        $qrCode = new QrCode($shortUrl);
         $qrCode->setSize(300);
         $qrCode->setMargin(10);
         $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::High)
-                ->setBackgroundColor(new \Endroid\QrCode\Color\Color(255, 255, 255));
+               ->setBackgroundColor(new \Endroid\QrCode\Color\Color(255, 255, 255));
 
         $writer = new PngWriter;
-
 
         if (isset($_POST['use-logo']) && $_POST['use-logo'] == 'yes') {
             $logo = Logo::create("images/Logo.jpg")
@@ -33,7 +40,8 @@ try {
 
         ob_end_clean();
         echo json_encode([
-            'image' => $base64Image,
+            'image'      => $base64Image,
+            'short_link' => $shortUrl
         ]);
     } else {
         ob_end_clean();
@@ -42,5 +50,5 @@ try {
     }
 } catch (Exception $e) {
     ob_end_clean();
-    echo json_encode(['error' => 'An error occurred!']);
+    echo json_encode(['error' => 'An error occurred: '.$e->getMessage()]);
 }
