@@ -10,7 +10,7 @@
 <body>
 <header>
     <nav class="navbar">
-        <img src='/images/logoif.png'>
+        <img src='/images/logoif.png' alt="logo">
         <a class="nav-link">QR Code Generator</a>
     </nav>
 </header>
@@ -18,14 +18,21 @@
     <div class="container">
         <div class="content">
             <div class="inputsection">
-                <form id="qrForm" method="post" action="generate.php">
+                <!-- Form upload logo dan URL -->
+                <form id="qrForm" method="post" action="generate.php" enctype="multipart/form-data">
                     <div>
                         <label class="url-input" for="url-input">URL</label>
-                        <input type="url" name="url-input" id="url-input" class="form-control" placeholder="Tulis URL anda di sini">
+                        <input type="url" name="url-input" id="url-input" class="form-control" placeholder="Tulis URL anda di sini" required>
                     </div>
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="use-logo" name="use-logo" value="yes" checked>
-                        <label class="form-check-label" for="use-logo">Gunakan logo IF UNPAR</label>
+                    <div>
+                        <!-- Upload logo-->
+                        <label for="logo-upload">Upload Logo (opsional):</label>
+                        <input type="file" name="logo-upload" id="logo-upload" accept="image/*">
+                    </div>
+                    <div>
+                        <!-- Memilih warna QRCode -->
+                        <label for="color">Warna QR Code:</label>
+                        <input type="color" name="color" id="color" value="#000000">
                     </div>
                     <div class="form-submit">
                         <button type="submit" class="btn">Generate QR Code</button>
@@ -35,7 +42,7 @@
             <div class="outputsection">
                 <h3>Output QR Code</h3>
                 <div>
-                    <img id="qrImage" src='' style="max-width:300px;">
+                    <img id="qrImage" src='' style="max-width:300px; opacity:0;">
                 </div>
                 <p id="shortlink" style="word-wrap:break-word;"></p>
                 <div>
@@ -70,8 +77,8 @@ document.getElementById('qrForm').addEventListener('submit', function(event) {
         } else {
             const qrImage = document.getElementById('qrImage');
             qrImage.src = 'data:image/png;base64,' + data.image;
+            qrImage.style.opacity = 1;
 
-            // tampilkan short link
             if (data.short_link) {
                 document.getElementById('shortlink').textContent = 'Short link: ' + data.short_link;
             }
@@ -80,7 +87,6 @@ document.getElementById('qrForm').addEventListener('submit', function(event) {
             downloadLink.href = 'data:image/png;base64,' + data.image;
             downloadLink.setAttribute('download', 'generated_qr_code.png');
             downloadLink.classList.remove('disabled');
-            qrImage.style.opacity = 1;
         }
     })
     .catch(error => {
