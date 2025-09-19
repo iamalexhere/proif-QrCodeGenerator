@@ -25,7 +25,7 @@
                         <input type="url" name="url-input" id="url-input" class="form-control" placeholder="Tulis URL anda di sini" required>
                     </div>
 
-                    <!-- Pilihan logo bawaan -->
+                    <!-- Pilihan logo bawaan, CSS pada style.css -->
                     <div>
                         <label>Pilih Logo Bawaan:</label>
                         <div class="logo-options">

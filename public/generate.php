@@ -1,6 +1,13 @@
 <?php
 require '../vendor/autoload.php';
 
+/*
+Menerima URL dari web, 
+mengubah menjadi gambar QR,
+dan menampilkan gambar kepada user
+*/
+
+//library untuk membuat QRCode dari URL
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Logo\Logo;
@@ -8,38 +15,51 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\Color\Color;
 
 try {
+    //Menerima input pengguna 
     if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
         $longUrl = trim($_POST['url-input']);
 
         // Buat shortlink via API v.gd
         $shortUrl = file_get_contents('https://v.gd/create.php?format=simple&url=' . urlencode($longUrl));
         if ($shortUrl === false || empty($shortUrl)) {
-            $shortUrl = $longUrl; // fallback jika gagal
+            // akan melakukan fallback jika gagal
+            $shortUrl = $longUrl;
         }
 
         // Ambil warna dari input user
+        // Ambil warna dari input user default nya hitam 
         $hexColor = isset($_POST['color']) ? $_POST['color'] : '#000000';
+
+        // Hilangkan simbol # dari kode hex
         $hexColor = ltrim($hexColor, '#');
 
+        // Ambil 2 digit pertama → nilai Red
         $r = hexdec(substr($hexColor, 0, 2));
+        // Ambil 2 digit berikutnya → nilai Green
         $g = hexdec(substr($hexColor, 2, 2));
+        // Ambil 2 digit terakhir → nilai Blu
         $b = hexdec(substr($hexColor, 4, 2));
 
-        // Buat QR Code
+        // Buat QR Code dari short link 
         $qrCode = new QrCode($shortUrl);
-        $qrCode->setSize(400);
-        $qrCode->setMargin(10);
+        $qrCode->setSize(400); //ukuran QRCode
+        $qrCode->setMargin(10); //Margin warna putih sekitar QR
         $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::High)
+                // Set warna QR sesuai input user
                ->setForegroundColor(new Color($r, $g, $b))
+               // Set warna background jadi putih
                ->setBackgroundColor(new Color(255, 255, 255));
 
-        $writer = new PngWriter();
+        $writer = new PngWriter(); //Mengubah jadi format PNG
 
+        // Variabel hasil QR Code
         $result = null;
 
-        // 🔹 Jika user pilih logo bawaan
+        // Jika user pilih logo bawaan
         if (!empty($_POST['preset-logo'])) {
-            $presetLogo = basename($_POST['preset-logo']); // amankan input
+            // Ambil nama file logo, amankan dari path traversal
+            $presetLogo = basename($_POST['preset-logo']);
+            // Path logo disimpan di folder `images/`
             $presetPath = __DIR__ . "/images/" . $presetLogo;
 
             if (file_exists($presetPath)) {
@@ -49,13 +69,13 @@ try {
                 $result = $writer->write($qrCode); // fallback jika file tidak ada
             }
         }
-        // 🔹 Jika user upload logo custom
+        // Jika user upload logo custom
         elseif (isset($_FILES['logo-upload']) && $_FILES['logo-upload']['error'] === UPLOAD_ERR_OK) {
             $logoTmpPath = $_FILES['logo-upload']['tmp_name'];
             $logo = Logo::create($logoTmpPath)->setResizeToWidth(150);
             $result = $writer->write($qrCode, logo: $logo);
         }
-        // 🔹 Tanpa logo
+        // Tanpa logo
         else {
             $result = $writer->write($qrCode);
         }
@@ -75,6 +95,7 @@ try {
         exit;
     }
 } catch (Exception $e) {
+    //Jika terjadi error --> kirim pesan error
     ob_end_clean();
     echo json_encode(['error' => 'An error occurred: ' . $e->getMessage()]);
 }
