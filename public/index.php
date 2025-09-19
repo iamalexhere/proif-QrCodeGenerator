@@ -24,21 +24,88 @@
                         <label class="url-input" for="url-input">URL</label>
                         <input type="url" name="url-input" id="url-input" class="form-control" placeholder="Tulis URL anda di sini" required>
                     </div>
+
+                    <!-- Pilihan logo bawaan -->
                     <div>
-                        <!-- Upload logo-->
-                        <label for="logo-upload">Upload Logo (opsional):</label>
+                        <label>Pilih Logo Bawaan:</label>
+                        <div class="logo-options">
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="instagram.webp">
+                                <img src="images/instagram.webp" alt="Instagram">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="tiktok.png">
+                                <img src="images/tiktok.png" alt="TikTok">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="line.png">
+                                <img src="images/line.png" alt="Line">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="spotify.webp">
+                                <img src="images/spotify.webp" alt="spotify">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="youtube.png">
+                                <img src="images/youtube.png" alt="youtube">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="twitter.png">
+                                <img src="images/twitter.png" alt="twitter">
+                            </label>
+                             <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="facebook.png">
+                                <img src="images/facebook.png" alt="facebook">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="snapchat.png">
+                                <img src="images/snapchat.png" alt="snapchat">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="LinkedIn.png">
+                                <img src="images/LinkedIn.png" alt="LinkedIn">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="whatsApp.png">
+                                <img src="images/whatsApp.png" alt="whatsApp">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="gmail.png">
+                                <img src="images/gmail.png" alt="gmail">
+                            </label>
+                             <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="joox.webp">
+                                <img src="images/joox.webp" alt="joox">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="telegram.png">
+                                <img src="images/telegram.png" alt="telegram">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="discord.png">
+                                <img src="images/discord.png" alt="discord">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Upload logo custom -->
+                    <div>
+                        <label for="logo-upload">Atau Upload Logo Sendiri (opsional):</label>
                         <input type="file" name="logo-upload" id="logo-upload" accept="image/*">
                     </div>
+
+                    <!-- Warna QR -->
                     <div>
-                        <!-- Memilih warna QRCode -->
                         <label for="color">Warna QR Code:</label>
                         <input type="color" name="color" id="color" value="#000000">
                     </div>
+
                     <div class="form-submit">
                         <button type="submit" class="btn">Generate QR Code</button>
                     </div>
                 </form>
             </div>
+
             <div class="outputsection">
                 <h3>Output QR Code</h3>
                 <div>
@@ -55,10 +122,10 @@
     </div>
 </section>
 <footer>
-    <div>
+    <!-- <div>
         Copyright &copy; 2024
         <a class="text-body" href="https://informatika.unpar.ac.id/">Informatika UNPAR</a>
-    </div>
+    </div> -->
 </footer>
 
 <script>
