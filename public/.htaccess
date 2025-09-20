@@ -1,0 +1,86 @@
+RewriteEngine On
+
+# Force HTTPS in production (uncomment for production)
+# RewriteCond %{HTTPS} off
+# RewriteCond %{HTTP_HOST} !^localhost
+# RewriteCond %{HTTP_HOST} !^127\.0\.0\.1
+# RewriteCond %{HTTP_HOST} !^192\.168\.
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Security headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+# Hide sensitive files
+<Files ~ "^\.">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files ~ "\.env$">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files ~ "composer\.(json|lock)$">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Block access to vendor directory from web
+RedirectMatch 403 ^/vendor/.*$
+
+# Block access to config directory from web
+RedirectMatch 403 ^/config/.*$
+
+# Block access to database directory from web
+RedirectMatch 403 ^/database/.*$
+
+# Block access to logs directory from web
+RedirectMatch 403 ^/logs/.*$
+
+# Handle short URL redirects
+# This rule handles short codes like: example.com/abc123
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/(css|js|images|fonts)/
+RewriteCond %{REQUEST_URI} !^/(index|generate|redirect)\.php
+RewriteCond %{REQUEST_URI} !^/favicon\.ico$
+RewriteRule ^([a-zA-Z0-9\-]{3,10})/?$ redirect.php?code=$1 [L,QSA]
+
+# Handle API endpoints (if you plan to add API functionality)
+RewriteRule ^api/(.*)$ api/index.php [L,QSA]
+
+# Compression for better performance
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# Browser caching for static files
+<IfModule mod_expires.c>
+    ExpiresActive on
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType font/woff "access plus 1 month"
+    ExpiresByType font/woff2 "access plus 1 month"
+</IfModule>
+
+# Error pages (optional)
+ErrorDocument 404 /index.php
+ErrorDocument 500 /index.php

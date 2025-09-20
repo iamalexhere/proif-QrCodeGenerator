@@ -1,5 +1,27 @@
 {
+    "name": "qr-generator/shortener",
+    "description": "QR Code Generator with Custom URL Shortener",
+    "type": "project",
     "require": {
-        "endroid/qr-code": "^5.1"
+        "php": ">=7.4",
+        "endroid/qr-code": "^5.1",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "QrGenerator\\": "src/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "php -r \"if (!file_exists('.env')) { copy('.env.example', '.env'); echo 'Created .env file from .env.example\\n'; }\""
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
     }
 }

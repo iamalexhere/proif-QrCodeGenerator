@@ -1,5 +1,6 @@
 <?php
 require '../vendor/autoload.php';
+require_once '../shorturl/UrlShortener.php';
 
 /*
 Menerima URL dari web, 
@@ -19,11 +20,15 @@ try {
     if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
         $longUrl = trim($_POST['url-input']);
 
-        // Buat shortlink via API v.gd
-        $shortUrl = file_get_contents('https://v.gd/create.php?format=simple&url=' . urlencode($longUrl));
-        if ($shortUrl === false || empty($shortUrl)) {
-            // akan melakukan fallback jika gagal
+        // Buat shortlink dengan custom URL shortener
+        try {
+            $urlShortener = new UrlShortener();
+            $result = $urlShortener->createShortUrl($longUrl);
+            $shortUrl = $result['short_url'];
+        } catch (Exception $e) {
+            // Fallback ke URL asli jika gagal
             $shortUrl = $longUrl;
+            error_log('URL shortener error: ' . $e->getMessage());
         }
 
         // Ambil warna dari input user
