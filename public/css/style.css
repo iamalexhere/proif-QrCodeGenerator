@@ -234,35 +234,75 @@ footer div {
 }
 
 
-/* Tambahan styling untuk pilihan logo */
+/* Container semua logo */
 .logo-options {
     display: flex;
-    gap: 15px;
-    margin: 10px 0;
     flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
 }
 
 .logo-option {
-    position: relative;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 8px;
     cursor: pointer;
-    border: 2px solid transparent;
-    border-radius: 10px;
-    padding: 5px;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    padding: 0 !important;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 .logo-option input[type="radio"] {
-    display: none;
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .logo-option img {
-    width: 60px;
-    height: 60px;
+    width: 32px !important;
+    height: 32px !important;
+    display: block !important;
     object-fit: contain;
+    transition: transform 0.3s ease;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none;
+    line-height: 0;
 }
 
+/* Efek hover pada kotak */
+.logo-option:hover {
+    border-color: #007BFF;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px);
+}
+
+/* Efek hover pada icon di dalam kotak */
+.logo-option:hover img {
+    transform: scale(1.2);
+}
+
+/* Efek ketika radio dipilih */
 .logo-option input[type="radio"]:checked+img {
-    border: 2px solid #007bff;
-    border-radius: 10px;
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 4px #007BFF);
+}
+
+.logo-option:has(input[type="radio"]:checked) {
+    border-color: #007BFF;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.7);
 }

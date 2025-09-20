@@ -1,3 +1,4 @@
+<!-- index.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,6 +86,44 @@
                                 <input type="radio" name="preset-logo" value="discord.png">
                                 <img src="images/discord.png" alt="discord">
                             </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="bitcoin.png">
+                                <img src="images/bitcoin.png" alt="bitcoin">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="gopay.png">
+                                <img src="images/gopay.png" alt="gopay">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="ovo.webp">
+                                <img src="images/ovo.webp" alt="ovo">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="dana.png">
+                                <img src="images/dana.png" alt="dana">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="wifi.png">
+                                <img src="images/wifi.png" alt="wifi">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="drive.png">
+                                <img src="images/drive.png" alt="drive">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="tokopedia.png">
+                                <img src="images/tokopedia.png" alt="tokopedia">
+                            </label>
+                            <label class="logo-option">
+                                <input type="radio" name="preset-logo" value="shopee.png">
+                                <img src="images/shopee.png" alt="shopee">
+                            </label>
+                        </div>
+                        <!-- Tombol untuk mengosongkan pilihan logo bawaan -->
+                        <div style="margin-top:10px;">
+                            <button type="button" id="resetLogo" class="btn btn-secondary">
+                                Tanpa Logo / Reset Pilihan
+                            </button>
                         </div>
                     </div>
 
@@ -129,6 +168,7 @@
 </footer>
 
 <script>
+// Event submit form QR
 document.getElementById('qrForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const formData = new FormData(this);
@@ -160,6 +200,17 @@ document.getElementById('qrForm').addEventListener('submit', function(event) {
         alert('Terjadi kesalahan saat mengirim data!');
         console.error('Error:', error);
     });
+});
+
+// Tombol untuk reset logo bawaan
+document.getElementById('resetLogo').addEventListener('click', function() {
+    // Berfungsi untuk menghilangkan semua radio button yang dipilij 
+    document.querySelectorAll('input[name="preset-logo"]').forEach(radio => {
+        radio.checked = false;
+    });
+
+    // Mengosongkan input file 
+    document.getElementById('logo-upload').value = '';
 });
 </script>
 </body>
