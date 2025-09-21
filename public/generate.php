@@ -14,10 +14,40 @@ use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\Color\Color;
 
+//KONEKSI KE DATABASE MYSQ
+$hostname = "localhost";
+$username = "root";
+$password = "";
+$database = "qrcode_db";
+$koneksi = new mysqli($hostname, $username, $password, $database);
+// Periksa koneksi
+if ($koneksi->connect_error) {
+    // Jika koneksi gagal, kirim response error dalam format JSON
+    ob_end_clean();
+    echo json_encode(['error' => 'Koneksi ke database gagal: ' . $koneksi->connect_error]);
+    exit; // Hentikan eksekusi skrip
+}
+
 try {
     //Menerima input pengguna 
     if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
         $longUrl = trim($_POST['url-input']);
+        $customUrlInput = isset($_POST['custom-url']) ? trim($_POST['custom-url']) : '';
+        $logoPathForDb = null; //Default --> path logo kosong
+
+        //UPLOAD LOGO KUSTOM
+        if (isset($_FILES['custom-logo']) && $_FILES['custom-logo']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = 'uploads/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true); // Buat folder jika belum ada
+            }
+            $fileName = uniqid() . '-' . basename($_FILES['custom-logo']['name']);
+            $uploadPath = $uploadDir . $fileName;
+
+            if (move_uploaded_file($_FILES['custom-logo']['tmp_name'], $uploadPath)) {
+                $logoPathForDb = $uploadPath; // Simpan path jika upload berhasil
+            }
+        }
 
         // Buat shortlink via API v.gd
         $shortUrl = file_get_contents('https://v.gd/create.php?format=simple&url=' . urlencode($longUrl));
