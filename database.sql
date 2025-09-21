@@ -6,7 +6,7 @@ USE qrcode_db;
 CREATE TABLE IF NOT EXISTS links (
     id INT AUTO_INCREMENT PRIMARY KEY,
     original_url TEXT NOT NULL,
-    short_url VARCHAR(255),
+    short_url VARCHAR(10) NOT NULL UNIQUE,
     custom_url VARCHAR(255),
     logo_path VARCHAR(500),
     qr_color VARCHAR(7) DEFAULT '#000000',

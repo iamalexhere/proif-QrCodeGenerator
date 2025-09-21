@@ -2,6 +2,8 @@
 
 // Memuat semua library dari Composer
 require '../vendor/autoload.php';
+require_once '../classes/UrlShortener.php';
+require_once '../config/Config.php';
 
 // Mengimpor class yang dibutuhkan
 use Endroid\QrCode\Color\Color;
@@ -9,20 +11,6 @@ use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\ErrorCorrectionLevel;
-
-// --- KONEKSI KE DATABASE MYSQL ---
-$hostname = "localhost";
-$username = "root";
-$password = "";
-$database = "qrcode_db";
-
-$koneksi = new mysqli($hostname, $username, $password, $database);
-if ($koneksi->connect_error) {
-    ob_end_clean();
-    echo json_encode(['error' => 'Koneksi ke database gagal: ' . $koneksi->connect_error]);
-    exit;
-}
-// -----------------------------------------
 
 try {
     if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
@@ -62,19 +50,17 @@ try {
                              ->setPunchoutBackground(true);
         }
 
-        // --- LOGIKA SHORT LINK (TANPA ALIAS KUSTOM) ---
+        // --- LOGIKA SHORT LINK DENGAN CUSTOM URL SHORTENER ---
         $customUrlInput = ''; 
-        $shortUrl = file_get_contents('https://v.gd/create.php?format=simple&url=' . urlencode($longUrl));
-        if ($shortUrl === false || strpos($shortUrl, 'Error:') === 0) {
+        try {
+            $urlShortener = new UrlShortener();
+            $result = $urlShortener->createShortUrl($longUrl, $customUrlInput, $logoPathForDb, $qrColor);
+            $shortUrl = $result['short_url'];
+        } catch (Exception $e) {
+            // Fallback ke URL asli jika gagal
             $shortUrl = $longUrl;
+            error_log('URL shortener error: ' . $e->getMessage());
         }
-
-        // --- SIMPAN DATA KE DATABASE (PASTIKAN NAMA KOLOM SUDAH BENAR) ---
-        $sql = "INSERT INTO links (original_url, short_url, custom_url, logo_path, qr_color) VALUES (?, ?, ?, ?, ?)";
-        $stmt = $koneksi->prepare($sql);
-        $stmt->bind_param("sssss", $longUrl, $shortUrl, $customUrlInput, $logoPathForDb, $qrColor);
-        $stmt->execute();
-        $stmt->close();
 
         // --- PEMBUATAN QR CODE ---
         function hexToColor(string $hex): Color {
@@ -115,6 +101,3 @@ try {
     ob_end_clean();
     echo json_encode(['error' => 'An error occurred: '.$e->getMessage()]);
 }
-
-// --- TUTUP KONEKSI DATABASE ---
-$koneksi->close();
