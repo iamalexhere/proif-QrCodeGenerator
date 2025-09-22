@@ -28,7 +28,7 @@ body {
     flex-wrap: wrap;
 }
 
-.inputsection{
+.inputsection {
     flex: 0 0 66.66667%;
     max-width: 66.66667%;
     border: 1px solid rgb(222, 226, 230);
@@ -49,7 +49,7 @@ body {
     height: auto;
 }
 
-.navbar>a{
+.navbar>a {
     color: #000;
     text-decoration: none;
     padding-left: 15px;
@@ -58,11 +58,11 @@ body {
 
 
 /* Form Styles */
-#qrForm{
+#qrForm {
     padding: 15px;
 }
 
-#qrForm *:not(:last-child){
+#qrForm *:not(:last-child) {
     padding-bottom: 15px;
 }
 
@@ -89,7 +89,7 @@ input[type="checkbox"] {
     justify-content: center;
 }
 
-.form-submit{
+.form-submit {
     display: flex;
     justify-content: center;
 }
@@ -121,14 +121,14 @@ input[type="checkbox"] {
     padding: 7px 10px;
 }
 
-.disabled{
+.disabled {
     opacity: 0.65;
     pointer-events: none;
 }
 
 
 /* Output Section */
-.outputsection{
+.outputsection {
     flex: 0 0 33.33333%;
     max-width: 33.33333%;
 }
@@ -147,7 +147,7 @@ h3 {
 
 
 /* Flex Utility Classes */
-.outputsection>div{
+.outputsection>div {
     display: flex;
     justify-content: center;
 }
@@ -162,11 +162,11 @@ footer {
     width: 100%;
 }
 
-footer div{
+footer div {
     padding: 1rem;
 }
 
-.text-body{
+.text-body {
     text-decoration: none;
     color: black;
 }
@@ -179,7 +179,7 @@ footer div{
         flex: 0 0 100%;
         max-width: 100%;
     }
-    
+
     .outputsection {
         flex: 0 0 100%;
         max-width: 100%;
@@ -194,7 +194,7 @@ footer div{
         text-align: center;
     }
 
-    .navbar > img {
+    .navbar>img {
         margin-bottom: 10px;
     }
 
@@ -202,7 +202,8 @@ footer div{
         flex-direction: column;
     }
 
-    .inputsection, .outputsection {
+    .inputsection,
+    .outputsection {
         max-width: 100%;
         flex: 0 0 100%;
     }
@@ -210,7 +211,7 @@ footer div{
     h3 {
         font-size: 20px;
     }
-    
+
     #qrImage {
         width: 200px;
     }
@@ -230,4 +231,78 @@ footer div{
         font-size: 16px;
         padding: 8px 15px;
     }
+}
+
+
+/* Container semua logo */
+.logo-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.logo-option {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    padding: 0 !important;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.logo-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.logo-option img {
+    width: 32px !important;
+    height: 32px !important;
+    display: block !important;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none;
+    line-height: 0;
+}
+
+/* Efek hover pada kotak */
+.logo-option:hover {
+    border-color: #007BFF;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px);
+}
+
+/* Efek hover pada icon di dalam kotak */
+.logo-option:hover img {
+    transform: scale(1.2);
+}
+
+/* Efek ketika radio dipilih */
+.logo-option input[type="radio"]:checked+img {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 4px #007BFF);
+}
+
+.logo-option:has(input[type="radio"]:checked) {
+    border-color: #007BFF;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.7);
 }

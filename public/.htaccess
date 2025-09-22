@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Handle short URL redirects
+RewriteRule ^r/([a-zA-Z0-9]+)/?$ r.php?code=$1 [L,QSA]
+
+# Optional: redirect to index.php for clean URLs
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [L,QSA]
