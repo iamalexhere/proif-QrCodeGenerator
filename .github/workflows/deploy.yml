@@ -15,6 +15,23 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Test SSH Connection
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.PRIVATE_KEY }}
+        port: ${{ secrets.PORT || 22 }}
+        debug: true
+        script: |
+          echo "✅ SSH connection successful!"
+          echo "Current user: $(whoami)"
+          echo "Current directory: $(pwd)"
+          echo "Server hostname: $(hostname)"
+          
     - name: Deploy to Server
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -22,25 +39,66 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.PRIVATE_KEY }}
         port: ${{ secrets.PORT || 22 }}
+        debug: true
         script: |
           # Navigate to project directory
+          echo "📂 Navigating to project directory: ${{ secrets.PROJECT_PATH }}"
           cd ${{ secrets.PROJECT_PATH }}
+          
+          # Verify we're in the right directory
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          
+          # Check git status
+          echo "🔍 Git status before pull:"
+          git status
           
           # Pull latest changes from main branch
           echo "🚀 Pulling latest changes..."
           git pull origin main
           
+          # Verify git pull success
+          echo "🔍 Git status after pull:"
+          git status
+          
+          # Check if composer.json exists
+          if [ ! -f "composer.json" ]; then
+            echo "❌ composer.json not found!"
+            exit 1
+          fi
+          
           # Install/update composer dependencies
           echo "📦 Installing composer dependencies..."
-          composer update
-          composer install --no-dev --optimize-autoloader --no-interaction
-
+          composer install --no-dev --optimize-autoloader --no-interaction --verbose
+          
+          # Verify composer install
+          if [ $? -eq 0 ]; then
+            echo "✅ Composer install successful"
+          else
+            echo "❌ Composer install failed"
+            exit 1
+          fi
+          
           # Run setup script to ensure configuration
-          echo "⚙️ Running setup script..."
-          php setup.php
+          if [ -f "setup.php" ]; then
+            echo "⚙️ Running setup script..."
+            php setup.php
+          else
+            echo "⚠️ setup.php not found, skipping..."
+          fi
+          
+          # Create uploads directory if it doesn't exist
+          echo "📁 Ensuring uploads directory exists..."
+          mkdir -p public/uploads
           
           # Set proper permissions for uploads directory
           echo "🔐 Setting permissions..."
           chmod -R 755 public/uploads
-                    
+          
+          # Verify final state
+          echo "🔍 Final verification:"
+          echo "Project directory: $(pwd)"
+          echo "Uploads directory permissions: $(ls -ld public/uploads)"
+          
           echo "✅ Deployment completed successfully!"
