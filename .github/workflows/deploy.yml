@@ -1,0 +1,46 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    types: [ closed ]
+
+jobs:
+  deploy:
+    # Only run on merged pull requests or direct pushes to main
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deploy to Server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.PRIVATE_KEY }}
+        port: ${{ secrets.PORT || 22 }}
+        script: |
+          # Navigate to project directory
+          cd ${{ secrets.PROJECT_PATH }}
+          
+          # Pull latest changes from main branch
+          echo "🚀 Pulling latest changes..."
+          git pull origin main
+          
+          # Install/update composer dependencies
+          echo "📦 Installing composer dependencies..."
+          composer update
+          composer install --no-dev --optimize-autoloader --no-interaction
+
+          # Run setup script to ensure configuration
+          echo "⚙️ Running setup script..."
+          php setup.php
+          
+          # Set proper permissions for uploads directory
+          echo "🔐 Setting permissions..."
+          chmod -R 755 public/uploads
+                    
+          echo "✅ Deployment completed successfully!"
