@@ -46,8 +46,7 @@ try {
         // Jika ada path logo yang terpilih dan filenya ada, siapkan objek Logo
         if ($logoPathForDb !== null && file_exists($logoPathForDb)) {
             $logoToUse = Logo::create($logoPathForDb)
-                             ->setResizeToWidth(70)
-                             ->setPunchoutBackground(true);
+                             ->setResizeToWidth(100);
         }
 
         // --- LOGIKA SHORT LINK DENGAN CUSTOM URL SHORTENER ---

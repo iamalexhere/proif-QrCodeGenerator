@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>IF Unpar QR Code Generator</title>
+    <title>QR Code Generator</title>
     <meta name="title" content="IF Unpar QR Code Generator">
     <meta name="description" content="Website untuk membuat QR Code dari URL">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +15,9 @@
     <header>
         <nav class="navbar">
             <img src='images/logoif.png'>
-            <a class="nav-link">QR Code Generator</a>
+            <a class="nav-link">
+                <div>QR Code Generator</div>
+            </a>
         </nav>
     </header>
     <section>
@@ -24,11 +26,11 @@
                 <div class="inputsection">
                     <form id="qrForm" method="post" enctype="multipart/form-data">
                         <div>
-                            <label class="url-input" for="url-input">URL</label>
-                            <input type="url" name="url-input" id="url-input" class="form-control" placeholder="Tulis URL anda di sini" required>
+                            <label class="url-input" for="url-input">Website URL</label>
+                            <input type="url" name="url-input" id="url-input" class="form-control" placeholder="https://www.your-website.com" required>
                         </div>
 
-                        <p>Pilih Logo Bawaan:</p>
+                        <p>Add logo on image:</p>
                         <div class="logo-options">
                             <label class="logo-option">
                                 <input type="radio" name="default-logo" value="instagram.webp">
@@ -116,19 +118,19 @@
                             </label>
                         </div>
                         
-                        <button type="button" id="reset-logo" class="btn" style="background-color: #6c757d;">Tanpa Logo / Reset Pilihan</button>
+                        <button type="button" id="reset-logo" class="btn" style="background-color: #6c757d;">Reset logo</button>
 
                         <div style="padding-top: 15px;">
-                            <label class="url-input" for="custom-logo">Atau Upload Logo Sendiri (opsional):</label>
+                            <label class="url-input" for="custom-logo">Upload your own logo:</label>
                             <input type="file" name="custom-logo" id="custom-logo" class="form-control" accept="image/png, image/jpeg">
                         </div>
 
                         <div style="padding-top: 15px;">
-                            <label class="url-input" for="qr_color">Warna QR Code:</label>
+                            <label class="url-input" for="qr_color">QR Code color:</label>
                             <input type="color" name="qr_color" id="qr_color" value="#000000">
                         </div>
                         
-                        <div class="form-submit" style="padding-top: 15px;"> 
+                        <div class="form-submit"> 
                             <button type="submit" class="btn">Generate QR Code</button>
                         </div>
                     </form>
@@ -137,13 +139,16 @@
                 <div class="outputsection">
                     <h3>Output QR Code</h3>
                     <div>
-                        <img id="qrImage" src=''>
+                        <img id="qrImage" src='images/base.png'>
                     </div>
-                    <div id="short-link-container" style="margin-top: 15px; text-align: center; word-break: break-all;"></div>
-                    <div>
-                        <a id="download-link" class="btn disabled">
-                            Download PNG
-                        </a>
+                    <div class=link-container>
+                        <div id="short-link-container">Short Link:<a href="http://qrcode.alexhere.me/r/bLVNjS" target="_blank">
+    http://qrcode.alexhere.me/r/bLVNjS</a></div>
+                        <div id=download-link-container>
+                            <a id="download-link" class="btn">
+                                <div>Download PNG</div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -218,7 +223,7 @@
                     qrImage.style.opacity = 1;
 
                     if (data.short_link) {
-                        shortLinkContainer.innerHTML = `Short Link: <a href="${data.short_link}" target="_blank">${data.short_link}</a>`;
+                        shortLinkContainer.innerHTML = `Short Link:<a href="${data.short_link}" target="_blank">${data.short_link}</a>`;
                     }
                 }
             })

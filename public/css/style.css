@@ -15,8 +15,9 @@ body {
 /* Container */
 .container {
     width: 100%;
-    max-width: 1140px;
-    padding: 15px;
+    max-width: 1340px;
+    padding: 10px;
+    padding-top: 50px;
     margin-right: auto;
     margin-left: auto;
 }
@@ -33,6 +34,9 @@ body {
     max-width: 66.66667%;
     border: 1px solid rgb(222, 226, 230);
     padding: 15px;
+    border-radius: 0.25rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 
@@ -40,7 +44,7 @@ body {
 .navbar {
     display: flex;
     align-items: center;
-    padding: 0.5rem 1rem;
+    padding: 1.755rem 3rem;
     background-color: #ebedf0;
 }
 
@@ -56,14 +60,14 @@ body {
     display: flex;
 }
 
+.nav-link > div{
+    font-size: 22px;
+    font-weight: 600; 
+}
 
 /* Form Styles */
 #qrForm {
     padding: 15px;
-}
-
-#qrForm *:not(:last-child) {
-    padding-bottom: 15px;
 }
 
 .form-control {
@@ -92,8 +96,13 @@ input[type="checkbox"] {
 .form-submit {
     display: flex;
     justify-content: center;
+    margin-top: 35px;
 }
 
+#url-input{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 
 /* Button Styles */
 .btn {
@@ -117,8 +126,14 @@ input[type="checkbox"] {
 }
 
 #download-link {
-    font-size: 16px;
-    padding: 7px 10px;
+    width: 100%;
+    justify-content: center;
+}
+
+#download-link > div{
+    font-weight: 400;
+    font-size: 20px;
+    /* padding: 7px 10px; */
 }
 
 .disabled {
@@ -126,33 +141,57 @@ input[type="checkbox"] {
     pointer-events: none;
 }
 
-
 /* Output Section */
 .outputsection {
     flex: 0 0 33.33333%;
     max-width: 33.33333%;
+    border: 1px solid rgb(222, 226, 230);
+    border-left: none;
+    border-radius: 0.25rem;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.shortlinkcontainer {
+    margin-top: 15px;
+    text-align: center; 
+    word-break: break-all;
 }
 
 h3 {
+    padding: 20px;
     text-align: center;
     font-size: 25px;
 }
 
 #qrImage {
+    min-height: 250px; /*Sesuai ukuran Qr-code  */
     max-width: 100%;
     height: auto;
     width: 250px;
     opacity: 1;
 }
 
-
 /* Flex Utility Classes */
 .outputsection>div {
     display: flex;
     justify-content: center;
+    padding: 30px;
 }
 
+#short-link-container{
+    text-align: center;
+    min-height: 58.4px;
+}
 
+.link-container{
+    height: auto;
+    flex-direction: column;
+    margin-bottom: 30px;
+}
 /* Footer */
 footer {
     background-color: #ebedf0;
@@ -170,6 +209,8 @@ footer div {
     text-decoration: none;
     color: black;
 }
+
+
 
 /* for Responsive */
 
@@ -250,7 +291,7 @@ footer div {
     height: 60px;
     background-color: #fff;
     border: 2px solid #ccc;
-    border-radius: 8px;
+    border-radius: 0.25rem;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
