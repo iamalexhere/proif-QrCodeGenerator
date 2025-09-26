@@ -4,27 +4,29 @@
   <meta charset="UTF-8">
   <title>Dashboard QR Code</title>
   <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    /* CSS tambahan khusus untuk halaman Pause */
+    .btn-edit,
+    .btn-download {
+      pointer-events: none;      /* tidak bisa di klik */
+      opacity: 0.5;              /* kelihatan abu-abu */
+      cursor: not-allowed;       /* cursor tanda larangan */
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="menu-top">
-        <a href="#" class="menu-link active">All QR Codes</a>
-        <a href="#" class="menu-link">Active</a>
-        <a href="#" class="menu-link">Paused</a>
-      </div>
-      <div class="menu-bottom">
-        <p class="trial-text">Start free trial for 7 days</p>
-        <a href="payment.php" class="btn-upgrade">Upgrade</a>
-      </div>
-    </aside>
+
+    <!-- Sidebar include -->
+    <?php include 'sidebar.php'; ?>
 
     <!-- Main Content -->
     <div class="main-content">
       <header class="navbar">
-        <button class="btn-toggle" id="toggleBtn">☰</button>
-        <div class="logo">QR Code Generator PRO</div>
+        <div class="left-nav">
+          <button class="btn-toggle" id="toggleBtn">☰</button>
+          <div class="logo">QR Code Generator PRO</div>
+        </div>
         <div class="user-account">
           <img src="images/user.png" alt="User" class="user-avatar">
           <span class="user-name">John Doe</span>
@@ -39,9 +41,11 @@
         <!-- Card 1 -->
         <div class="qr-card">
           <div class="qr-info">
+            <label class="label">Original URL</label>
             <p class="url">https://example.com</p>
+            <label class="label">Short Link</label>
             <a href="#" class="short">short.ly/abc123</a>
-            <p class="scans">3 scans</p>
+            <p class="scans"><strong>3</strong> scans</p>
           </div>
           <div class="actions">
             <a href="edit.php?code=abc123" class="btn-edit">Edit</a>
@@ -55,9 +59,11 @@
         <!-- Card 2 -->
         <div class="qr-card">
           <div class="qr-info">
+            <label class="label">Original URL</label>
             <p class="url">https://binus.ac.id/</p>
+            <label class="label">Short Link</label>
             <a href="#" class="short">short.ly/xyz999</a>
-            <p class="scans">12 scans</p>
+            <p class="scans"><strong>12</strong> scans</p>
           </div>
           <div class="actions">
             <a href="edit.php?code=xyz999" class="btn-edit">Edit</a>

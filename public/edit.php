@@ -1,3 +1,9 @@
+<?php
+// edit.php
+// Tangkap parameter kode QR dan halaman asal
+$code       = $_GET['code'] ?? '';                   // short code QR
+$returnPage = $_GET['return'] ?? 'dashboardAll.php'; // default balik ke dashboardAll
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,18 +14,22 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <!-- Navbar dengan tombol back dinamis -->
   <header class="navbar">
     <div class="logo">QR Code Generator</div>
-    <a href="dashboard.php" class="btn-back">&larr; Back to Dashboard</a>
+    <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
   </header>
 
   <main class="edit-container">
     <!-- Kiri: QR Code + form edit -->
     <section class="edit-left">
+      <!-- QR Code Image -->
       <img src="images/sample_qr.png" alt="QR Code" class="qr-image">
       <div class="qr-details">
-        <p><strong>Short Link:</strong> short.ly/abc123</p>
-        <form class="edit-form">
+        <p><strong>Short Link:</strong> short.ly/<?php echo htmlspecialchars($code); ?></p>
+        <form class="edit-form" method="post" action="save_edit.php">
+          <input type="hidden" name="code" value="<?php echo htmlspecialchars($code); ?>">
+          <input type="hidden" name="return" value="<?php echo htmlspecialchars($returnPage); ?>">
           <label for="url">Destination URL:</label>
           <input type="text" id="url" name="url" value="https://example.com">
           <button type="submit">Save Changes</button>

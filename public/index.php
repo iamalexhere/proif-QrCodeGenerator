@@ -9,7 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="images/logoif.png" type="image/x-icon">
-    <a href="dashboard.php"> Lihat Statistik
 </head>
 
 <body>
@@ -19,6 +18,8 @@
             <a class="nav-link">
                 <div>QR Code Generator</div>
             </a>
+
+            <a href="dashboardAll.php" class="btn-pro">Try QRCode Generator PRO</a>
         </nav>
     </header>
     <section>

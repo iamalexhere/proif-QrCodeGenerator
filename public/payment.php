@@ -9,7 +9,7 @@
 <body>
   <!-- Header dengan tombol back -->
   <header class="pricing-header">
-    <a href="dashboard.php" style="text-decoration:none;display:inline-block;background:#00aaff;color:#fff;padding:6px 12px;border-radius:6px;font-weight:bold;margin-bottom:10px;">
+    <a href="dashboardAll.php" style="text-decoration:none;display:inline-block;background:#00aaff;color:#fff;padding:6px 12px;border-radius:6px;font-weight:bold;margin-bottom:10px;">
       ← Back to Dashboard
     </a>
     <h1>Plans & Pricing</h1>

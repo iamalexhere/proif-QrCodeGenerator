@@ -21,6 +21,7 @@ body {
     flex-direction: column;
     justify-content: space-between;
     padding: 20px 15px;
+    box-sizing: border-box;
     transition: width 0.3s ease;
 }
 
@@ -75,7 +76,12 @@ body {
     border-radius: 6px;
     cursor: pointer;
     width: 100%;
+    max-width: 190px;
+    /* supaya tidak melebar keluar sidebar */
     font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    box-sizing: border-box;
 }
 
 /* Main Content */
@@ -89,15 +95,21 @@ body {
 /* Navbar top */
 .navbar {
     background: #fff;
-    padding: 15px 30px;
+    padding: 10px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #ddd;
 }
 
+.left-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
 .navbar .logo {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: bold;
 }
 
@@ -106,7 +118,6 @@ body {
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    margin-right: 15px;
 }
 
 .user-account {
@@ -129,15 +140,21 @@ body {
 
 /* Create button under navbar */
 .content-header {
-    padding: 15px 30px;
+    padding: 20px 30px 15px 30px;
+    /* jarak atas lebih besar supaya turun */
+    display: flex;
+    justify-content: flex-end;
 }
 
 .btn-create {
     background: #28a745;
     color: #fff;
-    padding: 8px 15px;
+    padding: 10px 18px;
     border-radius: 4px;
     text-decoration: none;
+    display: inline-block;
+    margin-top: 5px;
+    /* jarak ke bawah navbar */
 }
 
 /* Dashboard (cards) */
@@ -145,7 +162,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding: 0 30px 30px 30px;
+    padding: 10px 30px 30px 30px;
+    /* padding atas supaya kartu turun */
 }
 
 /* QR Card styling */
@@ -156,8 +174,7 @@ body {
     padding: 20px;
     display: grid;
     grid-template-columns: 1fr auto auto;
-    /* info - actions - image */
-    align-items: center;
+    align-items: start;
     gap: 20px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s, box-shadow 0.2s;
@@ -169,11 +186,23 @@ body {
 }
 
 /* Info text */
+.qr-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.qr-info .label {
+    font-size: 0.75rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .qr-info .url {
     font-size: 1rem;
     color: #333;
     font-weight: 500;
-    margin-bottom: 5px;
     word-break: break-word;
 }
 
@@ -181,8 +210,6 @@ body {
     font-size: 0.9rem;
     color: #007bff;
     text-decoration: none;
-    display: inline-block;
-    margin-bottom: 5px;
 }
 
 .qr-info .scans {
@@ -216,6 +243,14 @@ body {
     cursor: pointer;
     font-size: 0.85rem;
     text-align: center;
+}
+
+/* Jika ingin tombol disabled untuk dashboardPause */
+.actions .btn-edit.disabled,
+.actions .btn-download.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* QR image */
