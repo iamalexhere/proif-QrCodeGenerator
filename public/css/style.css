@@ -60,9 +60,9 @@ body {
     display: flex;
 }
 
-.nav-link > div{
+.nav-link>div {
     font-size: 22px;
-    font-weight: 600; 
+    font-weight: 600;
 }
 
 /* Form Styles */
@@ -99,7 +99,7 @@ input[type="checkbox"] {
     margin-top: 35px;
 }
 
-#url-input{
+#url-input {
     margin-top: 10px;
     margin-bottom: 10px;
 }
@@ -130,7 +130,7 @@ input[type="checkbox"] {
     justify-content: center;
 }
 
-#download-link > div{
+#download-link>div {
     font-weight: 400;
     font-size: 20px;
     /* padding: 7px 10px; */
@@ -157,7 +157,7 @@ input[type="checkbox"] {
 
 .shortlinkcontainer {
     margin-top: 15px;
-    text-align: center; 
+    text-align: center;
     word-break: break-all;
 }
 
@@ -168,7 +168,8 @@ h3 {
 }
 
 #qrImage {
-    min-height: 250px; /*Sesuai ukuran Qr-code  */
+    min-height: 250px;
+    /*Sesuai ukuran Qr-code  */
     max-width: 100%;
     height: auto;
     width: 250px;
@@ -182,16 +183,17 @@ h3 {
     padding: 30px;
 }
 
-#short-link-container{
+#short-link-container {
     text-align: center;
     min-height: 58.4px;
 }
 
-.link-container{
+.link-container {
     height: auto;
     flex-direction: column;
     margin-bottom: 30px;
 }
+
 /* Footer */
 footer {
     background-color: #ebedf0;

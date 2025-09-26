@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="images/logoif.png" type="image/x-icon">
+    <a href="dashboard.php"> Lihat Statistik
 </head>
 
 <body>
