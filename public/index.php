@@ -142,11 +142,16 @@
                         <img id="qrImage" src='images/base.png'>
                     </div>
                     <div class=link-container>
-                        <div id="short-link-container">Short Link:<a href="http://qrcode.alexhere.me/r/bLVNjS" target="_blank">
-    http://qrcode.alexhere.me/r/bLVNjS</a></div>
-                        <div id=download-link-container>
-                            <a id="download-link" class="btn">
+                        <div id="short-link-container">Short Link:<a href="" target="_blank"></a></div>
+                        <div id="download-links-container">
+                            <a id="download-png" class="btn" style="margin-right: 10px;">
                                 <div>Download PNG</div>
+                            </a>
+                            <a id="download-svg" class="btn" style="margin-right: 10px; background-color: #28a745;">
+                                <div>Download SVG</div>
+                            </a>
+                            <a id="download-pdf" class="btn" style="background-color: #dc3545;">
+                                <div>Download PDF</div>
                             </a>
                         </div>
                     </div>
@@ -168,6 +173,13 @@
         const customLogoInput = document.getElementById('custom-logo');
         const defaultLogoRadios = document.querySelectorAll('input[name="default-logo"]');
         const resetLogoButton = document.getElementById('reset-logo');
+
+        // Variabel untuk menyimpan data QR code dalam berbagai format
+        let qrData = {
+            png: null,
+            svg: null,
+            pdf: null
+        };
 
         // Fungsi untuk mereset pilihan radio logo bawaan
         function deselectDefaultLogos() {
@@ -194,44 +206,180 @@
             customLogoInput.value = '';
         });
 
-        qrForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(this);
+        // Fungsi untuk generate QR code dalam format tertentu
+        async function generateQRCode(format) {
+            const formData = new FormData(qrForm);
+            formData.set('format', format);
 
+            try {
+                const response = await fetch('generate.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                console.log(`Generated ${format} successfully:`, {
+                    format: data.format,
+                    size: data.image ? data.image.length : 0,
+                    mimeType: data.mime_type
+                });
+                
+                return data;
+            } catch (error) {
+                console.error('Error generating QR code:', error);
+                throw error;
+            }
+        }
+
+        // Fungsi untuk download file
+        function downloadFile(dataUrl, filename, mimeType) {
+            try {
+                // For PDF files, use blob approach for better compatibility
+                if (mimeType === 'application/pdf') {
+                    // Extract base64 data from data URL
+                    const base64Data = dataUrl.split(',')[1];
+                    const byteCharacters = atob(base64Data);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: mimeType });
+                    
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    // For other file types, use the simple approach
+                    const link = document.createElement('a');
+                    link.href = dataUrl;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            } catch (error) {
+                console.error('Download error:', error);
+                throw new Error('Failed to download file: ' + error.message);
+            }
+        }
+
+        // Event listener untuk form submit (generate PNG)
+        qrForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
             const qrImage = document.getElementById('qrImage');
-            const downloadLink = document.getElementById('download-link');
+            const downloadPng = document.getElementById('download-png');
+            const downloadSvg = document.getElementById('download-svg');
+            const downloadPdf = document.getElementById('download-pdf');
             const shortLinkContainer = document.getElementById('short-link-container');
             
+            // Reset UI
             qrImage.style.opacity = 0.5;
-            downloadLink.classList.add('disabled');
+            [downloadPng, downloadSvg, downloadPdf].forEach(btn => btn.classList.add('disabled'));
             shortLinkContainer.innerHTML = 'Memproses...';
 
-            fetch('generate.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                    shortLinkContainer.innerHTML = '';
-                } else {
-                    qrImage.src = 'data:image/png;base64,' + data.image;
-                    downloadLink.href = 'data:image/png;base64,' + data.image;
-                    downloadLink.setAttribute('download', 'qr_code.png');
-                    downloadLink.classList.remove('disabled');
-                    qrImage.style.opacity = 1;
-
-                    if (data.short_link) {
-                        shortLinkContainer.innerHTML = `Short Link:<a href="${data.short_link}" target="_blank">${data.short_link}</a>`;
-                    }
+            try {
+                // Generate PNG first (untuk preview)
+                const pngData = await generateQRCode('png');
+                
+                // Update UI dengan PNG
+                qrImage.src = 'data:image/png;base64,' + pngData.image;
+                qrImage.style.opacity = 1;
+                
+                // Update short link
+                if (pngData.short_link) {
+                    shortLinkContainer.innerHTML = `Short Link:<a href="${pngData.short_link}" target="_blank">${pngData.short_link}</a>`;
                 }
-            })
-            .catch(error => {
+                
+                // Store PNG data
+                qrData.png = pngData;
+                
+                // Enable download buttons
+                [downloadPng, downloadSvg, downloadPdf].forEach(btn => btn.classList.remove('disabled'));
+                
+            } catch (error) {
                 alert('Terjadi kesalahan saat mengirim data!');
                 console.error('Error:', error);
                 shortLinkContainer.innerHTML = 'Gagal memproses permintaan.';
-            });
+            }
+        });
+
+        // Event listener untuk download PNG
+        document.getElementById('download-png').addEventListener('click', async function(e) {
+            e.preventDefault();
+            if (this.classList.contains('disabled')) return;
+            
+            try {
+                if (!qrData.png) {
+                    qrData.png = await generateQRCode('png');
+                }
+                const dataUrl = `data:${qrData.png.mime_type};base64,${qrData.png.image}`;
+                downloadFile(dataUrl, `qr_code.${qrData.png.file_extension}`, qrData.png.mime_type);
+            } catch (error) {
+                alert('Gagal mengunduh file PNG!');
+            }
+        });
+
+        // Event listener untuk download SVG
+        document.getElementById('download-svg').addEventListener('click', async function(e) {
+            e.preventDefault();
+            if (this.classList.contains('disabled')) return;
+            
+            try {
+                if (!qrData.svg) {
+                    this.innerHTML = '<div>Generating SVG...</div>';
+                    qrData.svg = await generateQRCode('svg');
+                    this.innerHTML = '<div>Download SVG</div>';
+                }
+                const dataUrl = `data:${qrData.svg.mime_type};base64,${qrData.svg.image}`;
+                downloadFile(dataUrl, `qr_code.${qrData.svg.file_extension}`, qrData.svg.mime_type);
+            } catch (error) {
+                alert('Gagal mengunduh file SVG!');
+                this.innerHTML = '<div>Download SVG</div>';
+            }
+        });
+
+        // Event listener untuk download PDF
+        document.getElementById('download-pdf').addEventListener('click', async function(e) {
+            e.preventDefault();
+            if (this.classList.contains('disabled')) return;
+            
+            try {
+                if (!qrData.pdf) {
+                    this.innerHTML = '<div>Generating PDF...</div>';
+                    qrData.pdf = await generateQRCode('pdf');
+                    this.innerHTML = '<div>Download PDF</div>';
+                }
+                
+                // Check if PDF data is valid
+                if (!qrData.pdf.image) {
+                    throw new Error('PDF data is empty');
+                }
+                
+                console.log('PDF size:', qrData.pdf.image.length, 'chars');
+                const dataUrl = `data:${qrData.pdf.mime_type};base64,${qrData.pdf.image}`;
+                await downloadFile(dataUrl, `qr_code.${qrData.pdf.file_extension}`, qrData.pdf.mime_type);
+                
+            } catch (error) {
+                console.error('PDF download error:', error);
+                alert('Gagal mengunduh file PDF: ' + error.message);
+                this.innerHTML = '<div>Download PDF</div>';
+            }
         });
     });
     </script>

@@ -125,6 +125,49 @@ input[type="checkbox"] {
     background-color: #0056b3;
 }
 
+#download-links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#download-links-container .btn {
+    width: 100%;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+#download-links-container .btn:disabled,
+#download-links-container .btn.disabled {
+    opacity: 0.65;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Responsive for download buttons */
+@media (min-width: 768px) {
+    #download-links-container {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    #download-links-container .btn {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: calc(33.333% - 6px);
+        margin: 0;
+        font-size: 14px;
+        padding: 8px 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
 #download-link {
     width: 100%;
     justify-content: center;
@@ -260,6 +303,17 @@ footer div {
     .btn {
         font-size: 18px;
     }
+    
+    #download-links-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    #download-links-container .btn {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+    }
 }
 
 /* Small Mobile View */
@@ -271,6 +325,20 @@ footer div {
     .btn {
         font-size: 16px;
         padding: 8px 15px;
+    }
+    
+    #download-links-container .btn {
+        font-size: 14px;
+        padding: 8px 10px;
+    }
+}
+
+/* Medium screens - tablet landscape */
+@media (min-width: 768px) and (max-width: 1024px) {
+    #download-links-container .btn {
+        font-size: 13px;
+        padding: 8px 10px;
+        max-width: calc(33.333% - 5px);
     }
 }
 
