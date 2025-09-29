@@ -52,6 +52,10 @@ try {
     $tampilkanIklan = true;
     $waktuTampilIklan = (int) Config::get('AD_DISPLAY_TIME', 3); // detik
     
+    // Get AdSense configuration
+    $adSenseConfig = Config::getAdSenseConfig();
+    $adSenseEnabled = Config::isAdSenseEnabled();
+    
     // Kondisi untuk skip iklan:
     // 1. Parameter skip_ads=1 di URL
     // 2. Iklan dinonaktifkan
@@ -79,6 +83,22 @@ try {
     <!-- Meta tags SEO -->
     <meta name="robots" content="noindex, nofollow">
     <meta name="description" content="Anda sedang dialihkan ke tujuan Anda.">
+    
+    <?php if ($adSenseEnabled): ?>
+    <!-- Google AdSense Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=<?php echo htmlspecialchars($adSenseConfig['client_id']); ?>"
+            crossorigin="anonymous"></script>
+    
+    <?php if ($adSenseConfig['auto_ads']): ?>
+    <!-- AdSense Auto Ads -->
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "<?php echo htmlspecialchars($adSenseConfig['client_id']); ?>",
+              enable_page_level_ads: true
+         });
+    </script>
+    <?php endif; ?>
+    <?php endif; ?>
     
     <style>
         /* === RESET DASAR === */
@@ -179,6 +199,19 @@ try {
             text-transform: uppercase;
         }
         
+        /* === MOBILE AD CONTAINER === */
+        .mobile-ad-container {
+            margin: 2rem 0;
+            text-align: center;
+            display: none; /* Hidden by default, shown on mobile */
+        }
+        
+        /* === ADSENSE STYLING === */
+        .adsbygoogle {
+            display: block;
+            margin: 0 auto;
+        }
+        
         /* === PROGRESS BAR === */
         .progress-bar {
             width: 100%;
@@ -261,6 +294,16 @@ try {
                 padding: 0.8rem 1.5rem;
                 font-size: 0.9rem;
             }
+            
+            /* Show mobile ad on mobile devices */
+            .mobile-ad-container {
+                display: block;
+            }
+            
+            /* Hide main ad container on very small screens if mobile ad is present */
+            .ad-container {
+                min-height: 200px;
+            }
         }
     </style>
 </head>
@@ -291,16 +334,56 @@ try {
         
         <!-- Container Iklan -->
         <div class="ad-container" id="ad-container">
-            <div class="ad-placeholder">
-                <h3>Ruang Iklan</h3>
-                <p>Konten Anda akan segera dimuat...</p>
-            </div>
+            <?php if ($adSenseEnabled && !empty($adSenseConfig['rectangle_slot'])): ?>
+                <!-- Google AdSense Rectangle Ad (300x250) -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="<?php echo htmlspecialchars($adSenseConfig['client_id']); ?>"
+                     data-ad-slot="<?php echo htmlspecialchars($adSenseConfig['rectangle_slot']); ?>"
+                     data-ad-format="rectangle"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            <?php elseif ($adSenseEnabled && !empty($adSenseConfig['banner_slot'])): ?>
+                <!-- Google AdSense Banner Ad (728x90 or responsive) -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="<?php echo htmlspecialchars($adSenseConfig['client_id']); ?>"
+                     data-ad-slot="<?php echo htmlspecialchars($adSenseConfig['banner_slot']); ?>"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            <?php else: ?>
+                <!-- Fallback placeholder -->
+                <div class="ad-placeholder">
+                    <h3>Ruang Iklan</h3>
+                    <p>Konten Anda akan segera dimuat...</p>
+                </div>
+            <?php endif; ?>
         </div>
         
         <!-- Info URL Tujuan -->
         <div class="destination-url">
             <strong>Tujuan:</strong> <?php echo htmlspecialchars($urlAsli); ?>
         </div>
+        
+        <?php if ($adSenseEnabled && !empty($adSenseConfig['mobile_banner_slot'])): ?>
+        <!-- Mobile AdSense Banner (shown only on mobile) -->
+        <div class="mobile-ad-container">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="<?php echo htmlspecialchars($adSenseConfig['client_id']); ?>"
+                 data-ad-slot="<?php echo htmlspecialchars($adSenseConfig['mobile_banner_slot']); ?>"
+                 data-ad-format="banner"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+        <?php endif; ?>
         
         <!-- Tombol Skip -->
         <a href="<?php echo htmlspecialchars($urlAsli); ?>" class="skip-button" id="skip-button">

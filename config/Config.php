@@ -47,4 +47,28 @@ class Config {
             'password' => self::get('DB_PASS', '')
         ];
     }
+    
+    /**
+     * Get Google AdSense configuration
+     * @return array AdSense configuration settings
+     */
+    public static function getAdSenseConfig() {
+        return [
+            'enabled' => filter_var(self::get('ADSENSE_ENABLED', 'false'), FILTER_VALIDATE_BOOLEAN),
+            'client_id' => self::get('ADSENSE_CLIENT_ID', ''),
+            'banner_slot' => self::get('ADSENSE_BANNER_SLOT', ''),
+            'rectangle_slot' => self::get('ADSENSE_RECTANGLE_SLOT', ''),
+            'mobile_banner_slot' => self::get('ADSENSE_MOBILE_BANNER_SLOT', ''),
+            'auto_ads' => filter_var(self::get('ADSENSE_AUTO_ADS', 'false'), FILTER_VALIDATE_BOOLEAN)
+        ];
+    }
+    
+    /**
+     * Check if AdSense is enabled and properly configured
+     * @return bool
+     */
+    public static function isAdSenseEnabled() {
+        $config = self::getAdSenseConfig();
+        return $config['enabled'] && !empty($config['client_id']);
+    }
 }
