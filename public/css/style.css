@@ -130,6 +130,7 @@ input[type="checkbox"] {
     flex-direction: column;
     gap: 10px;
     width: 100%;
+    box-sizing: border-box;
 }
 
 #download-links-container .btn {
@@ -149,20 +150,21 @@ input[type="checkbox"] {
 @media (min-width: 768px) {
     #download-links-container {
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
     }
     
     #download-links-container .btn {
-        flex: 1;
-        margin: 0 5px;
-    }
-    
-    #download-links-container .btn:first-child {
-        margin-left: 0;
-    }
-    
-    #download-links-container .btn:last-child {
-        margin-right: 0;
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: calc(33.333% - 6px);
+        margin: 0;
+        font-size: 14px;
+        padding: 8px 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 
@@ -301,6 +303,17 @@ footer div {
     .btn {
         font-size: 18px;
     }
+    
+    #download-links-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    #download-links-container .btn {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+    }
 }
 
 /* Small Mobile View */
@@ -312,6 +325,20 @@ footer div {
     .btn {
         font-size: 16px;
         padding: 8px 15px;
+    }
+    
+    #download-links-container .btn {
+        font-size: 14px;
+        padding: 8px 10px;
+    }
+}
+
+/* Medium screens - tablet landscape */
+@media (min-width: 768px) and (max-width: 1024px) {
+    #download-links-container .btn {
+        font-size: 13px;
+        padding: 8px 10px;
+        max-width: calc(33.333% - 5px);
     }
 }
 

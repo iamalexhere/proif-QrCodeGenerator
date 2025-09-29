@@ -142,8 +142,7 @@
                         <img id="qrImage" src='images/base.png'>
                     </div>
                     <div class=link-container>
-                        <div id="short-link-container">Short Link:<a href="http://qrcode.alexhere.me/r/bLVNjS" target="_blank">
-    http://qrcode.alexhere.me/r/bLVNjS</a></div>
+                        <div id="short-link-container">Short Link:<a href="" target="_blank"></a></div>
                         <div id="download-links-container">
                             <a id="download-png" class="btn" style="margin-right: 10px;">
                                 <div>Download PNG</div>
