@@ -24,7 +24,7 @@ $returnPage = $_GET['return'] ?? 'dashboardAll.php'; // default balik ke dashboa
     <!-- Kiri: QR Code + form edit -->
     <section class="edit-left">
       <!-- QR Code Image -->
-      <img src="images/sample_qr.png" alt="QR Code" class="qr-image">
+      <img src="images/base.png" alt="QR Code" class="qr-image">
       <div class="qr-details">
         <p><strong>Short Link:</strong> short.ly/<?php echo htmlspecialchars($code); ?></p>
         <form class="edit-form" method="post" action="save_edit.php">
