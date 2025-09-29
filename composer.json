@@ -1,5 +1,6 @@
 {
     "require": {
-        "endroid/qr-code": "^5.1"
+        "endroid/qr-code": "^5.1",
+        "tecnickcom/tcpdf": "^6.6"
     }
 }

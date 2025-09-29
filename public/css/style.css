@@ -125,6 +125,47 @@ input[type="checkbox"] {
     background-color: #0056b3;
 }
 
+#download-links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+#download-links-container .btn {
+    width: 100%;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+#download-links-container .btn:disabled,
+#download-links-container .btn.disabled {
+    opacity: 0.65;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Responsive for download buttons */
+@media (min-width: 768px) {
+    #download-links-container {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    #download-links-container .btn {
+        flex: 1;
+        margin: 0 5px;
+    }
+    
+    #download-links-container .btn:first-child {
+        margin-left: 0;
+    }
+    
+    #download-links-container .btn:last-child {
+        margin-right: 0;
+    }
+}
+
 #download-link {
     width: 100%;
     justify-content: center;
