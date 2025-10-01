@@ -1,4 +1,34 @@
 <?php
+
+//Koneksi db
+require_once __DIR__ . '/../classes/Database.php';
+
+// Mengambil instance koneksi database
+$db = Database::getInstance()->getConnection();
+
+// Menyiapkan dan menjalankan query untuk mengambil semua data dari tabel 'links'
+$result = $db->query("SELECT * FROM links ORDER BY created_at DESC");
+
+// Menyimpan semua hasil query ke dalam sebuah array
+$links = [];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $links[] = $row;
+    }
+}
+
+// Menghitung jumlah total, QR aktif, dan QR yang dijeda
+$total_qrs = count($links);
+$active_qrs = 0;
+$paused_qrs = 0;
+foreach ($links as $link) {
+    if ($link['status'] === 'active') {
+        $active_qrs++;
+    } else {
+        $paused_qrs++;
+    }
+}
+
 // Mengambil nama file PHP yang sedang dibuka untuk menentukan menu aktif di sidebar
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
@@ -23,21 +53,21 @@ $current_page = basename($_SERVER['PHP_SELF']);
           <a href="dashboardAll.php" class="nav-link <?php echo ($current_page == 'dashboardAll.php') ? 'active' : ''; ?>">
             <span class="nav-icon">📊</span>
             <span class="nav-text">All QR Codes</span>
-            <span class="nav-count">4</span>
+            <span class="nav-count"><?php echo $total_qrs; ?></span>
           </a>
         </li>
         <li class="nav-item">
           <a href="dashboardActive.php" class="nav-link <?php echo ($current_page == 'dashboardActive.php') ? 'active' : ''; ?>">
             <span class="nav-icon">✅</span>
             <span class="nav-text">Active QR Codes</span>
-            <span class="nav-count">2</span>
+            <span class="nav-count"><?php echo $active_qrs; ?></span>
           </a>
         </li>
         <li class="nav-item">
           <a href="dashboardPause.php" class="nav-link <?php echo ($current_page == 'dashboardPause.php') ? 'active' : ''; ?>">
             <span class="nav-icon">⏸️</span>
             <span class="nav-text">Paused QR Codes</span>
-            <span class="nav-count">1</span>
+            <span class="nav-count"><?php echo $paused_qrs; ?></span>
           </a>
         </li>
       </ul>
@@ -70,165 +100,54 @@ $current_page = basename($_SERVER['PHP_SELF']);
           <p>Generate a new QR code with custom design</p>
         </div>
 
-        <!-- Active QR Card 1 -->
-        <div class="qr-card" data-type="active" data-status="active">
-          <div class="performance-indicator"></div>
-          <div class="card-header">
-            <div class="qr-icon">QR</div>
-            <div class="card-title">
-              <h3>Example Website</h3>
-              <div class="created-date">Created: March 15, 2024</div>
+        <?php if (empty($links)): ?>
+            <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <h3>No QR Codes Found</h3>
+                <p>You haven't created any QR codes yet. Let's create one!</p>
             </div>
-            <span class="status-badge status-active">Active</span>
-          </div>
+        <?php else: ?>
+            <?php foreach ($links as $link): ?>
+                <div class="qr-card" data-status="<?php echo htmlspecialchars($link['status']); ?>">
+                    <div class="performance-indicator <?php echo ($link['status'] !== 'active') ? 'paused' : ''; ?>"></div>
+                    
+                    <div class="card-header">
+                        <div class="qr-icon">QR</div>
+                        <div class="card-title">
+                            <h3><?php echo htmlspecialchars($link['custom_url'] ?: 'Untitled'); ?></h3>
+                            <div class="created-date">Created: <?php echo date('F d, Y', strtotime($link['created_at'])); ?></div>
+                        </div>
+                        <span class="status-badge status-<?php echo htmlspecialchars($link['status']); ?>">
+                            <?php echo ucfirst(htmlspecialchars($link['status'])); ?>
+                        </span>
+                    </div>
 
-          <div class="qr-content">
-            <div class="qr-info">
-              <div class="info-item">
-                <span class="info-label">Original URL</span>
-                <div class="url-display">https://example.com</div>
-              </div>
-              
-              <div class="info-item">
-                <span class="info-label">Short Link</span>
-                <a href="#" class="short-link" onclick="copyToClipboard('short.ly/abc123')">
-                  short.ly/abc123
-                  <span>📋</span>
-                </a>
-              </div>
+                    <div class="qr-content">
+                        <div class="qr-info">
+                            <div class="info-item">
+                                <span class="info-label">Original URL</span>
+                                <div class="url-display"><?php echo htmlspecialchars($link['original_url']); ?></div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Short Link</span>
+                                <a href="#" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($link['short_url']); ?>')">
+                                    <?php echo htmlspecialchars($link['short_url']); ?>
+                                    <span>📋</span>
+                                </a>
+                            </div>
+                        </div>
 
-              <div class="stats-row">
-                <div class="stat-item">
-                  <span class="stat-number">247</span>
-                  <div class="stat-label">Total Scans</div>
+                        <div class="qr-visual">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image">
+                            <div class="actions">
+                                <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php" class="btn btn-edit">✏️ Edit</a>
+                                <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-item">
-                  <span class="stat-number">12</span>
-                  <div class="stat-label">Today</div>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-number">85%</span>
-                  <div class="stat-label">Mobile</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="qr-visual">
-              <!-- sementara mengambil gambar dari api nanti diganti  -->
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https://example.com" alt="QR Code" class="qr-image">
-              <div class="actions">
-                <a href="edit.php?id=1&return=dashboardAll.php" class="btn btn-edit">✏️ Edit</a>
-                <button class="btn btn-download" onclick="downloadQR('https://example.com', 'example_website')">⬇️ Download</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Active QR Card 2 -->
-        <div class="qr-card" data-type="active" data-status="active">
-          <div class="performance-indicator"></div>
-          <div class="card-header">
-            <div class="qr-icon">QR</div>
-            <div class="card-title">
-              <h3>Binus University</h3>
-              <div class="created-date">Created: March 10, 2024</div>
-            </div>
-            <span class="status-badge status-active">Active</span>
-          </div>
-
-          <div class="qr-content">
-            <div class="qr-info">
-              <div class="info-item">
-                <span class="info-label">Original URL</span>
-                <div class="url-display">https://binus.ac.id/</div>
-              </div>
-              
-              <div class="info-item">
-                <span class="info-label">Short Link</span>
-                <a href="#" class="short-link" onclick="copyToClipboard('short.ly/xyz999')">
-                  short.ly/xyz999
-                  <span>📋</span>
-                </a>
-              </div>
-
-              <div class="stats-row">
-                <div class="stat-item">
-                  <span class="stat-number">1,256</span>
-                  <div class="stat-label">Total Scans</div>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-number">45</span>
-                  <div class="stat-label">Today</div>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-number">92%</span>
-                  <div class="stat-label">Mobile</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="qr-visual">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https://binus.ac.id/" alt="QR Code" class="qr-image">
-              <div class="actions">
-                <a href="edit.php?id=2&return=dashboardAll.php" class="btn btn-edit">✏️ Edit</a>
-                <button class="btn btn-download" onclick="downloadQR('https://binus.ac.id/', 'binus_university')">⬇️ Download</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Paused QR Card -->
-        <div class="qr-card" data-type="paused" data-status="paused">
-          <div class="performance-indicator paused"></div>
-          <div class="card-header">
-            <div class="qr-icon">QR</div>
-            <div class="card-title">
-              <h3>Marketing Campaign</h3>
-              <div class="created-date">Created: February 28, 2024</div>
-            </div>
-            <span class="status-badge status-paused">Paused</span>
-          </div>
-
-          <div class="qr-content">
-            <div class="qr-info">
-              <div class="info-item">
-                <span class="info-label">Original URL</span>
-                <div class="url-display">https://marketing.example.com/promo</div>
-              </div>
-              
-              <div class="info-item">
-                <span class="info-label">Short Link</span>
-                <a href="#" class="short-link" onclick="copyToClipboard('short.ly/promo24')">
-                  short.ly/promo24
-                  <span>📋</span>
-                </a>
-              </div>
-
-              <div class="stats-row">
-                <div class="stat-item">
-                  <span class="stat-number">892</span>
-                  <div class="stat-label">Total Scans</div>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-number">0</span>
-                  <div class="stat-label">Today</div>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-number">78%</span>
-                  <div class="stat-label">Mobile</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="qr-visual">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https://marketing.example.com/promo" alt="QR Code" class="qr-image">
-              <div class="actions">
-                <a href="edit.php?id=3&return=dashboardAll.php" class="btn btn-secondary">✏️ Resume</a>
-                <button class="btn btn-download" onclick="downloadQR('https://marketing.example.com/promo', 'marketing_campaign')">⬇️ Download</button>
-              </div>
-            </div>
-          </div>
-        </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
       </main>
     </div>
   </div>
