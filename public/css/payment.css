@@ -1,0 +1,152 @@
+/* General reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f5f7fb;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header */
+.pricing-header {
+    text-align: center;
+    padding: 40px 20px 20px;
+}
+
+.pricing-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1d2d50;
+}
+
+.pricing-header p {
+    font-size: 1rem;
+    color: #555;
+    margin-top: 5px;
+}
+
+/* Pricing Section */
+.pricing-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* Plan Card */
+.plan-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 30px 20px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+}
+
+.plan-card h2 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.plan-card .price {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1d2d50;
+}
+
+.plan-card .price span {
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.plan-card .annual {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 5px 0 20px;
+}
+
+/* Checkout button */
+.btn-checkout {
+    display: inline-block;
+    background: #00aaff;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    transition: background 0.3s;
+}
+
+.btn-checkout:hover {
+    background: #008ecc;
+}
+
+/* Features list */
+.features {
+    list-style: none;
+    text-align: left;
+    margin-top: 15px;
+}
+
+.features li {
+    padding: 8px 0;
+    border-top: 1px solid #eee;
+    font-size: 0.95rem;
+}
+
+.features li strong {
+    color: #1d2d50;
+}
+
+/* Highlighted card */
+.plan-card.highlight {
+    border: 2px solid #00c49a;
+    box-shadow: 0 5px 15px rgba(0, 196, 154, 0.1);
+}
+
+.plan-card.highlight .btn-checkout {
+    background: #00c49a;
+}
+
+.plan-card.highlight .btn-checkout:hover {
+    background: #00a37e;
+}
+
+.badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #00c49a;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .pricing-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .plan-card .price {
+        font-size: 1.8rem;
+    }
+}
