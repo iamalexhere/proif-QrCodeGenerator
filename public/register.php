@@ -58,7 +58,7 @@
             </div>
             <div class="term-and-condition">
                 <span>
-                    By logging in with an account, you agree to AARO's <a href="">Terms of Service</a>, <a href="">Privacy Policy</a> and <a href="">Acceptable Use Policy</a>.
+                    By creating an account, you agree to AARO's <a href="">Terms of Service</a>, <a href="">Privacy Policy</a> and <a href="">Acceptable Use Policy</a>.
                 </span>
             </div>
             
