@@ -130,6 +130,7 @@ header{
 
 .form-login button{
     width: 100%;
+    font-size: 1rem;
     margin-top: 2rem;
     padding: 0.625rem 1rem;
     border-radius: 0.25rem;
