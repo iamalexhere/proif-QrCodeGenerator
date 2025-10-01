@@ -17,11 +17,13 @@ try {
         
         // --- MENGAMBIL DATA DARI FORM ---
         $longUrl = trim($_POST['url-input']);
-        $qrColor = $_POST['qr_color'] ?? '#000000';
+        $qrColor = $_POST['qr_color'] ?? '#000000'; // Warna dari color picker, default hitam
         $logoPathForDb = null;
         $logoToUse = null;
 
         // --- LOGIKA PEMILIHAN LOGO (DENGAN PRIORITAS) ---
+
+        // Prioritas 1: Cek apakah ada logo kustom yang diunggah
         if (isset($_FILES['custom-logo']) && $_FILES['custom-logo']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = 'uploads/';
             if (!is_dir($uploadDir)) {
@@ -31,29 +33,30 @@ try {
             $uploadPath = $uploadDir . $fileName;
 
             if (move_uploaded_file($_FILES['custom-logo']['tmp_name'], $uploadPath)) {
-                $logoPathForDb = $uploadPath;
+                $logoPathForDb = $uploadPath; // Simpan path logo kustom
             }
         } 
+        // Prioritas 2: Jika tidak ada logo kustom, cek apakah ada logo bawaan yang dipilih
         else if (isset($_POST['default-logo']) && !empty($_POST['default-logo'])) {
             $defaultLogoName = basename($_POST['default-logo']);
+            // Pastikan path ini sesuai dengan lokasi logo bawaan Anda
             $logoPathForDb = 'images/' . $defaultLogoName; 
         }
 
+        // Jika ada path logo yang terpilih dan filenya ada, siapkan objek Logo
         if ($logoPathForDb !== null && file_exists($logoPathForDb)) {
             $logoToUse = Logo::create($logoPathForDb)
                              ->setResizeToWidth(100);
         }
 
         // --- LOGIKA SHORT LINK DENGAN CUSTOM URL SHORTENER ---
-        $customUrlInput = '';
-        $status = 'active'; // **PERBAIKAN 1: Menyiapkan status default**
-
+        $customUrlInput = ''; 
         try {
             $urlShortener = new UrlShortener();
-            // **PERBAIKAN 2: Mengirim semua parameter yang dibutuhkan, termasuk $status**
-            $result = $urlShortener->createShortUrl($longUrl, $customUrlInput, $logoPathForDb, $qrColor, $status);
+            $result = $urlShortener->createShortUrl($longUrl, $customUrlInput, $logoPathForDb, $qrColor);
             $shortUrl = $result['short_url'];
         } catch (Exception $e) {
+            // Fallback ke URL asli jika gagal
             $shortUrl = $longUrl;
             error_log('URL shortener error: ' . $e->getMessage());
         }
@@ -79,6 +82,7 @@ try {
         
         // --- MENGIRIM RESPONSE KE FRONTEND ---
         $imageData   = $result->getString();
+        // INI BAGIAN YANG DIPERBAIKI:
         $base64Image = base64_encode($imageData);
 
         ob_end_clean();

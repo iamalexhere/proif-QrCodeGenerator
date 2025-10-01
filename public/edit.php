@@ -1,32 +1,8 @@
 <?php
-// Memuat class dan konfigurasi
-require_once __DIR__ . '/../classes/Database.php';
-require_once __DIR__ . '/../config/Config.php';
-
-// Ambil ID dari URL
-$linkId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-$linkData = null;
-
-if ($linkId > 0) {
-    try {
-        $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT * FROM links WHERE id = ?");
-        $stmt->bind_param("i", $linkId);
-        $stmt->execute();
-        $linkData = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-    } catch (Exception $e) {
-        $error = "Gagal mengambil data link: " . $e->getMessage();
-    }
-}
-
-// Redirect jika data tidak ditemukan
-if (!$linkData) {
-    header('Location: dashboardAll.php');
-    exit;
-}
-
-$returnPage = $_GET['return'] ?? 'dashboardAll.php';
+// edit.php
+// Tangkap parameter kode QR dan halaman asal
+$code       = $_GET['code'] ?? '';                   // short code QR
+$returnPage = $_GET['return'] ?? 'dashboardAll.php'; // default balik ke dashboardAll
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,34 +10,40 @@ $returnPage = $_GET['return'] ?? 'dashboardAll.php';
   <meta charset="UTF-8">
   <title>Edit QR Code</title>
   <link rel="stylesheet" href="css/edit.css">
+  <!-- Chart.js untuk grafik -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <!-- Navbar dengan tombol back dinamis -->
   <header class="navbar">
     <div class="logo">QR Code Generator</div>
     <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
   </header>
 
   <main class="edit-container">
+    <!-- Kiri: QR Code + form edit -->
     <section class="edit-left">
+      <!-- QR Code Image -->
       <img src="images/base.png" alt="QR Code" class="qr-image">
       <div class="qr-details">
-        <p><strong>Short Link:</strong> <?php echo htmlspecialchars($linkData['short_url']); ?></p>
+        <p><strong>Short Link:</strong> short.ly/<?php echo htmlspecialchars($code); ?></p>
         <form class="edit-form" method="post" action="save_edit.php">
-          <input type="hidden" name="id" value="<?php echo $linkData['id']; ?>">
+          <input type="hidden" name="code" value="<?php echo htmlspecialchars($code); ?>">
+          <input type="hidden" name="return" value="<?php echo htmlspecialchars($returnPage); ?>">
           <label for="url">Destination URL:</label>
-          <input type="text" id="url" name="url" value="<?php echo htmlspecialchars($linkData['original_url']); ?>">
+          <input type="text" id="url" name="url" value="https://example.com">
           <button type="submit">Save Changes</button>
         </form>
       </div>
     </section>
 
+    <!-- Kanan: Statistik -->
     <section class="edit-right">
       <h2>Statistics</h2>
       <div class="stats-grid">
         <div class="stat-card">
           <h3>Total Scans</h3>
-          <p class="stat-number" id="total-scans">...</p>
+          <p class="stat-number">123</p>
         </div>
         <div class="stat-card">
           <h3>Devices</h3>
@@ -76,51 +58,54 @@ $returnPage = $_GET['return'] ?? 'dashboardAll.php';
           <canvas id="countryChart"></canvas>
         </div>
         <div class="stat-card wide">
-          <h3>Scans per Day</h3>
-          <canvas id="scansChart"></canvas>
+          <h3>Scans per Week</h3>
+          <canvas id="weekChart"></canvas>
         </div>
       </div>
     </section>
   </main>
 
-<script>
-    // Kode JavaScript yang sebelumnya sudah benar, tinggal disalin ke sini.
-    // Kode ini akan memanggil api/statistics.php dan mengisi grafiknya.
-    
-    function createChart(canvasId, type, labels, data, chartLabel) {
-        // ... (fungsi createChart tetap sama)
-    }
+  <script>
+    // Data dummy, nanti diganti PHP
+    const deviceData = {
+      labels: ['iOS', 'Android', 'Other'],
+      datasets: [{
+        data: [50, 70, 10],
+        backgroundColor: ['#007bff','#28a745','#ffc107']
+      }]
+    };
 
-    const linkId = <?php echo $linkData['id']; ?>;
+    const cityData = {
+      labels: ['Jakarta','Bandung','Surabaya'],
+      datasets: [{
+        data: [40,30,20],
+        backgroundColor: ['#17a2b8','#6f42c1','#fd7e14']
+      }]
+    };
 
-    if (linkId) {
-        fetch(`api/statistics.php?link_id=${linkId}`)
-            .then(response => response.json())
-            .then(stats => {
-                if (stats.error) {
-                    alert(stats.error);
-                    return;
-                }
-                
-                document.getElementById('total-scans').textContent = stats.total_scans;
+    const countryData = {
+      labels: ['Indonesia','Malaysia','Singapore'],
+      datasets: [{
+        data: [80,10,10],
+        backgroundColor: ['#20c997','#e83e8c','#6c757d']
+      }]
+    };
 
-                const deviceLabels = stats.devices.map(d => d.device_type);
-                const deviceData = stats.devices.map(d => d.count);
-                createChart('deviceChart', 'doughnut', deviceLabels, deviceData, 'Perangkat');
+    const weekData = {
+      labels: ['Week 1','Week 2','Week 3','Week 4'],
+      datasets: [{
+        label: 'Scans',
+        data: [30,50,80,60],
+        fill:false,
+        borderColor:'#007bff',
+        tension:0.1
+      }]
+    };
 
-                const cityLabels = stats.cities.map(c => c.city);
-                const cityData = stats.cities.map(c => c.count);
-                createChart('cityChart', 'bar', cityLabels, cityData, 'Jumlah Scan');
-
-                const countryLabels = stats.countries.map(c => c.country);
-                const countryData = stats.countries.map(c => c.count);
-                createChart('countryChart', 'bar', countryLabels, countryData, 'Jumlah Scan');
-                
-                const scanLabels = stats.scans_per_day.map(s => s.date);
-                const scanData = stats.scans_per_day.map(s => s.count);
-                createChart('scansChart', 'line', scanLabels, scanData, 'Jumlah Scan');
-            });
-    }
-</script>
+    new Chart(document.getElementById('deviceChart'),{type:'doughnut',data:deviceData});
+    new Chart(document.getElementById('cityChart'),{type:'bar',data:cityData});
+    new Chart(document.getElementById('countryChart'),{type:'bar',data:countryData});
+    new Chart(document.getElementById('weekChart'),{type:'line',data:weekData});
+  </script>
 </body>
 </html>
