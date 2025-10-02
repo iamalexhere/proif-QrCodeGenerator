@@ -9,8 +9,7 @@ require_once __DIR__ . '/../classes/Database.php';
 // Mengambil instance koneksi database
 $db = Database::getInstance()->getConnection();
 
-// --- Query 1: Mengambil HANYA link yang statusnya BUKAN 'active' ---
-// Kita asumsikan semua yang tidak aktif adalah 'paused'
+// --- Query 1: Ambil QR yang statusnya bukan active (paused) ---
 $result_paused = $db->query("SELECT * FROM links WHERE status != 'active' ORDER BY created_at DESC");
 
 // Menyimpan hasil query ke dalam sebuah array
@@ -20,11 +19,10 @@ if ($result_paused) {
         $paused_links[] = $row;
     }
 } else {
-    // Hentikan script jika query gagal
     die("Error saat mengambil data paused: " . $db->error);
 }
 
-// --- Query 2: Mengambil SEMUA link HANYA untuk menghitung jumlah di sidebar ---
+// --- Query 2: Hitung total, active, paused untuk sidebar ---
 $result_all = $db->query("SELECT status FROM links");
 $total_qrs = 0;
 $active_qrs = 0;
@@ -52,6 +50,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 </head>
 <body>
   <div class="container">
+    <!-- Sidebar -->
     <div class="sidebar">
       <div class="sidebar-header">
         <h2>QR Dashboard</h2>
@@ -87,7 +86,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
           <span class="create-btn-icon">+</span>
           Create New QR Code
         </a>
-
         <div class="trial-section">
           <div class="trial-text">Start Free Trial for 7 days</div>
           <a href="payment.php" class="upgrade-btn">Upgrade</a>
@@ -95,6 +93,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
       </div>
     </div>
 
+    <!-- Main Content -->
     <div class="main-content">
       <div class="header">
         <h1 id="page-title">Paused QR Codes</h1>
@@ -127,7 +126,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 <span class="info-label">Original URL</span>
                                 <div class="url-display"><?php echo htmlspecialchars($link['original_url']); ?></div>
                             </div>
-                            
                             <div class="info-item">
                                 <span class="info-label">Short Link</span>
                                 <a href="#" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($link['short_url']); ?>')">
@@ -144,8 +142,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image paused-image">
                             <?php endif; ?>
                             <div class="actions">
-                                <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardPause.php" class="btn btn-edit">▶️ Resume</a>
+                                <!-- Tombol View Detail -->
+                                <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardPause.php" class="btn btn-edit">✏️ View Details</a>
+                                <!-- Tombol Download (kiri) -->
                                 <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
+                                <!-- Tombol Resume (kanan) -->
+                                <button class="btn btn-resume" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', 'paused')">▶️ Resume</button>
                             </div>
                         </div>
                     </div>
@@ -157,14 +159,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
   </div>
 
   <script>
+    // Copy link
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
         showNotification('Link copied to clipboard!', 'success');
-      }).catch(err => {
+      }).catch(() => {
         showNotification('Failed to copy link', 'error');
       });
     }
 
+    // Download QR
     function downloadQR(url, filename) {
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
       const link = document.createElement('a');
@@ -176,6 +180,30 @@ $current_page = basename($_SERVER['PHP_SELF']);
       showNotification('QR Code downloaded successfully!', 'success');
     }
 
+    // Resume (update status ke active)
+    function toggleStatus(shortUrl, currentStatus) {
+      const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+
+      fetch('updateStatus.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `short_url=${encodeURIComponent(shortUrl)}&status=${newStatus}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showNotification(`QR Code ${newStatus === 'active' ? 'resumed' : 'paused'} successfully!`, 'success');
+          setTimeout(() => { location.reload(); }, 1000);
+        } else {
+          showNotification('Failed to update status', 'error');
+        }
+      })
+      .catch(() => {
+        showNotification('An error occurred', 'error');
+      });
+    }
+
+    // Notifikasi
     function showNotification(message, type) {
       const notification = document.createElement('div');
       notification.className = `notification ${type}`;
