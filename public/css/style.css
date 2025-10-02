@@ -287,8 +287,8 @@ footer div {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     background-color: #fff;
     border: 2px solid #ccc;
     border-radius: 0.25rem;
@@ -308,8 +308,8 @@ footer div {
 }
 
 .logo-option img {
-    width: 32px !important;
-    height: 32px !important;
+    width: 75% !important;
+    height: 750% !important;
     display: block !important;
     object-fit: contain;
     transition: transform 0.3s ease;

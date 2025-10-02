@@ -1,4 +1,6 @@
+
 <?php
+header('Content-Type: application/json');
 
 // Memuat semua library dari Composer
 require '../vendor/autoload.php';
@@ -11,6 +13,7 @@ use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Writer\SvgWriter as LogoSvgWriter;   
 
 try {
     if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
@@ -44,9 +47,20 @@ try {
         }
 
         // Jika ada path logo yang terpilih dan filenya ada, siapkan objek Logo
+        $isSvgLogo = false; //butuh format khusus buat svg
         if ($logoPathForDb !== null && file_exists($logoPathForDb)) {
-            $logoToUse = Logo::create($logoPathForDb)
-                             ->setResizeToWidth(100);
+            $pathInfo = pathinfo($logoPathForDb);
+            $extension = strtolower($pathInfo['extension'] ?? '');
+            if ($extension === 'svg') {
+                $logoToUse = Logo::create($logoPathForDb)
+                    ->setResizeToWidth(100)
+                    ->setResizeToHeight(100)
+                    ->setPunchoutBackground(true);
+                $isSvgLogo = true;
+            } else {
+                $logoToUse = Logo::create($logoPathForDb)
+                    ->setResizeToWidth(100);
+            }
         }
 
         // --- LOGIKA SHORT LINK DENGAN CUSTOM URL SHORTENER ---
@@ -76,20 +90,29 @@ try {
         $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::High);
         $qrCode->setForegroundColor(hexToColor($qrColor));
         $qrCode->setBackgroundColor(new Color(255, 255, 255));
-        
-        $writer = new PngWriter;
-        $result = $writer->write($qrCode, logo: $logoToUse);
-        
-        // --- MENGIRIM RESPONSE KE FRONTEND ---
-        $imageData   = $result->getString();
-        // INI BAGIAN YANG DIPERBAIKI:
-        $base64Image = base64_encode($imageData);
 
-        ob_end_clean();
-        echo json_encode([
-            'image'      => $base64Image,
-            'short_link' => $shortUrl 
-        ]);
+        if ($isSvgLogo) {
+            $writer = new LogoSvgWriter();
+            $result = $writer->write($qrCode, logo: $logoToUse);
+            $svgData = $result->getString();
+            ob_end_clean();
+            echo json_encode([
+                'image'      => $svgData,
+                'image_type' => 'svg',
+                'short_link' => $shortUrl
+            ]);
+        } else {
+            $writer = new PngWriter;
+            $result = $writer->write($qrCode, logo: $logoToUse);
+            $imageData   = $result->getString();
+            $base64Image = base64_encode($imageData);
+            ob_end_clean();
+            echo json_encode([
+                'image'      => $base64Image,
+                'image_type' => 'png',
+                'short_link' => $shortUrl
+            ]);
+        }
 
     } else {
         ob_end_clean();

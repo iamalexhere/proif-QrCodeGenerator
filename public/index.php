@@ -33,88 +33,56 @@
                         <p>Add logo on image:</p>
                         <div class="logo-options">
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="instagram.webp">
-                                <img src="images/instagram.webp" alt="Instagram">
+                                <input type="radio" name="default-logo" value="bitcoin.svg">
+                                <img src="images/bitcoin.svg" alt="bitcoin">
                             </label>
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="tiktok.png">
-                                <img src="images/tiktok.png" alt="TikTok">
+                                <input type="radio" name="default-logo" value="discord.svg">
+                                <img src="images/discord.svg" alt="Discord">
                             </label>
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="line.png">
-                                <img src="images/line.png" alt="Line">
+                                <input type="radio" name="default-logo" value="facebook.svg">
+                                <img src="images/facebook.svg" alt="Facebook">
                             </label>
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="spotify.webp">
-                                <img src="images/spotify.webp" alt="Spotify">
+                                <input type="radio" name="default-logo" value="gmail.svg">
+                                <img src="images/gmail.svg" alt="Gmail">
                             </label>
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="youtube.png">
-                                <img src="images/youtube.png" alt="YouTube">
+                                <input type="radio" name="default-logo" value="instagram.svg">
+                                <img src="images/instagram.svg" alt="Instagram">
                             </label>
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="twitter.png">
-                                <img src="images/twitter.png" alt="Twitter">
+                                <input type="radio" name="default-logo" value="line.svg">
+                                <img src="images/line.svg" alt="LINE">
                             </label>
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="facebook.png">
-                                <img src="images/facebook.png" alt="Facebook">
+                                <input type="radio" name="default-logo" value="linkedin.svg">
+                                <img src="images/linkedin.svg" alt="LinkedIn">
                             </label>
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="snapchat.png">
-                                <img src="images/snapchat.png" alt="Snapchat">
+                                <input type="radio" name="default-logo" value="snapchat.svg">
+                                <img src="images/snapchat.svg" alt="Snapchat">
                             </label>
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="LinkedIn.png">
-                                <img src="images/LinkedIn.png" alt="LinkedIn">
+                                <input type="radio" name="default-logo" value="spotify.svg">
+                                <img src="images/spotify.svg" alt="Spotify">
                             </label>
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="whatsApp.png">
-                                <img src="images/whatsApp.png" alt="WhatsApp">
+                                <input type="radio" name="default-logo" value="telegram.svg">
+                                <img src="images/telegram.svg" alt="Telegram">
                             </label>
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="gmail.png">
-                                <img src="images/gmail.png" alt="Gmail">
+                                <input type="radio" name="default-logo" value="tiktok.svg">
+                                <img src="images/tiktok.svg" alt="Tiktok">
                             </label>
                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="telegram.png">
-                                <img src="images/telegram.png" alt="Telegram">
+                                <input type="radio" name="default-logo" value="whatsapp.svg">
+                                <img src="images/whatsapp.svg" alt="Whatsapp">
                             </label>
-                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="discord.png">
-                                <img src="images/discord.png" alt="Discord">
-                            </label>
-                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="bitcoin.png">
-                                <img src="images/bitcoin.png" alt="Bitcoin">
-                            </label>
-                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="gopay.png">
-                                <img src="images/gopay.png" alt="Gopay">
-                            </label>
-                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="ovo.webp">
-                                <img src="images/ovo.webp" alt="OVO">
-                            </label>
-                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="dana.png">
-                                <img src="images/dana.png" alt="Dana">
-                            </label>
-                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="wifi.png">
-                                <img src="images/wifi.png" alt="Wifi">
-                            </label>
-                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="drive.png">
-                                <img src="images/drive.png" alt="Google Drive">
-                            </label>
-                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="tokopedia.png">
-                                <img src="images/tokopedia.png" alt="Tokopedia">
-                            </label>
-                             <label class="logo-option">
-                                <input type="radio" name="default-logo" value="shopee.png">
-                                <img src="images/shopee.png" alt="Shopee">
+                            <label class="logo-option">
+                                <input type="radio" name="default-logo" value="youtube.svg">
+                                <img src="images/youtube.svg" alt="Youtube">
                             </label>
                         </div>
                         
@@ -122,7 +90,7 @@
 
                         <div style="padding-top: 15px;">
                             <label class="url-input" for="custom-logo">Upload your own logo:</label>
-                            <input type="file" name="custom-logo" id="custom-logo" class="form-control" accept="image/png, image/jpeg">
+                            <input type="file" name="custom-logo" id="custom-logo" class="form-control" accept="image/png, image/jpeg, image/svg+xml">
                         </div>
 
                         <div style="padding-top: 15px;">
@@ -216,12 +184,17 @@
                     alert(data.error);
                     shortLinkContainer.innerHTML = '';
                 } else {
-                    qrImage.src = 'data:image/png;base64,' + data.image;
-                    downloadLink.href = 'data:image/png;base64,' + data.image;
-                    downloadLink.setAttribute('download', 'qr_code.png');
+                    if (data.image_type === 'svg') {
+                        qrImage.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(data.image);
+                        downloadLink.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(data.image);
+                        downloadLink.setAttribute('download', 'qr_code.svg');
+                    } else {
+                        qrImage.src = 'data:image/png;base64,' + data.image;
+                        downloadLink.href = 'data:image/png;base64,' + data.image;
+                        downloadLink.setAttribute('download', 'qr_code.png');
+                    }
                     downloadLink.classList.remove('disabled');
                     qrImage.style.opacity = 1;
-
                     if (data.short_link) {
                         shortLinkContainer.innerHTML = `Short Link:<a href="${data.short_link}" target="_blank">${data.short_link}</a>`;
                     }
