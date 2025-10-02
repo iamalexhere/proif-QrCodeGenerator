@@ -145,8 +145,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                           <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image">
                       <?php endif; ?>
                       <div class="actions">
-                        <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardActive.php" class="btn btn-edit">✏️ Edit</a>
+                        <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardActive.php" class="btn btn-edit">✏️ View Details</a>
                         <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
+                        <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', 'active')">⏸️ Pause</button>
                       </div>
                     </div>
                   </div>
@@ -160,7 +161,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
   <script>
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
+        const linkElement = event.target.closest('.short-link');
+        const originalColor = linkElement.style.color;
+        linkElement.style.color = '#4CAF50';
         showNotification('Link copied to clipboard!', 'success');
+        setTimeout(() => {
+          linkElement.style.color = originalColor || '#667eea';
+        }, 1000);
       }).catch(err => {
         showNotification('Failed to copy link', 'error');
       });
@@ -175,6 +182,35 @@ $current_page = basename($_SERVER['PHP_SELF']);
       link.click();
       document.body.removeChild(link);
       showNotification('QR Code downloaded successfully!', 'success');
+    }
+
+    // Toggle status QR Code (Pause/Resume)
+    function toggleStatus(shortUrl, currentStatus) {
+      const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+      
+      // Kirim request ke server untuk update status
+      fetch('updateStatus.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `short_url=${encodeURIComponent(shortUrl)}&status=${newStatus}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showNotification(`QR Code ${newStatus === 'active' ? 'resumed' : 'paused'} successfully!`, 'success');
+          // Reload halaman setelah 1 detik
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } else {
+          showNotification('Failed to update status', 'error');
+        }
+      })
+      .catch(error => {
+        showNotification('An error occurred', 'error');
+      });
     }
 
     function showNotification(message, type) {
@@ -197,6 +233,39 @@ $current_page = basename($_SERVER['PHP_SELF']);
         setTimeout(() => { document.body.removeChild(notification); }, 300);
       }, 3000);
     }
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      if (!link.classList.contains('active')) {
+        link.addEventListener('click', function(e) {
+          const spinner = document.createElement('div');
+          spinner.innerHTML = '⏳';
+          spinner.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            z-index: 1000;
+            animation: spin 1s linear infinite;
+          `;
+          
+          const style = document.createElement('style');
+          style.textContent = `
+            @keyframes spin {
+              0% { transform: translate(-50%, -50%) rotate(0deg); }
+              100% { transform: translate(-50%, -50%) rotate(360deg); }
+            }
+          `;
+          document.head.appendChild(style);
+          document.body.appendChild(spinner);
+          
+          setTimeout(() => {
+            document.body.removeChild(spinner);
+            document.head.removeChild(style);
+          }, 500);
+        });
+      }
+    });
   </script>
 </body>
 </html>

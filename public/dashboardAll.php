@@ -144,8 +144,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image">
                           <?php endif; ?>
                             <div class="actions">
-                                <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php" class="btn btn-edit">✏️ Edit</a>
+                                <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php" class="btn btn-edit">✏️ View Details</a>
                                 <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
+                                <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['status']); ?>')">
+                                    <?php echo ($link['status'] === 'active') ? '⏸️ Pause' : '▶️ Resume'; ?>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -191,6 +194,35 @@ $current_page = basename($_SERVER['PHP_SELF']);
       document.body.removeChild(link);
       
       showNotification('QR Code downloaded successfully!', 'success');
+    }
+
+    // Toggle status QR Code (Pause/Resume)
+    function toggleStatus(shortUrl, currentStatus) {
+      const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+      
+      // Kirim request ke server untuk update status
+      fetch('updateStatus.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `short_url=${encodeURIComponent(shortUrl)}&status=${newStatus}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showNotification(`QR Code ${newStatus === 'active' ? 'resumed' : 'paused'} successfully!`, 'success');
+          // Reload halaman setelah 1 detik
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } else {
+          showNotification('Failed to update status', 'error');
+        }
+      })
+      .catch(error => {
+        showNotification('An error occurred', 'error');
+      });
     }
 
     function showNotification(message, type) {
