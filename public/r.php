@@ -13,6 +13,7 @@
 // Memuat class yang diperlukan
 require_once __DIR__ . '/../classes/UrlShortener.php';
 require_once __DIR__ . '/../config/Config.php';
+require_once __DIR__ . '/../classes/Analytics.php'; 
 
 // === MENGAMBIL KODE PENDEK DARI URL ===
 $kodePendek = '';
@@ -39,14 +40,25 @@ try {
     // Inisialisasi URL Shortener
     $urlShortener = new UrlShortener();
     
+    // --- Mengambil data link (termasuk ID) ---
+    $linkData = $urlShortener->getLinkDataByShortCode($kodePendek);
+
     // Cari URL asli berdasarkan kode pendek dan catat klik
-    $urlAsli = $urlShortener->recordClick($kodePendek);
+    //$urlAsli = $urlShortener->recordClick($kodePendek);
     
     // Jika kode pendek tidak ditemukan
-    if (!$urlAsli) {
+    if (!$linkData) {
         header('Location: ../');
         exit;
     }
+
+    // Simpan ID dan URL asli ke variabel
+    $urlAsli = $linkData['original_url'];
+    $linkId = $linkData['id'];
+
+    // --- Menjalankan pencatatan statistik ---
+    $analytics = new Analytics();
+    $analytics->recordClick($linkId);
     
     // === PENGATURAN IKLAN ===
     $tampilkanIklan = true;

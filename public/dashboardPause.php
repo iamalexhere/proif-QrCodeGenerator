@@ -143,7 +143,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <?php endif; ?>
                             <div class="actions">
                                 <!-- Tombol View Detail -->
-                                <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardPause.php" class="btn btn-edit">✏️ View Details</a>
+                                <a href="view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardPause.php" class="btn btn-edit">✏️ View Details</a>
                                 <!-- Tombol Download (kiri) -->
                                 <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
                                 <!-- Tombol Resume (kanan) -->

@@ -9,7 +9,7 @@ $returnPage = $_GET['return'] ?? 'dashboardAll.php'; // default balik ke dashboa
 <head>
   <meta charset="UTF-8">
   <title>Edit QR Code</title>
-  <link rel="stylesheet" href="css/edit.css">
+  <link rel="stylesheet" href="css/view_detail.css">
   <!-- Chart.js untuk grafik -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>

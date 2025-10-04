@@ -145,7 +145,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                           <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image">
                       <?php endif; ?>
                       <div class="actions">
-                        <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardActive.php" class="btn btn-edit">✏️ View Details</a>
+                        <a href="view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardActive.php" class="btn btn-edit">✏️ View Details</a>
                         <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
                         <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', 'active')">⏸️ Pause</button>
                       </div>
