@@ -19,34 +19,33 @@ class Statistics {
      * @param int $linkId ID dari link yang di-klik.
      */
     public function recordClick($linkId) {
-        // 1. Get IP address & User Agent
         $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
 
-        // 2. Deteksi Bot Sederhana
-        // Jika user agent mengandung kata 'bot' atau 'spider', kita anggap itu bot dan tidak mencatatnya.
+        // Deteksi bot (skip kalau bot)
         if (preg_match('/(bot|crawl|spider|slurp)/i', $userAgent)) {
-            return; // Hentikan proses
+            return;
         }
 
-        // 3. Get location dari IP (via API ip-api.com)
-        // Tanda @ digunakan untuk menekan error jika API gagal
-        $geoData = @json_decode(@file_get_contents("http://ip-api.com/json/{$ipAddress}"), true);
-        $country = $geoData['country'] ?? 'Unknown';
-        $city = $geoData['city'] ?? 'Unknown';
-
-        // 4. Parse device info dari User Agent
+        // Deteksi device
         $deviceType = 'Desktop';
-        if (preg_match('/(tablet|ipad|playbook)|(android(?!.*(mobi|opera mini)))/i', strtolower($userAgent))) {
+        $ua = strtolower($userAgent);
+        if (preg_match('/(tablet|ipad|playbook)|(android(?!.*(mobi|opera mini)))/i', $ua)) {
             $deviceType = 'Tablet';
-        } elseif (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|android|iemobile)/i', strtolower($userAgent))) {
+        } elseif (preg_match('/(mobile|phone|android|iemobile)/i', $ua)) {
             $deviceType = 'Mobile';
         }
 
-        // 5. INSERT ke tabel clicks
-        // Perintah ini cocok persis dengan tabel 'clicks' yang sudah Anda buat.
-        $sql = "INSERT INTO clicks (link_id, ip_address, user_agent, country, city, device_type) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $this->db->prepare($sql);
+        // Ambil lokasi dari ipapi.co (lebih akurat daripada ip-api)
+        $geo = @json_decode(@file_get_contents("https://ipapi.co/{$ipAddress}/json/"), true);
+        $country = $geo['country_name'] ?? 'Unknown';
+        $city = $geo['city'] ?? 'Unknown';
+
+        // Simpan ke database
+        $stmt = $this->db->prepare("
+            INSERT INTO clicks (link_id, ip_address, user_agent, country, city, device_type)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
         $stmt->bind_param("isssss", $linkId, $ipAddress, $userAgent, $country, $city, $deviceType);
         $stmt->execute();
         $stmt->close();
@@ -98,16 +97,30 @@ class Statistics {
 
     private function getLocationStats($linkId) {
         $locations = ['countries' => [], 'cities' => []];
-        
-        // Data per Negara (Top 5)
-        $stmt = $this->db->prepare("SELECT country, COUNT(*) as count FROM clicks WHERE link_id = ? AND country != 'Unknown' GROUP BY country ORDER BY count DESC LIMIT 5");
+
+        // Negara (Top 5)
+        $stmt = $this->db->prepare("
+            SELECT country, COUNT(*) as count
+            FROM clicks
+            WHERE link_id = ? AND country != 'Unknown'
+            GROUP BY country
+            ORDER BY count DESC
+            LIMIT 5
+        ");
         $stmt->bind_param("i", $linkId);
         $stmt->execute();
         $locations['countries'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         $stmt->close();
 
-        // Data per Kota (Top 5)
-        $stmt = $this->db->prepare("SELECT city, COUNT(*) as count FROM clicks WHERE link_id = ? AND city != 'Unknown' GROUP BY city ORDER BY count DESC LIMIT 5");
+        // Kota (Top 5)
+        $stmt = $this->db->prepare("
+            SELECT city, COUNT(*) as count
+            FROM clicks
+            WHERE link_id = ? AND city != 'Unknown'
+            GROUP BY city
+            ORDER BY count DESC
+            LIMIT 5
+        ");
         $stmt->bind_param("i", $linkId);
         $stmt->execute();
         $locations['cities'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -115,6 +128,7 @@ class Statistics {
 
         return $locations;
     }
+
     
     private function getTemporalStats($linkId, $days = 7) {
         $stmt = $this->db->prepare("SELECT DATE(click_time) as date, COUNT(*) as count FROM clicks WHERE link_id = ? AND click_time >= CURDATE() - INTERVAL ? DAY GROUP BY DATE(click_time) ORDER BY date ASC");
