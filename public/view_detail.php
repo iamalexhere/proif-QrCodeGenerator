@@ -49,7 +49,16 @@ $returnPage = $_GET['return'] ?? 'dashboardAll.php';
     <section class="edit-left">
       <img src="data:image/png;base64,<?php echo base64_encode($linkData['qr_image']); ?>" alt="QR Code" class="qr-image">
       <div class="qr-details">
-        <p><strong>Short Link:</strong> <a href="<?php echo htmlspecialchars($linkData['short_url']); ?>" target="_blank"><?php echo htmlspecialchars($linkData['short_url']); ?></a></p>
+        <?php
+          $baseDomain = 'http://qr.local/r/';
+          $fullShortUrl = $baseDomain . $linkData['short_url'];
+          ?>
+          <p>
+            <strong>Short Link:</strong>
+            <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" target="_blank">
+              <?php echo htmlspecialchars($fullShortUrl); ?>
+            </a>
+          </p>
         <div class="destination-url">
             <strong>Destination URL:</strong>
             <p style="word-break: break-all; margin-top: 5px;"><?php echo htmlspecialchars($linkData['original_url']); ?></p>
