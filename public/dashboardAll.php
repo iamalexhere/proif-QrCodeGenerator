@@ -130,8 +130,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             
                             <div class="info-item">
                                 <span class="info-label">Short Link</span>
+                                <?php $baseDomain = 'http://qr.local/r/'; $fullShortUrl = $baseDomain . $link['short_url'];?>
                                 <a href="#" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($link['short_url']); ?>')">
-                                    <?php echo htmlspecialchars($link['short_url']); ?>
+                                    <?php echo htmlspecialchars($fullShortUrl); ?>
                                     <span>📋</span>
                                 </a>
                             </div>
@@ -144,7 +145,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image">
                           <?php endif; ?>
                             <div class="actions">
-                                <a href="view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php" class="btn btn-edit">✏️ View Details</a>
+                                <a href="view_detail.php?id=<?php echo htmlspecialchars($link['id']); ?>&return=dashboardAll.php" class="btn btn-edit">✏️ View Details</a>
                                 <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
                                 <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['status']); ?>')">
                                     <?php echo ($link['status'] === 'active') ? '⏸️ Pause' : '▶️ Resume'; ?>

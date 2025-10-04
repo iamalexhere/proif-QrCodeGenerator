@@ -173,4 +173,20 @@ class UrlShortener {
         // Jika kode pendek tidak valid/tidak ditemukan
         return null;
     }
+
+    public function getLinkDataByShortCode($shortCode){
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("
+            SELECT id, original_url, short_url, custom_url, status 
+            FROM links 
+            WHERE short_url = ? OR custom_url = ? 
+            LIMIT 1
+        ");
+        $stmt->bind_param("ss", $shortCode, $shortCode);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $linkData = $result->fetch_assoc();
+        $stmt->close();
+        return $linkData ?: null;
+    }
 }

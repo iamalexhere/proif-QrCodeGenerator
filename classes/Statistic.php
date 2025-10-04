@@ -1,15 +1,13 @@
 <?php
-// classes/Statistics.php
+
+//Mencatat scan qr ke tabel "clicks" 
 
 require_once __DIR__ . '/Database.php';
 
 class Statistics {
-    /** @var mysqli Koneksi database */
+    /* Koneksi database */
     private $db;
     
-    /**
-     * Constructor - Inisialisasi koneksi database
-     */
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
     }
