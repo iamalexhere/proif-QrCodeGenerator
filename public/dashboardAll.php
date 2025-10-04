@@ -161,7 +161,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                         <div class="stat-label">Top City</div>
                                     </div>
                                 </div>
-                                <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php" class="btn btn-edit">✏️ View Details</a>
+                                <a href="view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php" class="btn btn-edit">✏️ View Details</a>
                                 <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
                                 <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['status']); ?>')">
                                     <?php echo ($link['status'] === 'active') ? '⏸️ Pause' : '▶️ Resume'; ?>
