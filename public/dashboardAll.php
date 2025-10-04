@@ -131,7 +131,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <div class="info-item">
                                 <span class="info-label">Short Link</span>
                                 <?php $baseDomain = 'http://qr.local/r/'; $fullShortUrl = $baseDomain . $link['short_url'];?>
-                                <a href="#" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($link['short_url']); ?>')">
+                                <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($link['short_url']); ?>')">
                                     <?php echo htmlspecialchars($fullShortUrl); ?>
                                     <span>📋</span>
                                 </a>
