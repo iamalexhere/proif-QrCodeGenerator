@@ -142,22 +142,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image paused-image">
                             <?php endif; ?>
 
-                            <!-- Actions + Statistik -->
                             <div class="actions">
-                              <!-- Statistik -->
                               <div class="qr-stats">
                                 <div class="stat-box">
                                   <div class="stat-icon">📊</div>
                                   <span class="stat-value"><?php echo number_format($link['scan_count'] ?? 0); ?></span>
                                   <div class="stat-label">Total Scans</div>
                                 </div>
-                                
                                 <div class="stat-box">
                                   <div class="stat-icon">📱</div>
                                   <span class="stat-value"><?php echo $link['top_device'] ?? 'N/A'; ?></span>
                                   <div class="stat-label">Top Device</div>
                                 </div>
-                                
                                 <div class="stat-box">
                                   <div class="stat-icon">🌍</div>
                                   <span class="stat-value"><?php echo $link['top_city'] ?? 'N/A'; ?></span>
@@ -165,7 +161,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 </div>
                               </div>
 
-                              <!-- Tombol Aksi -->
                               <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardPause.php" class="btn btn-edit">✏️ View Details</a>
                               <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
                               <button class="btn btn-resume" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', 'paused')">▶️ Resume</button>
@@ -201,10 +196,36 @@ $current_page = basename($_SERVER['PHP_SELF']);
       showNotification('QR Code downloaded successfully!', 'success');
     }
 
-    // Resume (update status ke active)
+    // Konfirmasi sebelum Resume
     function toggleStatus(shortUrl, currentStatus) {
       const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+      const confirmBox = document.createElement('div');
+      confirmBox.className = 'confirm-box';
+      confirmBox.innerHTML = `
+        <div class="confirm-content">
+          <h3>Confirm Action</h3>
+          <p>Are you sure you want to resume this QR Code?</p>
+          <div class="confirm-actions">
+            <button id="confirm-yes" class="btn-confirm yes">Yes</button>
+            <button id="confirm-no" class="btn-confirm no">Cancel</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(confirmBox);
+      setTimeout(() => confirmBox.classList.add('show'), 10);
 
+      document.getElementById('confirm-yes').addEventListener('click', () => {
+        updateStatus(shortUrl, newStatus);
+        confirmBox.remove();
+      });
+      document.getElementById('confirm-no').addEventListener('click', () => {
+        confirmBox.classList.remove('show');
+        setTimeout(() => confirmBox.remove(), 200);
+      });
+    }
+
+    // Resume + redirect ke dashboardActive.php
+    function updateStatus(shortUrl, newStatus) {
       fetch('updateStatus.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -213,8 +234,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          showNotification(`QR Code ${newStatus === 'active' ? 'resumed' : 'paused'} successfully!`, 'success');
-          setTimeout(() => { location.reload(); }, 1000);
+          showNotification('QR Code resumed successfully!', 'success');
+          setTimeout(() => {
+            window.location.href = 'dashboardActive.php';
+          }, 1000);
         } else {
           showNotification('Failed to update status', 'error');
         }
@@ -246,5 +269,33 @@ $current_page = basename($_SERVER['PHP_SELF']);
       }, 3000);
     }
   </script>
+
+  <style>
+    .confirm-box {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .2s ease; z-index: 9999;
+    }
+    .confirm-box.show { opacity: 1; }
+    .confirm-content {
+      background: #fff; color: #333;
+      border-radius: 12px; padding: 25px 30px;
+      max-width: 340px; text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      animation: scaleIn .25s ease;
+    }
+    .confirm-content h3 { color: #0ea5e9; margin-bottom: 10px; }
+    .confirm-actions { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+    .btn-confirm {
+      padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;
+    }
+    .btn-confirm.yes { background: #0ea5e9; color: #fff; }
+    .btn-confirm.no { background: #ddd; color: #333; }
+    @keyframes scaleIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
 </body>
 </html>

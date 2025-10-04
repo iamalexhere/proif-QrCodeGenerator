@@ -1,6 +1,6 @@
 <?php
 
-//Koneksi db
+// Koneksi db
 require_once __DIR__ . '/../classes/Database.php';
 
 // Mengambil instance koneksi database
@@ -78,7 +78,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
           Create New QR Code
         </a>
 
-         <div class="trial-section">
+        <div class="trial-section">
           <div class="trial-text">Start Free Trial for 7 days</div>
           <a href="payment.php" class="upgrade-btn">Upgrade</a>
         </div>
@@ -144,26 +144,23 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image">
                           <?php endif; ?>
                             <div class="actions">
-                                 <!-- Stats Box - TAMBAHKAN INI -->
-    <div class="qr-stats">
-        <div class="stat-box">
-            <div class="stat-icon">📊</div>
-            <span class="stat-value"><?php echo number_format($link['scan_count'] ?? 0); ?></span>
-            <div class="stat-label">Total Scans</div>
-        </div>
-        
-        <div class="stat-box">
-            <div class="stat-icon">📱</div>
-            <span class="stat-value"><?php echo $link['top_device'] ?? 'N/A'; ?></span>
-            <div class="stat-label">Top Device</div>
-        </div>
-        
-        <div class="stat-box">
-            <div class="stat-icon">🌍</div>
-            <span class="stat-value"><?php echo $link['top_city'] ?? 'N/A'; ?></span>
-            <div class="stat-label">Top City</div>
-        </div>
-    </div>
+                                <div class="qr-stats">
+                                    <div class="stat-box">
+                                        <div class="stat-icon">📊</div>
+                                        <span class="stat-value"><?php echo number_format($link['scan_count'] ?? 0); ?></span>
+                                        <div class="stat-label">Total Scans</div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <div class="stat-icon">📱</div>
+                                        <span class="stat-value"><?php echo $link['top_device'] ?? 'N/A'; ?></span>
+                                        <div class="stat-label">Top Device</div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <div class="stat-icon">🌍</div>
+                                        <span class="stat-value"><?php echo $link['top_city'] ?? 'N/A'; ?></span>
+                                        <div class="stat-label">Top City</div>
+                                    </div>
+                                </div>
                                 <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php" class="btn btn-edit">✏️ View Details</a>
                                 <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
                                 <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['status']); ?>')">
@@ -180,139 +177,127 @@ $current_page = basename($_SERVER['PHP_SELF']);
   </div>
 
   <script>
-    // Untuk copy text 
+    // Copy ke clipboard
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
-        // Jika sudah berhasil copy maka ubah warna text nya 
         const linkElement = event.target.closest('.short-link');
         const originalColor = linkElement.style.color;
         linkElement.style.color = '#4CAF50';
-        
-        // Jika bisa di copy maka ada munculkan notifikasi bahwa sukses 
         showNotification('Link copied to clipboard!', 'success');
-        
-        //Mengembalikan ke warna awal setelah 1 detik 
-        setTimeout(() => {
-          linkElement.style.color = originalColor || '#667eea';
-        }, 1000);
-      }).catch(err => {
-        //Jika gagal untuk di copy 
-        showNotification('Failed to copy link', 'error');
-      });
+        setTimeout(() => linkElement.style.color = originalColor || '#667eea', 1000);
+      }).catch(() => showNotification('Failed to copy link', 'error'));
     }
 
-    // Download QR Code nantinya akan disesuaikan lagi dengan page utama 
+    // Download QR
     function downloadQR(url, filename) {
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
-      
-      // Create temporary link element
       const link = document.createElement('a');
       link.href = qrUrl;
       link.download = `${filename}_qr_code.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
       showNotification('QR Code downloaded successfully!', 'success');
     }
 
-    // Toggle status QR Code (Pause/Resume)
+    // Konfirmasi popup sebelum update status
     function toggleStatus(shortUrl, currentStatus) {
       const newStatus = currentStatus === 'active' ? 'paused' : 'active';
-      
-      // Kirim request ke server untuk update status
+      const actionText = newStatus === 'paused' ? 'pause' : 'resume';
+
+      const confirmBox = document.createElement('div');
+      confirmBox.className = 'confirm-box';
+      confirmBox.innerHTML = `
+        <div class="confirm-content">
+          <h3>Confirm Action</h3>
+          <p>Are you sure you want to <b>${actionText}</b> this QR Code?</p>
+          <div class="confirm-actions">
+            <button id="confirm-yes" class="btn-confirm yes">Yes</button>
+            <button id="confirm-no" class="btn-confirm no">Cancel</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(confirmBox);
+      setTimeout(() => confirmBox.classList.add('show'), 10);
+
+      document.getElementById('confirm-yes').addEventListener('click', () => {
+        updateStatus(shortUrl, newStatus);
+        confirmBox.remove();
+      });
+      document.getElementById('confirm-no').addEventListener('click', () => {
+        confirmBox.classList.remove('show');
+        setTimeout(() => confirmBox.remove(), 200);
+      });
+    }
+
+    // Update status + arahkan ke halaman sesuai status baru
+    function updateStatus(shortUrl, newStatus) {
       fetch('updateStatus.php', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `short_url=${encodeURIComponent(shortUrl)}&status=${newStatus}`
       })
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
         if (data.success) {
           showNotification(`QR Code ${newStatus === 'active' ? 'resumed' : 'paused'} successfully!`, 'success');
-          // Reload halaman setelah 1 detik
           setTimeout(() => {
-            location.reload();
+            if (newStatus === 'paused') {
+              window.location.href = 'dashboardPause.php';
+            } else {
+              window.location.href = 'dashboardActive.php';
+            }
           }, 1000);
         } else {
           showNotification('Failed to update status', 'error');
         }
       })
-      .catch(error => {
-        showNotification('An error occurred', 'error');
-      });
+      .catch(() => showNotification('An error occurred', 'error'));
     }
 
-    function showNotification(message, type) {
-      const notification = document.createElement('div');
-      notification.className = `notification ${type}`;
-      notification.textContent = message;
-      
-      notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 600;
-        z-index: 1000;
-        opacity: 0;
-        transform: translateY(-20px);
+    // Notifikasi popup
+    function showNotification(msg, type) {
+      const el = document.createElement('div');
+      el.className = `notification ${type}`;
+      el.textContent = msg;
+      el.style.cssText = `
+        position: fixed; top: 20px; right: 20px; padding: 15px 20px;
+        border-radius: 8px; color: white; font-weight: 600; z-index: 1000;
+        opacity: 0; transform: translateY(-20px);
         transition: all 0.3s ease;
-        ${type === 'success' ? 'background: #4CAF50;' : 'background: #f44336;'}
-      `;
-      
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.style.opacity = '1';
-        notification.style.transform = 'translateY(0)';
-      }, 100);
-      
-      setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateY(-20px)';
-        setTimeout(() => {
-          document.body.removeChild(notification);
-        }, 300);
-      }, 3000);
+        ${type === 'success' ? 'background:#4CAF50;' : 'background:#f44336;'}`;
+      document.body.appendChild(el);
+      setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; }, 100);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(-20px)'; setTimeout(() => el.remove(), 300); }, 3000);
     }
-
-    document.querySelectorAll('.nav-link').forEach(link => {
-      if (!link.classList.contains('active')) {
-        link.addEventListener('click', function(e) {
-          const spinner = document.createElement('div');
-          spinner.innerHTML = '⏳';
-          spinner.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2rem;
-            z-index: 1000;
-            animation: spin 1s linear infinite;
-          `;
-          
-          const style = document.createElement('style');
-          style.textContent = `
-            @keyframes spin {
-              0% { transform: translate(-50%, -50%) rotate(0deg); }
-              100% { transform: translate(-50%, -50%) rotate(360deg); }
-            }
-          `;
-          document.head.appendChild(style);
-          document.body.appendChild(spinner);
-          
-          setTimeout(() => {
-            document.body.removeChild(spinner);
-            document.head.removeChild(style);
-          }, 500);
-        });
-      }
-    });
   </script>
+
+  <style>
+    .confirm-box {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .2s ease; z-index: 9999;
+    }
+    .confirm-box.show { opacity: 1; }
+    .confirm-content {
+      background: #fff; color: #333;
+      border-radius: 12px; padding: 25px 30px;
+      max-width: 340px; text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      animation: scaleIn .25s ease;
+    }
+    .confirm-content h3 { color: #0ea5e9; margin-bottom: 10px; }
+    .confirm-actions { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+    .btn-confirm {
+      padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;
+    }
+    .btn-confirm.yes { background: #0ea5e9; color: #fff; }
+    .btn-confirm.no { background: #ddd; color: #333; }
+    @keyframes scaleIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
 </body>
 </html>
