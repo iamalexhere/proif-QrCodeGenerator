@@ -103,7 +103,8 @@ $returnPage = $_GET['return'] ?? 'dashboardAll.php';
     const linkId = <?php echo (int)$linkData['id']; ?>;
 
     // Fetch data statistik dari API
-    fetch(`api/statistics.php?link_id=${linkId}`)
+    console.log(`Fetching: api/statistics.php?link_id=${linkId}`);
+      fetch(`./api/statistics.php?link_id=${linkId}`)
       .then(response => {
           if (!response.ok) {
               throw new Error('Network response was not ok');
