@@ -14,7 +14,7 @@ $links = [];
 if ($result) {
     while ($row = $result->fetch_assoc()) {
         $links[] = $row;
-    }
+    } 
 }
 
 // Menghitung jumlah total, QR aktif, dan QR yang dijeda
@@ -144,6 +144,26 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image">
                           <?php endif; ?>
                             <div class="actions">
+                                 <!-- Stats Box - TAMBAHKAN INI -->
+    <div class="qr-stats">
+        <div class="stat-box">
+            <div class="stat-icon">📊</div>
+            <span class="stat-value"><?php echo number_format($link['scan_count'] ?? 0); ?></span>
+            <div class="stat-label">Total Scans</div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-icon">📱</div>
+            <span class="stat-value"><?php echo $link['top_device'] ?? 'N/A'; ?></span>
+            <div class="stat-label">Top Device</div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-icon">🌍</div>
+            <span class="stat-value"><?php echo $link['top_city'] ?? 'N/A'; ?></span>
+            <div class="stat-label">Top City</div>
+        </div>
+    </div>
                                 <a href="edit.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php" class="btn btn-edit">✏️ View Details</a>
                                 <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
                                 <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['status']); ?>')">
