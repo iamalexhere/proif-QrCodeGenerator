@@ -9,12 +9,23 @@ body{
     font-family: Arial, sans-serif;
 }
 
-header{
-    grid-area: header;
-    background-color: beige;
-    padding: 2.125rem 1.5rem;
+.logo {
+    font-size: 3rem;
+    margin-bottom: 10px;
 }
 
+header{
+    grid-area: header;
+    padding: 2.125rem 1.5rem;
+    display: flex;
+    flex-direction: row;
+}
+
+h1 {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
 .main{
     grid-area: left;
     justify-content: center;
@@ -57,15 +68,26 @@ header{
 }
 
 .login-google a{
+    gap: 12px;
     width: 100%;
-    border: 0.0625rem solid rgb(219, 224, 235);
-    padding: 0.625rem 1rem;
-    font-weight: 500;
+    border: 0.3rem solid rgb(219, 224, 235);
+    padding: 0.625rem 0rem;
+    font-weight: 600;
     font-size: 1rem;
     text-align: center;
     display: inline-block;
     cursor: pointer;
-    color: black;
+    color: #333;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.login-google a:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
 .login-google span{
@@ -74,37 +96,37 @@ header{
     align-items: center;
 }
 
-.divider {
-  display: flex; /* Establishes a flex container */
-  align-items: center; /* Vertically centers the items (the line, the text, and the other line) */
-  text-align: center;
-  color: black; /* A light gray color for the text and lines */
-  font-family: sans-serif;
-  font-size: 0.8em;
-  text-transform: uppercase;
-  margin: 20px 0; /* Adds some space above and below the divider */
+ .features {
+    margin-top: 0rem;
+    text-align: left;
+    padding: 2rem;
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+    border-radius: 12px;
 }
 
-/* This creates the line before the text */
-.divider::before,
-/* This creates the line after the text */
-.divider::after {
-  content: ''; /* This is required for pseudo-elements to show up */
-  flex-grow: 1; /* This makes the lines take up all available space */
-  height: 1px; /* This defines the thickness of the line */
-  background: #ccc; /* The color of the line */
+.features h3 {
+    color: #667eea;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
 }
 
-/* This adds a small gap between the line and the text */
-.divider::before {
-  margin-right: 1em; /* Space on the right side of the left line */
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 0.95rem;
 }
 
-.divider::after {
-  margin-left: 1em; /* Space on the left side of the right line */
+.feature-item::before {
+    content: "✓";
+    color: #667eea;
+    font-weight: bold;
+    font-size: 1.2rem;
 }
-
-.form-login{
+/* .form-login{
     font-weight: 500;
     font-size: 1rem;
     margin: 0px 0px 1.5rem;
@@ -136,9 +158,11 @@ header{
     border-radius: 0.25rem;
     background: rgb(42, 91, 215);
     color: white;
-}
+} */
 
 .side-panel{
     grid-area: right;
-    background-color: rgb(25, 41, 80);
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
 }

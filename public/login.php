@@ -1,3 +1,21 @@
+<?php
+session_start();
+require_once __DIR__ . '/../config/Config.php';
+
+// If already logged in, redirect to dashboard
+if (isset($_SESSION['user_id'])) {
+    header('Location: dashboardAll.php');
+    // header('Location: index.php');
+    exit;
+}
+
+$redirectUrl = $_GET['redirect'] ?? 'dashboardAll.php';
+$_SESSION['redirect_after_login'] = $redirectUrl;
+
+// Google OAuth URL (will be set via JavaScript)
+$googleClientId = Config::get('GOOGLE_CLIENT_ID', '');
+$googleRedirectUri = Config::get('GOOGLE_REDIRECT_URI', 'http://qr.local/oauth-callback.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,17 +26,28 @@
 </head>
 <body>
     <Header>
-        <h1>AARO</h1>
+        <div class="logo">🔗</div>
+        <h1>QR Code Generator</h1>
     </Header>
     <div class="main">
         <div class="section-login">
             <div class="head-login">
                 <h2>Login and start making</h2>
-                <p>Don't have an account? <a href="">Sign up</a></p>
             </div>
-
+            
+            <div class="features">
+                <h3>What you get:</h3>
+                <div class="feature-item">Generate 10 QR codes for month</div>
+                <div class="feature-item">Download your own</div>
+                <h3>For Newcomer Get 7 Day Trial Feature Premium </h3>
+                <div class="feature-item">You can edit your own QR URL</div>
+                <div class="feature-item">Track scans with analytics</div>
+                <div class="feature-item">Download </div>
+                <div class="feature-item">Custom QR (logos & colors)</div>
+            </div>
+            
             <div class="login-google">
-                <a href="">
+                <a id="google-login-btn" href="#">
                     <span>
                         <!-- logo google -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none">
@@ -30,10 +59,10 @@
                         Continue with google
                     </span>
                 </a>
-                <div class="divider">OR</div>
+                <div class="divider"></div>
             </div>
 
-            <div class="form-login">
+            <!-- <div class="form-login">
                 <form action="">
                     <div>
                         <div>Email</div>
@@ -50,7 +79,7 @@
                     </div>
                     <button type="submit">Log in</button>
                 </form>
-            </div>
+            </div> -->
             <div class="term-and-condition">
                 <span>
                     By logging in with an account, you agree to AARO's <a href="">Terms of Service</a>, <a href="">Privacy Policy</a> and <a href="">Acceptable Use Policy</a>.
@@ -62,5 +91,28 @@
     <div class="side-panel">
         
     </div>
+      <script>
+        // Google OAuth login
+        document.getElementById('google-login-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const clientId = '<?php echo htmlspecialchars($googleClientId); ?>';
+            const redirectUri = '<?php echo htmlspecialchars($googleRedirectUri); ?>';
+            
+            if (!clientId) {
+                alert('Google OAuth is not configured. Please set GOOGLE_CLIENT_ID in .env file');
+                return;
+            }
+            
+            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+                `client_id=${encodeURIComponent(clientId)}` +
+                `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+                `&response_type=code` +
+                `&scope=email profile` +
+                `&access_type=online`;
+            
+            window.location.href = authUrl;
+        });
+    </script>
 </body>
 </html>
