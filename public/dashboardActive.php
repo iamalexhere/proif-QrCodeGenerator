@@ -163,7 +163,7 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
             name="search"
             class="search-input"
             placeholder="Search QRCodes..."
-            value="<?php echo htmlspecialchars($search_query); ?>" <!-- Menampilkan kembali input pencarian -->
+            value="<?php echo htmlspecialchars($search_query); ?>"
           >
         </form>
       </div>
