@@ -49,3 +49,31 @@ CREATE TABLE users (
 ALTER TABLE links
 ADD COLUMN user_id INT NULL AFTER id,
 ADD FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL;
+
+CREATE TABLE link_analytics_summary (
+  link_id INT PRIMARY KEY,
+  total_clicks INT DEFAULT 0,
+  today_clicks INT DEFAULT 0,
+  last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (link_id) REFERENCES links(id) ON DELETE CASCADE
+);
+
+DELIMITER $$
+
+CREATE PROCEDURE update_link_analytics(IN p_link_id INT)
+BEGIN
+  DECLARE total INT DEFAULT 0;
+  DECLARE today INT DEFAULT 0;
+
+  SELECT COUNT(*) INTO total FROM clicks WHERE link_id = p_link_id;
+  SELECT COUNT(*) INTO today FROM clicks WHERE link_id = p_link_id AND DATE(click_time) = CURDATE();
+
+  INSERT INTO link_analytics_summary (link_id, total_clicks, today_clicks)
+  VALUES (p_link_id, total, today)
+  ON DUPLICATE KEY UPDATE
+    total_clicks = total,
+    today_clicks = today,
+    last_updated = NOW();
+END $$
+
+DELIMITER ;

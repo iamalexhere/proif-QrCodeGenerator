@@ -61,12 +61,6 @@ class Statistics {
             $city = 'Bandung';
         }
 
-        // Debug log (hapus kalau sudah fix)
-        file_put_contents(__DIR__ . '/../debug_geo.txt',
-            date('Y-m-d H:i:s') . " | IP: {$ipAddress} | Lookup: {$lookupIp} | Country: {$country} | City: {$city} | Response: {$response}\n",
-            FILE_APPEND
-        );
-
         // Simpan ke database
         $stmt = $this->db->prepare("
             INSERT INTO clicks (link_id, ip_address, user_agent, country, city, device_type)
@@ -75,6 +69,8 @@ class Statistics {
         $stmt->bind_param("isssss", $linkId, $ipAddress, $userAgent, $country, $city, $deviceType);
         $stmt->execute();
         $stmt->close();
+
+        $this->db->query("CALL update_link_analytics({$linkId})");
     }
 
 
