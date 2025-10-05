@@ -1,1 +1,134 @@
-<svg id="Livello_1" data-name="Livello 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 240 240"><defs><linearGradient id="linear-gradient" x1="120" y1="240" x2="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1d93d2"/><stop offset="1" stop-color="#38b0e3"/></linearGradient></defs><title>Telegram_logo</title><circle cx="120" cy="120" r="120" fill="url(#linear-gradient)"/><path d="M81.229,128.772l14.237,39.406s1.78,3.687,3.686,3.687,30.255-29.492,30.255-29.492l31.525-60.89L81.737,118.6Z" fill="#c8daea"/><path d="M100.106,138.878l-2.733,29.046s-1.144,8.9,7.754,0,17.415-15.763,17.415-15.763" fill="#a9c6d8"/><path d="M81.486,130.178,52.2,120.636s-3.5-1.42-2.373-4.64c.232-.664.7-1.229,2.1-2.2,6.489-4.523,120.106-45.36,120.106-45.36s3.208-1.081,5.1-.362a2.766,2.766,0,0,1,1.885,2.055,9.357,9.357,0,0,1,.254,2.585c-.009.752-.1,1.449-.169,2.542-.692,11.165-21.4,94.493-21.4,94.493s-1.239,4.876-5.678,5.043A8.13,8.13,0,0,1,146.1,172.5c-8.711-7.493-38.819-27.727-45.472-32.177a1.27,1.27,0,0,1-.546-.9c-.093-.469.417-1.05.417-1.05s52.426-46.6,53.821-51.492c.108-.379-.3-.566-.848-.4-3.482,1.281-63.844,39.4-70.506,43.607A3.21,3.21,0,0,1,81.486,130.178Z" fill="#fff"/></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg1"
+   xml:space="preserve"
+   sodipodi:docname="telegram.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
+     id="namedview1"
+     pagecolor="#000000"
+     bordercolor="#000000"
+     borderopacity="0.36862745"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.71891835"
+     inkscape:cx="-16.691743"
+     inkscape:cy="269.15435"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_x0020_1" /><defs
+     id="defs1"><style
+       type="text/css"
+       id="style1">
+   <![CDATA[
+    .fil0 {fill:#1977F3;fill-rule:nonzero}
+    .fil1 {fill:#FEFEFE;fill-rule:nonzero}
+   ]]>
+  </style><radialGradient
+       id="paint0_radial_87_7153"
+       cx="0"
+       cy="0"
+       r="1"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(14.500016,-20.999988,20.999988,14.500016,12,23)"><stop
+         stop-color="#B13589"
+         id="stop5" /><stop
+         offset="0.79309"
+         stop-color="#C62F94"
+         id="stop6" /><stop
+         offset="1"
+         stop-color="#8A3AC8"
+         id="stop7" /></radialGradient><radialGradient
+       id="paint1_radial_87_7153"
+       cx="0"
+       cy="0"
+       r="1"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(9.4999814,-20.499957,20.499957,9.4999814,11,31)"><stop
+         stop-color="#E0E8B7"
+         id="stop8" /><stop
+         offset="0.444662"
+         stop-color="#FB8A2E"
+         id="stop9" /><stop
+         offset="0.71474"
+         stop-color="#E2425C"
+         id="stop10" /><stop
+         offset="1"
+         stop-color="#E2425C"
+         stop-opacity="0"
+         id="stop11" /></radialGradient><radialGradient
+       id="paint2_radial_87_7153"
+       cx="0"
+       cy="0"
+       r="1"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(38.500027,-5.5000022,1.1763934,8.2347563,0.500002,3)"><stop
+         offset="0.156701"
+         stop-color="#406ADC"
+         id="stop12" /><stop
+         offset="0.467799"
+         stop-color="#6A45BE"
+         id="stop13" /><stop
+         offset="1"
+         stop-color="#6A45BE"
+         stop-opacity="0"
+         id="stop14" /></radialGradient><style
+       id="style1-7">.cls-1{fill:#06c755;}.cls-2{fill:#fff;}</style><linearGradient
+       id="linear-gradient"
+       x1="120"
+       y1="240"
+       x2="120"
+       gradientUnits="userSpaceOnUse"><stop
+         offset="0"
+         stop-color="#1d93d2"
+         id="stop1" /><stop
+         offset="1"
+         stop-color="#38b0e3"
+         id="stop2" /></linearGradient></defs><g
+     id="Layer_x0020_1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     style="clip-rule:evenodd;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
+     transform="matrix(0.01955164,0,0,0.01955164,10.004519,9.9999766)">
+  <metadata
+   id="CorelCorpID_0Corel-Layer" />
+  <rect
+   style="clip-rule:evenodd;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke-width:13.5435;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
+   id="rect2"
+   width="5114.6606"
+   height="5114.6606"
+   x="-511.69717"
+   y="-511.46494" />
+ <g
+   id="g3"
+   transform="matrix(17.048868,0,0,17.048868,-0.23110825,0.00122009)"><circle
+     cx="120"
+     cy="120"
+     r="120"
+     fill="url(#linear-gradient)"
+     id="circle2"
+     style="fill:url(#linear-gradient)" /><path
+     d="m 81.229,128.772 14.237,39.406 c 0,0 1.78,3.687 3.686,3.687 1.906,0 30.255,-29.492 30.255,-29.492 L 160.932,81.483 81.737,118.6 Z"
+     fill="#c8daea"
+     id="path2" /><path
+     d="m 100.106,138.878 -2.733,29.046 c 0,0 -1.144,8.9 7.754,0 8.898,-8.9 17.415,-15.763 17.415,-15.763"
+     fill="#a9c6d8"
+     id="path3" /><path
+     d="M 81.486,130.178 52.2,120.636 c 0,0 -3.5,-1.42 -2.373,-4.64 0.232,-0.664 0.7,-1.229 2.1,-2.2 6.489,-4.523 120.106,-45.36 120.106,-45.36 0,0 3.208,-1.081 5.1,-0.362 a 2.766,2.766 0 0 1 1.885,2.055 9.357,9.357 0 0 1 0.254,2.585 c -0.009,0.752 -0.1,1.449 -0.169,2.542 -0.692,11.165 -21.4,94.493 -21.4,94.493 0,0 -1.239,4.876 -5.678,5.043 A 8.13,8.13 0 0 1 146.1,172.5 c -8.711,-7.493 -38.819,-27.727 -45.472,-32.177 a 1.27,1.27 0 0 1 -0.546,-0.9 c -0.093,-0.469 0.417,-1.05 0.417,-1.05 0,0 52.426,-46.6 53.821,-51.492 0.108,-0.379 -0.3,-0.566 -0.848,-0.4 -3.482,1.281 -63.844,39.4 -70.506,43.607 a 3.21,3.21 0 0 1 -1.48,0.09 z"
+     fill="#ffffff"
+     id="path4" /></g></g></svg>
