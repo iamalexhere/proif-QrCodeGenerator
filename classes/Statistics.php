@@ -27,7 +27,7 @@ class Statistics {
             return;
         }
 
-        // Deteksi device
+        // Deteksi jenis perangkat
         $deviceType = 'Desktop';
         $ua = strtolower($userAgent);
         if (preg_match('/(tablet|ipad|playbook)|(android(?!.*(mobi|opera mini)))/i', $ua)) {
@@ -36,10 +36,36 @@ class Statistics {
             $deviceType = 'Mobile';
         }
 
-        // Ambil lokasi dari ipapi.co (lebih akurat daripada ip-api)
-        $geo = @json_decode(@file_get_contents("https://ipapi.co/{$ipAddress}/json/"), true);
-        $country = $geo['country_name'] ?? 'Unknown';
+        // --- Lokasi (pakai ipwho.is + fallback) ---
+        $lookupIp = ($ipAddress === '127.0.0.1' || $ipAddress === '::1') ? '8.8.8.8' : $ipAddress;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://ipwho.is/{$lookupIp}");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // bypass SSL di localhost
+        $response = curl_exec($ch);
+        if (curl_errno($ch)) {
+            error_log('cURL Error: ' . curl_error($ch));
+        }
+        curl_close($ch);
+
+        $geo = json_decode($response, true);
+        $country = $geo['country'] ?? 'Unknown';
         $city = $geo['city'] ?? 'Unknown';
+
+        // Fallback untuk localhost
+        if ($ipAddress === '127.0.0.1' || $ipAddress === '::1') {
+            $country = 'Indonesia';
+            $city = 'Bandung';
+        }
+
+        // Debug log (hapus kalau sudah fix)
+        file_put_contents(__DIR__ . '/../debug_geo.txt',
+            date('Y-m-d H:i:s') . " | IP: {$ipAddress} | Lookup: {$lookupIp} | Country: {$country} | City: {$city} | Response: {$response}\n",
+            FILE_APPEND
+        );
 
         // Simpan ke database
         $stmt = $this->db->prepare("
@@ -50,6 +76,7 @@ class Statistics {
         $stmt->execute();
         $stmt->close();
     }
+
 
     /**
      * Method utama untuk mengambil semua statistik untuk satu link.

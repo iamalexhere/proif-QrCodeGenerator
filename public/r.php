@@ -13,7 +13,7 @@
 // Memuat class yang diperlukan
 require_once __DIR__ . '/../classes/UrlShortener.php';
 require_once __DIR__ . '/../config/Config.php';
-require_once __DIR__ . '/../classes/Analytics.php'; 
+require_once __DIR__ . '/../classes/Statistics.php';
 
 // === MENGAMBIL KODE PENDEK DARI URL ===
 $kodePendek = '';
@@ -57,8 +57,12 @@ try {
     $linkId = $linkData['id'];
 
     // --- Menjalankan pencatatan statistik ---
-    $analytics = new Analytics();
-    $analytics->recordClick($linkId);
+    // $analytics = new Statistics();
+    // $analytics->recordClick($linkId);
+    // Catat statistik klik QR
+    $stats = new Statistics();
+    $stats->recordClick($linkId);
+
     
     // === PENGATURAN IKLAN ===
     $tampilkanIklan = true;
