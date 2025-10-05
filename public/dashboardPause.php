@@ -1,4 +1,17 @@
 <?php
+/**
+ * ============================================================
+ * DASHBOARD - PAUSED QR CODES
+ * ------------------------------------------------------------
+ * File ini menampilkan semua QR Code yang memiliki status "paused".
+ * Termasuk fitur:
+ *  - Pagination
+ *  - Search filter
+ *  - Statistik QR aktif & paused
+ *  - Tombol resume, view detail, dan download QR
+ * ============================================================
+ */
+
 // Menampilkan error untuk debugging
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -119,6 +132,8 @@ function getDisplayName($link) {
     }
 }
 ?>
+
+<!-- Halaman HTML -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -147,7 +162,7 @@ function getDisplayName($link) {
             id="searchInput" 
             name="search"
             class="search-input" 
-            placeholder="Search paused QR codes..."
+            placeholder="Search QRCodes..."
             value="<?php echo htmlspecialchars($search_query); ?>"
           >
         </form>
@@ -268,7 +283,8 @@ function getDisplayName($link) {
                       </div>
                     </div>
 
-                    <a href="view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardPause.php" class="btn btn-edit">✏️ View Details</a>
+                    <!-- Tombol view_details, donwload, pause/resume -->
+                    <button class="btn btn-edit" onclick="window.location.href='view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardPause.php'">✏️ View Details</button>
                     <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
                     <button class="btn btn-resume" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', 'paused')">▶️ Resume</button>
                   </div>
