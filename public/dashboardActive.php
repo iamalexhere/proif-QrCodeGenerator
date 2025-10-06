@@ -45,7 +45,7 @@ $current_page = max(1, $current_page);
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 // Default kondisi WHERE hanya menampilkan QR aktif
-$where_clause = "WHERE status = 'active'";
+$where_clause = "WHERE l.status = 'active'";
 
 // Variabel untuk parameter pencarian (akan digunakan di prepared statement)
 $search_param = '';
@@ -55,7 +55,7 @@ if (!empty($search_query)) {
     // Format pencarian menggunakan LIKE (wildcard %)
     $search_param = '%' . $search_query . '%';
     // Tambahkan kondisi pencarian untuk kolom custom_url dan original_url
-    $where_clause .= " AND (custom_url LIKE ? OR original_url LIKE ?)";
+    $where_clause .= " AND (l.custom_url LIKE ? OR l.original_url LIKE ?)";
 }
 
 
@@ -63,7 +63,7 @@ if (!empty($search_query)) {
 // HITUNG TOTAL DATA (UNTUK PAGINATION)
 if (!empty($search_query)) {
     // Jika sedang melakukan pencarian, gunakan prepared statement untuk keamanan (hindari SQL Injection)
-    $stmt = $db->prepare("SELECT COUNT(*) as total FROM links " . $where_clause);
+    $stmt = $db->prepare("SELECT COUNT(*) as total FROM links l " . $where_clause);
     // Bind parameter pencarian ke query
     $stmt->bind_param('ss', $search_param, $search_param);
     $stmt->execute();
@@ -86,22 +86,56 @@ $current_page = min($current_page, $total_pages);
 $offset = ($current_page - 1) * $items_per_page;
 
 
-// AMBIL DATA QR AKTIF DARI DATABASE
+// AMBIL DATA QR AKTIF DARI DATABASE DENGAN STATISTIK
+$base_query = "
+    SELECT 
+        l.*,
+        COALESCE(stats.scan_count, 0) as scan_count,
+        COALESCE(stats.top_device, 'N/A') as top_device,
+        COALESCE(stats.top_city, 'N/A') as top_city
+    FROM links l
+    LEFT JOIN (
+        SELECT 
+            link_id,
+            COUNT(*) as scan_count,
+            (SELECT user_agent FROM clicks c2 WHERE c2.link_id = c.link_id 
+             GROUP BY user_agent ORDER BY COUNT(*) DESC LIMIT 1) as top_device,
+            (SELECT city FROM clicks c3 WHERE c3.link_id = c.link_id AND city IS NOT NULL
+             GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1) as top_city
+        FROM clicks c
+        GROUP BY link_id
+    ) stats ON l.id = stats.link_id
+";
+
 if (!empty($search_query)) {
     // Jika ada pencarian, gunakan prepared statement agar aman
-    $stmt = $db->prepare("SELECT * FROM links " . $where_clause . " ORDER BY created_at DESC LIMIT ? OFFSET ?");
+    $stmt = $db->prepare($base_query . $where_clause . " ORDER BY l.created_at DESC LIMIT ? OFFSET ?");
     $stmt->bind_param('ssii', $search_param, $search_param, $items_per_page, $offset);
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
     // Jika tidak ada pencarian, ambil semua link aktif berdasarkan urutan waktu pembuatan
-    $result = $db->query("SELECT * FROM links WHERE status = 'active' ORDER BY created_at DESC LIMIT $items_per_page OFFSET $offset");
+    $result = $db->query($base_query . " WHERE l.status = 'active' ORDER BY l.created_at DESC LIMIT $items_per_page OFFSET $offset");
 }
 
 // Simpan hasil query ke dalam array untuk digunakan di tampilan HTML
 $active_links = [];
 if ($result) {
     while ($row = $result->fetch_assoc()) {
+        // Extract device type from user agent for better display
+        if ($row['top_device'] && $row['top_device'] !== 'N/A') {
+            if (stripos($row['top_device'], 'iPhone') !== false || stripos($row['top_device'], 'iPad') !== false) {
+                $row['top_device'] = 'iOS';
+            } elseif (stripos($row['top_device'], 'Android') !== false) {
+                $row['top_device'] = 'Android';
+            } elseif (stripos($row['top_device'], 'Windows') !== false) {
+                $row['top_device'] = 'Windows';
+            } elseif (stripos($row['top_device'], 'Mac') !== false) {
+                $row['top_device'] = 'Mac';
+            } else {
+                $row['top_device'] = 'Other';
+            }
+        }
         $active_links[] = $row;
     }
 }
