@@ -14,8 +14,9 @@
  ***********************************************************/
 
 // KONEKSI DATABASE
-// Mengimpor file Database dan mengambil instance koneksi
+// Memuat koneksi database
 require_once __DIR__ . '/../classes/Database.php';
+require_once __DIR__ . '/../config/Config.php';
 $db = Database::getInstance()->getConnection();
 
 // PAGINATION 
@@ -285,7 +286,7 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
                   </div>
                   <div class="info-item">
                     <span class="info-label">Short Link</span>
-                    <?php $baseDomain = 'http://qr.local/r/'; $fullShortUrl = $baseDomain . $link['short_url'];?>
+                    <?php $fullShortUrl = Config::getShortUrlBase() . '/' . $link['short_url'];?>
                     <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>')">
                       <?php echo htmlspecialchars($fullShortUrl); ?> <span>📋</span>
                     </a>

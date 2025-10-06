@@ -20,6 +20,7 @@
 // Memanggil file Database.php untuk menggunakan kelas Database
 // Database.php berisi konfigurasi koneksi dan metode getInstance() agar hanya satu koneksi yang digunakan (Singleton Pattern)
 require_once __DIR__ . '/../classes/Database.php';
+require_once __DIR__ . '/../config/Config.php';
 
 // Membuat koneksi tunggal (singleton) ke database MySQL
 $db = Database::getInstance()->getConnection();
@@ -302,7 +303,7 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
                   
                   <div class="info-item">
                     <span class="info-label">Short Link</span>
-                    <?php $baseDomain = 'http://qr.local/r/'; $fullShortUrl = $baseDomain . $link['short_url'];?>
+                    <?php $fullShortUrl = Config::getShortUrlBase() . '/' . $link['short_url'];?>
                     <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>')">
                       <?php echo htmlspecialchars($fullShortUrl); ?> <span>📋</span>
                     </a>

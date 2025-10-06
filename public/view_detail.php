@@ -52,8 +52,7 @@ if (!$linkData) {
       <?php endif; ?>
       <div class="qr-details">
         <?php
-          $baseDomain = 'http://qr.local/r/';
-          $fullShortUrl = $baseDomain . $linkData['short_url'];
+          $fullShortUrl = Config::getShortUrlBase() . '/' . $linkData['short_url'];
         ?>
         <p>
           <strong>Short Link:</strong>

@@ -18,6 +18,7 @@ error_reporting(E_ALL);
 
 // Memuat koneksi database
 require_once __DIR__ . '/../classes/Database.php';
+require_once __DIR__ . '/../config/Config.php';
 
 // Mengambil koneksi
 $db = Database::getInstance()->getConnection();
@@ -250,7 +251,7 @@ function getDisplayName($link) {
                   </div>
                   <div class="info-item">
                     <span class="info-label">Short Link</span>
-                    <?php $baseDomain = 'http://qr.local/r/'; $fullShortUrl = $baseDomain . $link['short_url'];?>
+                    <?php $fullShortUrl = Config::getShortUrlBase() . '/' . $link['short_url'];?>
                     <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>')">
                       <?php echo htmlspecialchars($fullShortUrl); ?>
                       <span>📋</span>
