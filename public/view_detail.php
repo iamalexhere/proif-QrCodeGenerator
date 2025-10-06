@@ -1,18 +1,18 @@
 <?php
-
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../config/Config.php';
 
-// Mengambil ID dari URL. Di dashboard, kita mengirim 'id'
-$linkId = $_GET['id'] ?? 0;
+// Tangkap parameter kode QR dan halaman asal
+$code = $_GET['code'] ?? '';                   // short code QR
+$returnPage = $_GET['return'] ?? 'dashboardAll.php'; // default balik ke dashboardAll
 $linkData = null;
 
-// Mengambil data detail untuk link ini dari tabel 'links'
-if ($linkId > 0) {
+// Mengambil data detail untuk link ini dari tabel 'links' berdasarkan short_url
+if (!empty($code)) {
     try {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT id, original_url, short_url, custom_url, logo_path, qr_color, qr_image, status, created_at FROM links WHERE id = ?");
-        $stmt->bind_param("i", $linkId);
+        $stmt = $db->prepare("SELECT id, original_url, short_url, custom_url, logo_path, qr_color, qr_image, status, created_at FROM links WHERE short_url = ?");
+        $stmt->bind_param("s", $code);
         $stmt->execute();
         $result = $stmt->get_result();
         $linkData = $result->fetch_assoc();
@@ -27,9 +27,6 @@ if (!$linkData) {
     header('Location: dashboardAll.php');
     exit;
 }
-
-// Menentukan halaman kembali
-$returnPage = $_GET['return'] ?? 'dashboardAll.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -40,6 +37,7 @@ $returnPage = $_GET['return'] ?? 'dashboardAll.php';
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <!-- Navbar dengan tombol back dinamis -->
   <header class="navbar">
     <div class="logo">QR Code Generator</div>
     <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
@@ -47,21 +45,25 @@ $returnPage = $_GET['return'] ?? 'dashboardAll.php';
 
   <main class="edit-container">
     <section class="edit-left">
-      <img src="data:image/png;base64,<?php echo base64_encode($linkData['qr_image']); ?>" alt="QR Code" class="qr-image">
+      <?php if (!empty($linkData['qr_image'])): ?>
+        <img src="data:image/png;base64,<?php echo base64_encode($linkData['qr_image']); ?>" alt="QR Code" class="qr-image">
+      <?php else: ?>
+        <img src="images/base.png" alt="QR Code" class="qr-image">
+      <?php endif; ?>
       <div class="qr-details">
         <?php
           $baseDomain = 'http://qr.local/r/';
           $fullShortUrl = $baseDomain . $linkData['short_url'];
-          ?>
-          <p>
-            <strong>Short Link:</strong>
-            <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" target="_blank">
-              <?php echo htmlspecialchars($fullShortUrl); ?>
-            </a>
-          </p>
+        ?>
+        <p>
+          <strong>Short Link:</strong>
+          <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" target="_blank">
+            <?php echo htmlspecialchars($fullShortUrl); ?>
+          </a>
+        </p>
         <div class="destination-url">
-            <strong>Destination URL:</strong>
-            <p style="word-break: break-all; margin-top: 5px;"><?php echo htmlspecialchars($linkData['original_url']); ?></p>
+          <strong>Destination URL:</strong>
+          <p style="word-break: break-all; margin-top: 5px;"><?php echo htmlspecialchars($linkData['original_url']); ?></p>
         </div>
       </div>
     </section>

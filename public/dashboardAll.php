@@ -1,15 +1,81 @@
-<?php
+<?php 
+/***********************************************************
+ * DASHBOARD QR CODE - ALL
+ * ---------------------------------------------------------
+ * File ini menampilkan semua QR Code yang tersimpan di DB 
+ * dengan fitur pencarian, pagination, dan statistik QR aktif.
+ * 
+ * Struktur utama:
+ *  Koneksi Database
+ *  Pagination + Pencarian (Search)
+ *  Query Data + Perhitungan Total
+ *  Perhitungan Statistik Sidebar
+ *  Render Tampilan (Sidebar, Main, Pagination)
+ ***********************************************************/
 
-//Koneksi db
+// KONEKSI DATABASE
+// Mengimpor file Database dan mengambil instance koneksi
 require_once __DIR__ . '/../classes/Database.php';
-
-// Mengambil instance koneksi database
 $db = Database::getInstance()->getConnection();
 
-// Menyiapkan dan menjalankan query untuk mengambil semua data dari tabel 'links'
-$result = $db->query("SELECT * FROM links ORDER BY created_at DESC");
+// PAGINATION 
+// Jumlah item per halaman
+$items_per_page = 3;
 
-// Menyimpan semua hasil query ke dalam sebuah array
+// Ambil halaman aktif dari parameter URL (default = 1)
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$current_page = max(1, $current_page); // Pastikan minimal halaman = 1
+
+// FITUR PENCARIAN
+// Ambil kata kunci pencarian (jika ada)
+$search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
+$where_clause = '';  // Menyimpan kondisi pencarian SQL
+$search_param = '';  // Menyimpan parameter untuk prepared statement
+
+// Jika user mengetikkan sesuatu di search bar
+if (!empty($search_query)) {
+    $search_param = '%' . $search_query . '%';
+    // Mencari berdasarkan custom_url atau original_url
+    $where_clause = " WHERE custom_url LIKE ? OR original_url LIKE ?";
+}
+
+// HITUNG TOTAL DATA
+// Tujuan: untuk menentukan total halaman yang tersedia
+if (!empty($search_query)) {
+    // Jika ada pencarian, gunakan prepared statement agar aman dari SQL Injection
+    $stmt = $db->prepare("SELECT COUNT(*) as total FROM links" . $where_clause);
+    $stmt->bind_param('ss', $search_param, $search_param);
+    $stmt->execute();
+    $total_items = $stmt->get_result()->fetch_assoc()['total'];
+    $stmt->close();
+} else {
+    // Jika tidak ada pencarian, hitung total semua data
+    $count_query = $db->query("SELECT COUNT(*) as total FROM links");
+    $total_items = $count_query->fetch_assoc()['total'];
+}
+
+// Hitung total halaman berdasarkan jumlah data
+$total_pages = max(1, ceil($total_items / $items_per_page));
+
+// Pastikan halaman saat ini tidak melebihi total halaman
+$current_page = min($current_page, $total_pages);
+
+// ==================== 5. HITUNG OFFSET QUERY ====================
+// Digunakan untuk menentukan data mana yang akan diambil dari database
+$offset = ($current_page - 1) * $items_per_page;
+
+// ==================== 6. QUERY DATA LINKS ====================
+// Ambil data QR sesuai halaman dan kondisi pencarian
+if (!empty($search_query)) {
+    $stmt = $db->prepare("SELECT * FROM links" . $where_clause . " ORDER BY created_at DESC LIMIT ? OFFSET ?");
+    $stmt->bind_param('ssii', $search_param, $search_param, $items_per_page, $offset);
+    $stmt->execute();
+    $result = $stmt->get_result();
+} else {
+    $result = $db->query("SELECT * FROM links ORDER BY created_at DESC LIMIT $items_per_page OFFSET $offset");
+}
+
+// Simpan hasil query ke array $links
 $links = [];
 if ($result) {
     while ($row = $result->fetch_assoc()) {
@@ -17,54 +83,86 @@ if ($result) {
     }
 }
 
-// Menghitung jumlah total, QR aktif, dan QR yang dijeda
-$total_qrs = count($links);
+// HITUNG STATISTIK UNTUK SIDEBAR
+// Mengambil semua status QR untuk menampilkan jumlah total, aktif, dan pause
+$all_links_result = $db->query("SELECT status FROM links");
+
+$total_qrs = 0;
 $active_qrs = 0;
 $paused_qrs = 0;
-foreach ($links as $link) {
-    if ($link['status'] === 'active') {
-        $active_qrs++;
-    } else {
-        $paused_qrs++;
+
+if ($all_links_result) {
+    while ($row = $all_links_result->fetch_assoc()) {
+        $total_qrs++;
+        if ($row['status'] === 'active') {
+            $active_qrs++;
+        } else {
+            $paused_qrs++;
+        }
     }
 }
 
-// Mengambil nama file PHP yang sedang dibuka untuk menentukan menu aktif di sidebar
-$current_page = basename($_SERVER['PHP_SELF']);
+// Simpan nama file halaman aktif untuk menentukan item menu mana yang disorot
+$current_page_name = basename($_SERVER['PHP_SELF']);
 ?>
+
+<!--BAGIAN HTML-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Dashboard QR Code - All</title>
+
+  <!-- Load file CSS dan JS -->
   <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/searchbar.css">
+  <link rel="stylesheet" href="css/popUp.css">
+  <link rel="stylesheet" href="css/pagination.css">
+  <script src="js/script.js"></script>
 </head>
+
 <body>
   <div class="container">
-    <!-- Sidebar -->
+
+    <!--SIDEBAR-->
     <div class="sidebar">
       <div class="sidebar-header">
         <h2>QR Dashboard</h2>
         <p>Manage your QR codes</p>
       </div>
 
+      <!-- Form Pencarian -->
+      <div class="search-container">
+        <form action="" method="GET" id="searchForm">
+          <input 
+            type="text"
+            id="searchInput"
+            name="search"
+            class="search-input"
+            placeholder="Search QRCodes..."
+            value="<?php echo htmlspecialchars($search_query); ?>"
+          >
+        </form>
+      </div>
+
+      <!-- Navigasi Menu -->
       <ul class="nav-menu">
         <li class="nav-item">
-          <a href="dashboardAll.php" class="nav-link <?php echo ($current_page == 'dashboardAll.php') ? 'active' : ''; ?>">
+          <a href="dashboardAll.php" class="nav-link <?php echo ($current_page_name == 'dashboardAll.php') ? 'active' : ''; ?>">
             <span class="nav-icon">📊</span>
             <span class="nav-text">All QR Codes</span>
             <span class="nav-count"><?php echo $total_qrs; ?></span>
           </a>
         </li>
         <li class="nav-item">
-          <a href="dashboardActive.php" class="nav-link <?php echo ($current_page == 'dashboardActive.php') ? 'active' : ''; ?>">
+          <a href="dashboardActive.php" class="nav-link <?php echo ($current_page_name == 'dashboardActive.php') ? 'active' : ''; ?>">
             <span class="nav-icon">✅</span>
             <span class="nav-text">Active QR Codes</span>
             <span class="nav-count"><?php echo $active_qrs; ?></span>
           </a>
         </li>
         <li class="nav-item">
-          <a href="dashboardPause.php" class="nav-link <?php echo ($current_page == 'dashboardPause.php') ? 'active' : ''; ?>">
+          <a href="dashboardPause.php" class="nav-link <?php echo ($current_page_name == 'dashboardPause.php') ? 'active' : ''; ?>">
             <span class="nav-icon">⏸️</span>
             <span class="nav-text">Paused QR Codes</span>
             <span class="nav-count"><?php echo $paused_qrs; ?></span>
@@ -72,228 +170,254 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </li>
       </ul>
 
+      <!-- Tombol Buat QR Baru & Upgrade -->
       <div class="sidebar-footer">
         <a href="createQR.php" class="create-btn">
           <span class="create-btn-icon">+</span>
           Create New QR Code
         </a>
 
-         <div class="trial-section">
+        <div class="trial-section">
           <div class="trial-text">Start Free Trial for 7 days</div>
           <a href="payment.php" class="upgrade-btn">Upgrade</a>
         </div>
       </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- MAIN CONTENT-->
     <div class="main-content">
       <div class="header">
         <h1 id="page-title">All QR Codes</h1>
-        <p id="page-subtitle">Manage and track your QR codes with advanced analytics</p>
+        <p id="page-subtitle">
+          <?php if (!empty($search_query)): ?>
+            <!-- Jika user sedang mencari sesuatu -->
+            Search results for "<strong><?php echo htmlspecialchars($search_query); ?></strong>" - <?php echo $total_items; ?> found
+          <?php else: ?>
+            Manage and track your QR codes with advanced analytics
+          <?php endif; ?>
+        </p>
       </div>
 
+      <!--DAFTAR QR CODE-->
       <main class="dashboard">
-        <!-- Create New QR Card -->
-        <div class="qr-card create-card" onclick="location.href='createQR.php'">
-          <div class="create-icon">+</div>
-          <h3>Create New QR Code</h3>
-          <p>Generate a new QR code with custom design</p>
-        </div>
 
+        <!-- Kartu Buat Baru (disembunyikan saat pencarian) -->
+        <?php if (empty($search_query)): ?>
+          <div class="qr-card create-card" onclick="location.href='createQR.php'">
+            <div class="create-icon">+</div>
+            <h3>Create New QR Code</h3>
+            <p>Generate a new QR code with custom design</p>
+          </div>
+        <?php endif; ?>
+
+        <!-- Tampilkan pesan jika data kosong -->
         <?php if (empty($links)): ?>
-            <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-                <h3>No QR Codes Found</h3>
-                <p>You haven't created any QR codes yet. Let's create one!</p>
-            </div>
+          <div class="empty-state">
+            <h3>No QR Codes Found</h3>
+            <?php if (!empty($search_query)): ?>
+              <p>No results match your search "<strong><?php echo htmlspecialchars($search_query); ?></strong>"</p>
+            <?php else: ?>
+              <p>You haven't created any QR codes yet. Let's create one!</p>
+            <?php endif; ?>
+          </div>
+
         <?php else: ?>
-            <?php foreach ($links as $link): ?>
-                <div class="qr-card" data-status="<?php echo htmlspecialchars($link['status']); ?>">
-                    <div class="performance-indicator <?php echo ($link['status'] !== 'active') ? 'paused' : ''; ?>"></div>
-                    
-                    <div class="card-header">
-                        <div class="qr-icon">QR</div>
-                        <div class="card-title">
-                            <h3><?php echo htmlspecialchars($link['custom_url'] ?: 'Untitled'); ?></h3>
-                            <div class="created-date">Created: <?php echo date('F d, Y', strtotime($link['created_at'])); ?></div>
-                        </div>
-                        <span class="status-badge status-<?php echo htmlspecialchars($link['status']); ?>">
-                            <?php echo ucfirst(htmlspecialchars($link['status'])); ?>
-                        </span>
-                    </div>
+          <!-- Loop untuk setiap QR code -->
+          <?php foreach ($links as $link): ?>
 
-                    <div class="qr-content">
-                        <div class="qr-info">
-                            <div class="info-item">
-                                <span class="info-label">Original URL</span>
-                                <div class="url-display"><?php echo htmlspecialchars($link['original_url']); ?></div>
-                            </div>
-                            
-                            <div class="info-item">
-                                <span class="info-label">Short Link</span>
-                                <?php $baseDomain = 'http://qr.local/r/'; $fullShortUrl = $baseDomain . $link['short_url'];?>
-                                <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($link['short_url']); ?>')">
-                                    <?php echo htmlspecialchars($fullShortUrl); ?>
-                                    <span>📋</span>
-                                </a>
-                            </div>
-                        </div>
+            <?php
+            // Menentukan nama tampilan QR
+            // Berdasarkan custom URL, jika kosong maka ambil host dari original_url
+            // Jika domain cocok dengan platform populer → tampilkan nama platform
+             
+            $display_name = $link['custom_url'];
+            if (empty($display_name) && !empty($link['original_url'])) {
+                $host = parse_url($link['original_url'], PHP_URL_HOST);
+                if ($host) {
+                    $host = preg_replace('/^www\./', '', strtolower($host));
 
-                        <div class="qr-visual">
-                          <?php if (!empty($link['qr_image'])): ?>
-                            <img src="data:image/png;base64,<?php echo base64_encode($link['qr_image']); ?>" alt="QR Code" class="qr-image">
-                          <?php else: ?>
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image">
-                          <?php endif; ?>
-                            <div class="actions">
-                                <a href="view_detail.php?id=<?php echo htmlspecialchars($link['id']); ?>&return=dashboardAll.php" class="btn btn-edit">✏️ View Details</a>
-                                <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
-                                <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['status']); ?>')">
-                                    <?php echo ($link['status'] === 'active') ? '⏸️ Pause' : '▶️ Resume'; ?>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    // Deteksi platform populer
+                    if (strpos($host, 'youtube.com') !== false || strpos($host, 'youtu.be') !== false) {
+                        $display_name = 'YOUTUBE';
+                    } elseif (strpos($host, 'facebook.com') !== false) {
+                        $display_name = 'FACEBOOK';
+                    } elseif (strpos($host, 'instagram.com') !== false) {
+                        $display_name = 'INSTAGRAM';
+                    } elseif (strpos($host, 'docs.google.com') !== false) {
+                        $display_name = 'DOCS';
+                    } elseif (strpos($host, 'drive.google.com') !== false) {
+                        $display_name = 'DRIVE';
+                    } elseif (strpos($host, 'linkedin.com') !== false) {
+                        $display_name = 'LINKEDIN';
+                    } else {
+                        // Default ambil domain pertama
+                        $parts = explode('.', $host);
+                        $display_name = strtoupper($parts[0]);
+                    }
+                } else {
+                    $display_name = 'UNTITLED';
+                }
+            }
+            ?>
+
+            <!-- Card individual QR -->
+            <div class="qr-card" data-status="<?php echo htmlspecialchars($link['status']); ?>" data-qr-title="<?php echo htmlspecialchars(strtolower($display_name)); ?>">
+              <div class="performance-indicator <?php echo ($link['status'] !== 'active') ? 'paused' : ''; ?>"></div>
+
+              <div class="card-header">
+                <div class="qr-icon">QR</div>
+                <div class="card-title">
+                  <h3><?php echo htmlspecialchars($display_name); ?></h3>
+                  <div class="created-date">Created: <?php echo date('F d, Y', strtotime($link['created_at'])); ?></div>
                 </div>
-            <?php endforeach; ?>
+
+                <span class="status-badge status-<?php echo htmlspecialchars($link['status']); ?>">
+                  <?php echo ucfirst(htmlspecialchars($link['status'])); ?>
+                </span>
+              </div>
+
+              <!-- Konten QR -->
+              <div class="qr-content">
+                <div class="qr-info">
+                  <div class="info-item">
+                    <span class="info-label">Original URL</span>
+                    <div class="url-display"><?php echo htmlspecialchars($link['original_url']); ?></div>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Short Link</span>
+                    <?php $baseDomain = 'http://qr.local/r/'; $fullShortUrl = $baseDomain . $link['short_url'];?>
+                    <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>')">
+                      <?php echo htmlspecialchars($fullShortUrl); ?> <span>📋</span>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Gambar QR-->
+                <div class="qr-visual">
+                  <?php if (!empty($link['qr_image'])): ?>
+                    <img src="data:image/png;base64,<?php echo base64_encode($link['qr_image']); ?>" alt="QR Code" class="qr-image">
+                  <?php else: ?>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image">
+                  <?php endif; ?>
+
+                  <div class="actions">
+                    <!-- Statistik, diambil dari view_details-->
+                    <div class="qr-stats">
+                      <div class="stat-box">
+                        <div class="stat-icon">📊</div>
+                        <span class="stat-value"><?php echo number_format($link['scan_count'] ?? 0); ?></span>
+                        <div class="stat-label">Total Scans</div>
+                      </div>
+                      <div class="stat-box">
+                        <div class="stat-icon">📱</div>
+                        <span class="stat-value"><?php echo $link['top_device'] ?? 'N/A'; ?></span>
+                        <div class="stat-label">Top Device</div>
+                      </div>
+                      <div class="stat-box">
+                        <div class="stat-icon">🌍</div>
+                        <span class="stat-value"><?php echo $link['top_city'] ?? 'N/A'; ?></span>
+                        <div class="stat-label">Top City</div>
+                      </div>
+                    </div>
+
+                    <!-- tombol view details, donwload, dan resume /pause -->
+                    <button class="btn btn-edit" onclick="window.location.href='view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php'">✏️ View Details</button>
+                    <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
+                    <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['status']); ?>')">
+                      <?php echo ($link['status'] === 'active') ? '⏸️ Pause' : '▶️ Resume'; ?>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
         <?php endif; ?>
       </main>
+
+      <!-- PAGINATION-->
+      <?php if ($total_pages > 1): ?>
+        <div class="pagination-container">
+          <div class="pagination">
+            <!-- Tombol Prev -->
+            <?php 
+            $prev_link = "?page=" . ($current_page - 1);
+            if (!empty($search_query)) {
+                $prev_link .= "&search=" . urlencode($search_query);
+            }
+            ?>
+            <?php if ($current_page > 1): ?>
+              <a href="<?php echo $prev_link; ?>" class="pagination-btn pagination-prev">Prev</a>
+            <?php else: ?>
+              <span class="pagination-btn pagination-prev disabled">Prev</span>
+            <?php endif; ?>
+
+            <?php
+            // Hitung range halaman
+            $max_pages_shown = 5;
+            $start_page = max(1, $current_page - 2);
+            $end_page = min($total_pages, $start_page + $max_pages_shown - 1);
+
+            if ($end_page - $start_page < $max_pages_shown - 1) {
+                $start_page = max(1, $end_page - $max_pages_shown + 1);
+            }
+
+            function buildPageUrl($page, $search) {
+                $url = "?page=" . $page;
+                if (!empty($search)) {
+                    $url .= "&search=" . urlencode($search);
+                }
+                return $url;
+            }
+
+            // Tampilkan halaman pertama jika terlewati
+            if ($start_page > 1): ?>
+              <a href="<?php echo buildPageUrl(1, $search_query); ?>" class="pagination-btn">1</a>
+              <?php if ($start_page > 2): ?>
+                <span class="pagination-ellipsis">...</span>
+              <?php endif; ?>
+            <?php endif; ?>
+
+            <!-- Looping halaman -->
+            <?php for ($i = $start_page; $i <= $end_page; $i++): ?>
+              <?php if ($i == $current_page): ?>
+                <span class="pagination-btn active"><?php echo $i; ?></span>
+              <?php else: ?>
+                <a href="<?php echo buildPageUrl($i, $search_query); ?>" class="pagination-btn"><?php echo $i; ?></a>
+              <?php endif; ?>
+            <?php endfor; ?>
+
+            <!-- Halaman terakhir -->
+            <?php if ($end_page < $total_pages): ?>
+              <?php if ($end_page < $total_pages - 1): ?>
+                <span class="pagination-ellipsis">...</span>
+              <?php endif; ?>
+              <a href="<?php echo buildPageUrl($total_pages, $search_query); ?>" class="pagination-btn"><?php echo $total_pages; ?></a>
+            <?php endif; ?>
+
+            <!-- Tombol Next -->
+            <?php 
+            $next_link = "?page=" . ($current_page + 1);
+            if (!empty($search_query)) {
+                $next_link .= "&search=" . urlencode($search_query);
+            }
+            ?>
+            <?php if ($current_page < $total_pages): ?>
+              <a href="<?php echo $next_link; ?>" class="pagination-btn pagination-next">Next</a>
+            <?php else: ?>
+              <span class="pagination-btn pagination-next disabled">Next</span>
+            <?php endif; ?>
+          </div>
+
+          <!-- Info tambahan -->
+          <div class="pagination-info">
+            Showing <?php echo $offset + 1; ?> to <?php echo min($offset + $items_per_page, $total_items); ?> of <?php echo $total_items; ?> entries
+            <?php if (!empty($search_query)): ?>
+              <span class="search-active-badge">🔍 Search Active</span>
+            <?php endif; ?>
+          </div>
+        </div>
+      <?php endif; ?>
     </div>
   </div>
-
-  <script>
-    // Untuk copy text 
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        // Jika sudah berhasil copy maka ubah warna text nya 
-        const linkElement = event.target.closest('.short-link');
-        const originalColor = linkElement.style.color;
-        linkElement.style.color = '#4CAF50';
-        
-        // Jika bisa di copy maka ada munculkan notifikasi bahwa sukses 
-        showNotification('Link copied to clipboard!', 'success');
-        
-        //Mengembalikan ke warna awal setelah 1 detik 
-        setTimeout(() => {
-          linkElement.style.color = originalColor || '#667eea';
-        }, 1000);
-      }).catch(err => {
-        //Jika gagal untuk di copy 
-        showNotification('Failed to copy link', 'error');
-      });
-    }
-
-    // Download QR Code nantinya akan disesuaikan lagi dengan page utama 
-    function downloadQR(url, filename) {
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
-      
-      // Create temporary link element
-      const link = document.createElement('a');
-      link.href = qrUrl;
-      link.download = `${filename}_qr_code.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      showNotification('QR Code downloaded successfully!', 'success');
-    }
-
-    // Toggle status QR Code (Pause/Resume)
-    function toggleStatus(shortUrl, currentStatus) {
-      const newStatus = currentStatus === 'active' ? 'paused' : 'active';
-      
-      // Kirim request ke server untuk update status
-      fetch('updateStatus.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `short_url=${encodeURIComponent(shortUrl)}&status=${newStatus}`
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          showNotification(`QR Code ${newStatus === 'active' ? 'resumed' : 'paused'} successfully!`, 'success');
-          // Reload halaman setelah 1 detik
-          setTimeout(() => {
-            location.reload();
-          }, 1000);
-        } else {
-          showNotification('Failed to update status', 'error');
-        }
-      })
-      .catch(error => {
-        showNotification('An error occurred', 'error');
-      });
-    }
-
-    function showNotification(message, type) {
-      const notification = document.createElement('div');
-      notification.className = `notification ${type}`;
-      notification.textContent = message;
-      
-      notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 600;
-        z-index: 1000;
-        opacity: 0;
-        transform: translateY(-20px);
-        transition: all 0.3s ease;
-        ${type === 'success' ? 'background: #4CAF50;' : 'background: #f44336;'}
-      `;
-      
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.style.opacity = '1';
-        notification.style.transform = 'translateY(0)';
-      }, 100);
-      
-      setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateY(-20px)';
-        setTimeout(() => {
-          document.body.removeChild(notification);
-        }, 300);
-      }, 3000);
-    }
-
-    document.querySelectorAll('.nav-link').forEach(link => {
-      if (!link.classList.contains('active')) {
-        link.addEventListener('click', function(e) {
-          const spinner = document.createElement('div');
-          spinner.innerHTML = '⏳';
-          spinner.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2rem;
-            z-index: 1000;
-            animation: spin 1s linear infinite;
-          `;
-          
-          const style = document.createElement('style');
-          style.textContent = `
-            @keyframes spin {
-              0% { transform: translate(-50%, -50%) rotate(0deg); }
-              100% { transform: translate(-50%, -50%) rotate(360deg); }
-            }
-          `;
-          document.head.appendChild(style);
-          document.body.appendChild(spinner);
-          
-          setTimeout(() => {
-            document.body.removeChild(spinner);
-            document.head.removeChild(style);
-          }, 500);
-        });
-      }
-    });
-  </script>
 </body>
 </html>
