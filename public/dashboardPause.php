@@ -18,6 +18,7 @@ error_reporting(E_ALL);
 
 // Memuat koneksi database
 require_once __DIR__ . '/../classes/Database.php';
+require_once __DIR__ . '/../config/Config.php';
 
 // Mengambil koneksi
 $db = Database::getInstance()->getConnection();
@@ -57,20 +58,54 @@ $current_page = min($current_page, $total_pages);
 // Hitung offset
 $offset = ($current_page - 1) * $items_per_page;
 
-// Menyiapkan dan menjalankan query dengan LIMIT dan OFFSET
+// Menyiapkan dan menjalankan query dengan LIMIT dan OFFSET serta statistik
+$base_query = "
+    SELECT 
+        l.*,
+        COALESCE(stats.scan_count, 0) as scan_count,
+        COALESCE(stats.top_device, 'N/A') as top_device,
+        COALESCE(stats.top_city, 'N/A') as top_city
+    FROM links l
+    LEFT JOIN (
+        SELECT 
+            link_id,
+            COUNT(*) as scan_count,
+            (SELECT user_agent FROM clicks c2 WHERE c2.link_id = c.link_id 
+             GROUP BY user_agent ORDER BY COUNT(*) DESC LIMIT 1) as top_device,
+            (SELECT city FROM clicks c3 WHERE c3.link_id = c.link_id AND city IS NOT NULL
+             GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1) as top_city
+        FROM clicks c
+        GROUP BY link_id
+    ) stats ON l.id = stats.link_id
+";
+
 if (!empty($search_query)) {
-    $stmt = $db->prepare("SELECT * FROM links " . $where_clause . " ORDER BY created_at DESC LIMIT ? OFFSET ?");
+    $stmt = $db->prepare($base_query . $where_clause . " ORDER BY l.created_at DESC LIMIT ? OFFSET ?");
     $stmt->bind_param('ssii', $search_param, $search_param, $items_per_page, $offset);
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
-    $result = $db->query("SELECT * FROM links WHERE status != 'active' ORDER BY created_at DESC LIMIT $items_per_page OFFSET $offset");
+    $result = $db->query($base_query . " WHERE l.status != 'active' ORDER BY l.created_at DESC LIMIT $items_per_page OFFSET $offset");
 }
 
 // Menyimpan hasil query
 $paused_links = [];
 if ($result) {
     while ($row = $result->fetch_assoc()) {
+        // Extract device type from user agent for better display
+        if ($row['top_device'] && $row['top_device'] !== 'N/A') {
+            if (stripos($row['top_device'], 'iPhone') !== false || stripos($row['top_device'], 'iPad') !== false) {
+                $row['top_device'] = 'iOS';
+            } elseif (stripos($row['top_device'], 'Android') !== false) {
+                $row['top_device'] = 'Android';
+            } elseif (stripos($row['top_device'], 'Windows') !== false) {
+                $row['top_device'] = 'Windows';
+            } elseif (stripos($row['top_device'], 'Mac') !== false) {
+                $row['top_device'] = 'Mac';
+            } else {
+                $row['top_device'] = 'Other';
+            }
+        }
         $paused_links[] = $row;
     }
 }
@@ -250,8 +285,9 @@ function getDisplayName($link) {
                   </div>
                   <div class="info-item">
                     <span class="info-label">Short Link</span>
-                    <a href="#" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($link['short_url']); ?>')">
-                      <?php echo htmlspecialchars($link['short_url']); ?>
+                    <?php $fullShortUrl = Config::getShortUrlBase() . '/' . $link['short_url'];?>
+                    <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>')">
+                      <?php echo htmlspecialchars($fullShortUrl); ?>
                       <span>📋</span>
                     </a>
                   </div>

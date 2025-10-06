@@ -14,8 +14,9 @@
  ***********************************************************/
 
 // KONEKSI DATABASE
-// Mengimpor file Database dan mengambil instance koneksi
+// Memuat koneksi database
 require_once __DIR__ . '/../classes/Database.php';
+require_once __DIR__ . '/../config/Config.php';
 $db = Database::getInstance()->getConnection();
 
 // PAGINATION 
@@ -64,21 +65,55 @@ $current_page = min($current_page, $total_pages);
 // Digunakan untuk menentukan data mana yang akan diambil dari database
 $offset = ($current_page - 1) * $items_per_page;
 
-// ==================== 6. QUERY DATA LINKS ====================
-// Ambil data QR sesuai halaman dan kondisi pencarian
+// ==================== 6. QUERY DATA LINKS DENGAN STATISTIK ====================
+// Ambil data QR sesuai halaman dan kondisi pencarian dengan statistik
+$base_query = "
+    SELECT 
+        l.*,
+        COALESCE(stats.scan_count, 0) as scan_count,
+        COALESCE(stats.top_device, 'N/A') as top_device,
+        COALESCE(stats.top_city, 'N/A') as top_city
+    FROM links l
+    LEFT JOIN (
+        SELECT 
+            link_id,
+            COUNT(*) as scan_count,
+            (SELECT user_agent FROM clicks c2 WHERE c2.link_id = c.link_id 
+             GROUP BY user_agent ORDER BY COUNT(*) DESC LIMIT 1) as top_device,
+            (SELECT city FROM clicks c3 WHERE c3.link_id = c.link_id AND city IS NOT NULL
+             GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1) as top_city
+        FROM clicks c
+        GROUP BY link_id
+    ) stats ON l.id = stats.link_id
+";
+
 if (!empty($search_query)) {
-    $stmt = $db->prepare("SELECT * FROM links" . $where_clause . " ORDER BY created_at DESC LIMIT ? OFFSET ?");
+    $stmt = $db->prepare($base_query . $where_clause . " ORDER BY l.created_at DESC LIMIT ? OFFSET ?");
     $stmt->bind_param('ssii', $search_param, $search_param, $items_per_page, $offset);
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
-    $result = $db->query("SELECT * FROM links ORDER BY created_at DESC LIMIT $items_per_page OFFSET $offset");
+    $result = $db->query($base_query . " ORDER BY l.created_at DESC LIMIT $items_per_page OFFSET $offset");
 }
 
 // Simpan hasil query ke array $links
 $links = [];
 if ($result) {
     while ($row = $result->fetch_assoc()) {
+        // Extract device type from user agent for better display
+        if ($row['top_device'] && $row['top_device'] !== 'N/A') {
+            if (stripos($row['top_device'], 'iPhone') !== false || stripos($row['top_device'], 'iPad') !== false) {
+                $row['top_device'] = 'iOS';
+            } elseif (stripos($row['top_device'], 'Android') !== false) {
+                $row['top_device'] = 'Android';
+            } elseif (stripos($row['top_device'], 'Windows') !== false) {
+                $row['top_device'] = 'Windows';
+            } elseif (stripos($row['top_device'], 'Mac') !== false) {
+                $row['top_device'] = 'Mac';
+            } else {
+                $row['top_device'] = 'Other';
+            }
+        }
         $links[] = $row;
     }
 }
@@ -285,8 +320,9 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
                   </div>
                   <div class="info-item">
                     <span class="info-label">Short Link</span>
-                    <a href="#" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($link['short_url']); ?>')">
-                      <?php echo htmlspecialchars($link['short_url']); ?> <span>📋</span>
+                    <?php $fullShortUrl = Config::getShortUrlBase() . '/' . $link['short_url'];?>
+                    <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>')">
+                      <?php echo htmlspecialchars($fullShortUrl); ?> <span>📋</span>
                     </a>
                   </div>
                 </div>

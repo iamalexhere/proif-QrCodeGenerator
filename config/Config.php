@@ -71,4 +71,33 @@ class Config {
         $config = self::getAdSenseConfig();
         return $config['enabled'] && !empty($config['client_id']);
     }
+    
+    /**
+     * Get the base URL for the application
+     * @return string
+     */
+    public static function getBaseUrl() {
+        return self::get('BASE_URL', 'http://localhost');
+    }
+    
+    /**
+     * Get the short domain configuration
+     * @return string
+     */
+    public static function getShortDomain() {
+        return self::get('SHORT_DOMAIN', 'localhost/r');
+    }
+    
+    /**
+     * Get the full short URL base (with http://)
+     * @return string
+     */
+    public static function getShortUrlBase() {
+        $shortDomain = self::getShortDomain();
+        // If SHORT_DOMAIN doesn't include protocol, add it
+        if (!preg_match('/^https?:\/\//', $shortDomain)) {
+            return 'http://' . $shortDomain;
+        }
+        return $shortDomain;
+    }
 }
