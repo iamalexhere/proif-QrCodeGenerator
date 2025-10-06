@@ -18,6 +18,8 @@
             <a class="nav-link">
                 <div>QR Code Generator</div>
             </a>
+
+            <a href="dashboardAll.php" class="btn-pro">Try QRCode Generator PRO</a>
         </nav>
     </header>
     <section>

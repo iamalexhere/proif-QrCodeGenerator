@@ -1,0 +1,45 @@
+.search-container {
+    position: relative;
+    padding: 0 20px 20px;
+    margin-bottom: 15px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 15px 12px 42px;
+    /* kiri agak diperlebar untuk ruang ikon */
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 14px;
+    background-color: #f3f4f6;
+    color: #374151;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    line-height: 1.4;
+    /* menjaga teks di tengah vertikal */
+}
+
+.search-input::placeholder {
+    color: #9ca3af;
+    vertical-align: middle;
+    /* bantu posisi placeholder */
+}
+
+.search-input:focus {
+    outline: none;
+    background-color: #fff;
+    border-color: #6b7280;
+    box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
+}
+
+/* ikon pencarian di kiri input */
+.search-container::before {
+    content: "🔍";
+    position: absolute;
+    left: 32px;
+    top: 35%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    pointer-events: none;
+    opacity: 0.7;
+}

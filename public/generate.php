@@ -9,6 +9,7 @@ ob_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../classes/UrlShortener.php';
 require_once __DIR__ . '/../config/Config.php';
+require_once __DIR__ . '/../classes/Database.php';
 
 // Mengimpor class yang dibutuhkan
 use Endroid\QrCode\Color\Color;
@@ -62,6 +63,7 @@ try {
             $urlShortener = new UrlShortener();
             $result = $urlShortener->createShortUrl($longUrl, $customUrlInput, $logoPathForDb, $qrColor);
             $shortUrl = $result['short_url'];
+            $shortCode = $result['short_code'];
         } catch (Exception $e) {
             // Fallback ke URL asli jika gagal
             $shortUrl = $longUrl;
@@ -174,6 +176,22 @@ try {
                 $mimeType = 'image/png';
                 $fileExtension = 'png';
                 break;
+        }
+
+        //Menyimpan gambar ke DB links dengan format png
+        if ($format === 'png' && $imageData !== null) {
+            try {
+                $db = Database::getInstance()->getConnection();
+                $stmt = $db->prepare("UPDATE links SET qr_image = ? WHERE short_url = ?");
+                // "b" berarti kita mengirim data dalam format BLOB
+                $stmt->bind_param("bs", $null, $shortCode);
+                $stmt->send_long_data(0, $imageData);
+                $stmt->execute();
+                $stmt->close();
+            } catch (Exception $e) {
+                // Jika gagal menyimpan gambar, tidak apa-apa, lanjutkan saja
+                error_log("Gagal menyimpan gambar QR ke DB: " . $e->getMessage());
+            }
         }
         
         // --- MENGIRIM RESPONSE KE FRONTEND ---
