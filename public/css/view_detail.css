@@ -1,6 +1,5 @@
-/* ============================================================
-   BASE STYLE
-============================================================ */
+/* BASE STYLE */
+
 * {
     box-sizing: border-box;
 }
@@ -13,9 +12,9 @@ body {
     padding-bottom: 20px;
 }
 
-/* ============================================================
-   NAVBAR
-============================================================ */
+
+/* NAVBAR */
+
 .navbar {
     background: #4a5568;
     padding: 15px 30px;
@@ -50,9 +49,9 @@ body {
     background: #40916c;
 }
 
-/* ============================================================
-   LAYOUT CONTAINER
-============================================================ */
+
+/* LAYOUT CONTAINER */
+
 .edit-container {
     display: grid;
     grid-template-columns: 320px 1fr;
@@ -62,9 +61,9 @@ body {
     margin: 0 auto;
 }
 
-/* ============================================================
-   LEFT PANEL - QR INFO
-============================================================ */
+
+/* LEFT PANEL - QR INFO */
+
 .edit-left {
     background: #fff;
     padding: 25px;
@@ -121,9 +120,8 @@ body {
     border-radius: 8px;
 }
 
-/* ============================================================
-   RIGHT PANEL - STATISTICS
-============================================================ */
+
+/* RIGHT PANEL - STATISTICS */
 .edit-right {
     background: #fff;
     padding: 30px;
@@ -138,9 +136,7 @@ body {
     margin-bottom: 25px;
 }
 
-/* ============================================================
-   STATS GRID
-============================================================ */
+/* STATS GRID */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -181,9 +177,8 @@ body {
     margin: 20px 0;
 }
 
-/* ============================================================
-   FILTER CARD - Styling khusus untuk card filter
-============================================================ */
+/* FILTER CARD - Styling khusus untuk card filter */
+
 .stat-card.filter-card {
     grid-column: 1 / -1;
     background: linear-gradient(135deg, #f0f4f8 0%, #e8eef3 100%);
@@ -267,9 +262,8 @@ body {
     color: #fff;
 }
 
-/* ============================================================
-   VIEW CARD - Styling khusus untuk card view toggle
-============================================================ */
+
+/* VIEW CARD - Styling khusus untuk card view toggle */
 .stat-card.view-card {
     grid-column: 1 / -1;
     background: linear-gradient(135deg, #f8fafb 0%, #eef2f6 100%);
@@ -305,16 +299,16 @@ body {
     border-color: #52b788;
 }
 
-/* ============================================================
-   CHARTS / CANVAS
-============================================================ */
+
+/* CHARTS / CANVAS */
+
 canvas {
     max-height: 250px;
 }
 
-/* ============================================================
-   LOADING STATE
-============================================================ */
+
+/* LOADING STATE */
+
 #loading-stats {
     text-align: center;
     padding: 3rem;
@@ -338,9 +332,9 @@ canvas {
     }
 }
 
-/* ============================================================
-   STATUS BADGES
-============================================================ */
+
+/* STATUS BADGES */
+
 .status-badge {
     display: inline-block;
     padding: 6px 12px;
@@ -360,9 +354,9 @@ canvas {
     color: #1976d2;
 }
 
-/* ============================================================
-   RESPONSIVE DESIGN
-============================================================ */
+
+/* RESPONSIVE DESIGN */
+
 
 /* --- Tablet --- */
 @media (max-width: 1024px) {
