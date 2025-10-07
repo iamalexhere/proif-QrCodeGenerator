@@ -67,13 +67,14 @@ class UrlShortener {
      * 4. Simpan semua data ke database
      * 
      * @param string $originalUrl URL asli yang akan dipendekkan
+     * @param int $userId ID user yang membuat QR code
      * @param string $customUrl URL custom (opsional)
      * @param string $logoPath Path ke file logo untuk QR code (opsional)
      * @param string $qrColor Warna QR code dalam format hex (default: #000000)
      * @return array Data URL pendek yang berhasil dibuat
      * @throws Exception Jika gagal menyimpan ke database
      */
-    public function createShortUrl($originalUrl, $customUrl = '', $logoPath = '', $qrColor = '#000000') {
+    public function createShortUrl($originalUrl, $userId, $customUrl = '', $logoPath = '', $qrColor = '#000000') {
         // === GENERATE KODE PENDEK YANG UNIK ===
         // Loop sampai mendapat kode yang belum ada di database
         do {
@@ -93,9 +94,9 @@ class UrlShortener {
         $shortUrl = (strpos($baseUrl, 'http') === 0 ? '' : 'http://') . $baseUrl . '/' . $shortCode;
         
         // === SIMPAN KE DATABASE ===
-        $sql = "INSERT INTO links (original_url, short_url, custom_url, logo_path, qr_color) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO links (user_id, original_url, short_url, custom_url, logo_path, qr_color) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("sssss", $originalUrl, $shortCode, $customUrl, $logoPath, $qrColor);
+        $stmt->bind_param("isssss", $userId, $originalUrl, $shortCode, $customUrl, $logoPath, $qrColor);
         
         if ($stmt->execute()) {
             $insertId = $this->db->insert_id;

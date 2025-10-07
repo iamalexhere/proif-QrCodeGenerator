@@ -1,3 +1,17 @@
+<?php
+require_once __DIR__ . '/../classes/Auth.php';
+require_once __DIR__ . '/../config/Config.php';
+
+// Check if user is logged in
+$isLoggedIn = Auth::isLoggedIn();
+$currentUser = null;
+$quotaInfo = null;
+
+if ($isLoggedIn) {
+    $currentUser = Auth::getCurrentUser();
+    $quotaInfo = Auth::canCreateQRCode($currentUser['id']);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,7 +33,14 @@
                 <div>QR Code Generator</div>
             </a>
 
-            <a href="dashboardAll.php" class="btn-pro">Try QRCode Generator PRO</a>
+            <?php if ($isLoggedIn): ?>
+                <div style="display:flex;align-items:center;gap:15px;">
+                    <span style="color:#666;">Welcome, <?php echo htmlspecialchars($currentUser['name']); ?></span>
+                    <a href="dashboardAll.php" class="btn-pro">Dashboard</a>
+                </div>
+            <?php else: ?>
+                <a href="login.php" class="btn-pro">Login to Create QR Codes</a>
+            <?php endif; ?>
         </nav>
     </header>
     <section>
@@ -132,9 +153,36 @@
                             <input type="color" name="qr_color" id="qr_color" value="#000000">
                         </div>
                         
-                        <div class="form-submit"> 
-                            <button type="submit" class="btn">Generate QR Code</button>
-                        </div>
+                        <?php if ($isLoggedIn): ?>
+                            <!-- Quota Display -->
+                            <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; margin: 15px 0;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <span><strong>Monthly Quota:</strong></span>
+                                    <span><?php echo $quotaInfo['used']; ?> / <?php echo $quotaInfo['limit']; ?> QR Codes</span>
+                                </div>
+                                <div style="background: #e9ecef; border-radius: 10px; height: 8px; overflow: hidden;">
+                                    <div style="background: <?php echo $quotaInfo['used'] >= $quotaInfo['limit'] ? '#dc3545' : '#28a745'; ?>; height: 100%; width: <?php echo ($quotaInfo['used'] / $quotaInfo['limit']) * 100; ?>%;"></div>
+                                </div>
+                                <?php if (!$quotaInfo['canCreate']): ?>
+                                    <p style="color: #dc3545; margin-top: 10px; font-size: 14px;">⚠️ Monthly limit reached. <a href="payment.php">Upgrade your plan</a> to create more QR codes.</p>
+                                <?php endif; ?>
+                            </div>
+                            
+                            <div class="form-submit"> 
+                                <button type="submit" class="btn" <?php echo !$quotaInfo['canCreate'] ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : ''; ?>>
+                                    <?php echo $quotaInfo['canCreate'] ? 'Generate QR Code' : 'Quota Exceeded'; ?>
+                                </button>
+                            </div>
+                        <?php else: ?>
+                            <!-- Login Required Message -->
+                            <div style="padding: 20px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; margin: 15px 0; text-align: center;">
+                                <h4 style="color: #856404; margin-bottom: 10px;">🔐 Login Required</h4>
+                                <p style="color: #856404; margin-bottom: 15px;">Please log in with your Google account to create QR codes.</p>
+                                <a href="login.php" class="btn" style="background: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px;">
+                                    Login with Google
+                                </a>
+                            </div>
+                        <?php endif; ?>
                     </form>
                 </div>
 
@@ -283,6 +331,20 @@
         // Event listener untuk form submit (generate PNG)
         qrForm.addEventListener('submit', async function(event) {
             event.preventDefault();
+            
+            // Check if user is logged in
+            <?php if (!$isLoggedIn): ?>
+                alert('Please log in to create QR codes.');
+                window.location.href = 'login.php';
+                return;
+            <?php endif; ?>
+            
+            // Check quota
+            <?php if ($isLoggedIn && !$quotaInfo['canCreate']): ?>
+                alert('You have reached your monthly QR code limit. Please upgrade your plan.');
+                window.location.href = 'payment.php';
+                return;
+            <?php endif; ?>
             
             const qrImage = document.getElementById('qrImage');
             const downloadPng = document.getElementById('download-png');

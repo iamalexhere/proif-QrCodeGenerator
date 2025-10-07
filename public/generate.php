@@ -8,8 +8,21 @@ ob_start();
 // Memuat semua library dari Composer
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../classes/UrlShortener.php';
+require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../config/Config.php';
 require_once __DIR__ . '/../classes/Database.php';
+
+// Require authentication - user must be logged in
+Auth::requireAuth('login.php?redirect=' . urlencode($_SERVER['REQUEST_URI'] ?? 'generate.php'));
+
+// Get current user
+$currentUser = Auth::getCurrentUser();
+if (!$currentUser) {
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['error' => 'Authentication required']);
+    exit;
+}
 
 // Mengimpor class yang dibutuhkan
 use Endroid\QrCode\Color\Color;
@@ -21,6 +34,23 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 
 try {
     if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
+        
+        // --- CHECK USER QUOTA BEFORE CREATING QR CODE ---
+        $quotaCheck = Auth::canCreateQRCode($currentUser['id']);
+        if (!$quotaCheck['canCreate']) {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'error' => 'Monthly QR code limit reached',
+                'quota_info' => [
+                    'used' => $quotaCheck['used'],
+                    'limit' => $quotaCheck['limit'],
+                    'plan' => $currentUser['plan']
+                ],
+                'upgrade_required' => true
+            ]);
+            exit;
+        }
         
         // --- MENGAMBIL DATA DARI FORM ---
         $longUrl = trim($_POST['url-input']);
@@ -61,9 +91,12 @@ try {
         $customUrlInput = ''; 
         try {
             $urlShortener = new UrlShortener();
-            $result = $urlShortener->createShortUrl($longUrl, $customUrlInput, $logoPathForDb, $qrColor);
+            $result = $urlShortener->createShortUrl($longUrl, $currentUser['id'], $customUrlInput, $logoPathForDb, $qrColor);
             $shortUrl = $result['short_url'];
             $shortCode = $result['short_code'];
+            
+            // Increment user's QR code usage quota
+            Auth::incrementQRCodeUsage($currentUser['id']);
         } catch (Exception $e) {
             // Fallback ke URL asli jika gagal
             $shortUrl = $longUrl;

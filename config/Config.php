@@ -100,4 +100,100 @@ class Config {
         }
         return $shortDomain;
     }
+    
+    /**
+     * Get Google OAuth configuration
+     * @return array Google OAuth settings
+     */
+    public static function getGoogleOAuthConfig() {
+        return [
+            'client_id' => self::get('GOOGLE_CLIENT_ID', ''),
+            'client_secret' => self::get('GOOGLE_CLIENT_SECRET', ''),
+            'redirect_uri' => self::get('GOOGLE_REDIRECT_URI', '')
+        ];
+    }
+    
+    /**
+     * Get Google OAuth Client ID
+     * @return string
+     */
+    public static function getGoogleClientId() {
+        return self::get('GOOGLE_CLIENT_ID', '');
+    }
+    
+    /**
+     * Get Google OAuth Client Secret
+     * @return string
+     */
+    public static function getGoogleClientSecret() {
+        return self::get('GOOGLE_CLIENT_SECRET', '');
+    }
+    
+    /**
+     * Get Google OAuth Redirect URI
+     * @return string
+     */
+    public static function getGoogleRedirectUri() {
+        return self::get('GOOGLE_REDIRECT_URI', '');
+    }
+    
+    /**
+     * Check if Google OAuth is properly configured
+     * @return bool
+     */
+    public static function isGoogleOAuthEnabled() {
+        $config = self::getGoogleOAuthConfig();
+        return !empty($config['client_id']) && 
+               !empty($config['client_secret']) && 
+               !empty($config['redirect_uri']);
+    }
+    
+    /**
+     * Get plan limits configuration
+     * @return array Plan limits for each tier
+     */
+    public static function getPlanLimits() {
+        return [
+            'free' => [
+                'qr_codes_per_month' => 10,
+                'analytics_enabled' => false,
+                'trial_days' => 7,
+                'ads_enabled' => true,
+                'custom_features' => true,
+                'export_enabled' => false
+            ],
+            'starter' => [
+                'qr_codes_per_month' => 200,
+                'analytics_enabled' => true,
+                'trial_days' => 0,
+                'ads_enabled' => false,
+                'custom_features' => true,
+                'export_enabled' => false,
+                'price' => 50000,
+                'currency' => 'IDR'
+            ],
+            'pro' => [
+                'qr_codes_per_month' => 500,
+                'analytics_enabled' => true,
+                'trial_days' => 0,
+                'ads_enabled' => false,
+                'custom_features' => true,
+                'export_enabled' => true,
+                'price' => 100000,
+                'currency' => 'IDR'
+            ]
+        ];
+    }
+    
+    /**
+     * Get plan limit for specific plan and key
+     * @param string $plan Plan name (free, starter, pro)
+     * @param string $key Limit key
+     * @param mixed $default Default value if not found
+     * @return mixed
+     */
+    public static function getPlanLimit($plan, $key, $default = null) {
+        $limits = self::getPlanLimits();
+        return $limits[$plan][$key] ?? $default;
+    }
 }
