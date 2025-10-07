@@ -40,6 +40,7 @@ $linkCreatedAt = $linkData['created_at'] ? date('Y-m-d', strtotime($linkData['cr
     <title>View QR Code Details</title>
     <link rel="stylesheet" href="css/view_detail.css"> 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/view_detail.js"></script>
 </head>
 <body>
     <header class="navbar">
@@ -127,6 +128,5 @@ $linkCreatedAt = $linkData['created_at'] ? date('Y-m-d', strtotime($linkData['cr
         const linkId = <?php echo (int)$linkData['id']; ?>;
         const linkCreatedAt = "<?php echo $linkCreatedAt; ?>";
     </script>
-    <script src="js/view_detail.js"></script>
 </body>
 </html>
