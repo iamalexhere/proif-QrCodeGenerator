@@ -6,15 +6,24 @@ function copyToClipboard(text) {
 }
 
 // Download QR Code
-function downloadQR(url, filename) {
-    // Buat URL QR Code dari API eksternal
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
-    const link = document.createElement('a');
-    link.href = qrUrl;
-    link.download = `${filename}_qr_code.png`; // Nama file hasil download
-    link.click(); // Jalankan proses download
+function downloadQR(base64Image, filename) {
+    // // Buat URL QR Code dari API eksternal
+    // const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+    // const link = document.createElement('a');
+    // link.href = qrUrl;
+    // link.download = `${filename}_qr_code.png`; // Nama file hasil download
+    // link.click(); // Jalankan proses download
 
-    showNotification('QR Code downloaded successfully!', 'success');
+    // showNotification('QR Code downloaded successfully!', 'success');
+
+    //Update function
+    const dataUrl = `data:image/png;base64,${base64Image}`;
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `${filename}_qr_code.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // Mengubah status QR Code (pause / resume)

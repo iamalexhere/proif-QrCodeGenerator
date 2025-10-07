@@ -357,7 +357,7 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
 
                     <!-- tombol view details, donwload, dan resume /pause -->
                     <button class="btn btn-edit" onclick="window.location.href='view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php'">✏️ View Details</button>
-                    <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
+                    <button class="btn btn-download" onclick="downloadQR('<?php echo base64_encode($link['qr_image']); ?>', '<?php echo $link['short_url']; ?>')">⬇️ Download</button>
                     <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['status']); ?>')">
                       <?php echo ($link['status'] === 'active') ? '⏸️ Pause' : '▶️ Resume'; ?>
                     </button>

@@ -321,7 +321,7 @@ function getDisplayName($link) {
 
                     <!-- Tombol view_details, donwload, pause/resume -->
                     <button class="btn btn-edit" onclick="window.location.href='view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardPause.php'">✏️ View Details</button>
-                    <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
+                    <button class="btn btn-download" onclick="downloadQR('<?php echo base64_encode($link['qr_image']); ?>', '<?php echo $link['short_url']; ?>')">⬇️ Download</button>
                     <button class="btn btn-resume" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', 'paused')">▶️ Resume</button>
                   </div>
                 </div>
