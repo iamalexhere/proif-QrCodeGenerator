@@ -6,13 +6,17 @@ function copyToClipboard(text) {
 }
 
 // Download QR Code
-function downloadQR(url, filename) {
-    // Buat URL QR Code dari API eksternal
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+function downloadQR(shortCode, filename) {
+    // Use our download endpoint instead of external API
+    const downloadUrl = `download_qr.php?code=${encodeURIComponent(shortCode)}`;
+    
+    // Create a temporary link and trigger download
     const link = document.createElement('a');
-    link.href = qrUrl;
-    link.download = `${filename}_qr_code.png`; // Nama file hasil download
-    link.click(); // Jalankan proses download
+    link.href = downloadUrl;
+    link.download = `${filename}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
     showNotification('QR Code downloaded successfully!', 'success');
 }

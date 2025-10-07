@@ -18,7 +18,7 @@ $planLimits = Config::getPlanLimits();
   <link rel="stylesheet" href="css/payment.css">
 </head>
 <body>
-  <!-- Header dengan tombol back -->
+  <!-- Header with back button -->
   <header class="pricing-header">
     <a href="dashboardAll.php" style="text-decoration:none;display:inline-block;background:#00aaff;color:#fff;padding:6px 12px;border-radius:6px;font-weight:bold;margin-bottom:10px;">
       ← Back to Dashboard
@@ -27,64 +27,64 @@ $planLimits = Config::getPlanLimits();
     <p>Find a plan that suits your needs</p>
   </header>
 
-  <!-- Section Plan -->
+  <!-- Plans Section -->
   <section class="pricing-section">
     <!-- Free Plan -->
     <div class="plan-card <?php echo $currentUser['plan'] === 'free' ? 'current-plan' : ''; ?>">
       <h2>Free Plan</h2>
-      <p class="price"><span>Rp</span>0<span>/bulan</span></p>
-      <p class="annual">Gratis selamanya</p>
+      <p class="price"><span>Rp</span>0<span>/month</span></p>
+      <p class="annual">Free forever</p>
       <?php if ($currentUser['plan'] === 'free'): ?>
         <div class="current-badge">Current Plan</div>
       <?php else: ?>
         <a href="#" class="btn-checkout disabled">Current Plan</a>
       <?php endif; ?>
       <ul class="features">
-        <li><strong><?php echo $planLimits['free']['qr_codes_per_month']; ?></strong> QR Codes per bulan</li>
+        <li><strong><?php echo $planLimits['free']['qr_codes_per_month']; ?></strong> QR Codes per month</li>
         <li><strong>Unlimited</strong> Scans</li>
-        <li>7 hari trial analytics</li>
-        <li>Iklan ditampilkan</li>
-        <li>Custom logo, URL, warna</li>
+        <li>30 days analytics trial</li>
+        <li>Ads displayed</li>
+        <li>Custom logo, URL, color</li>
       </ul>
     </div>
 
     <!-- Starter Plan -->
-    <div class="plan-card highlight <?php echo $currentUser['plan'] === 'starter' ? 'current-plan' : ''; ?>">
+    <div class="plan-card highlight <?php echo $currentUser['plan'] === 'starter' ? 'current-plan' : ''; ?>" style="opacity: 0.7;">
       <div class="badge">Most Popular</div>
       <h2>Starter Plan</h2>
-      <p class="price"><span>Rp</span><?php echo number_format($planLimits['starter']['price'], 0, ',', '.'); ?><span>/bulan</span></p>
-      <p class="annual">Pembayaran bulanan</p>
+      <p class="price"><span>Rp</span><?php echo number_format($planLimits['starter']['price'], 0, ',', '.'); ?><span>/month</span></p>
+      <p class="annual">Monthly payment</p>
       <?php if ($currentUser['plan'] === 'starter'): ?>
         <div class="current-badge">Current Plan</div>
       <?php else: ?>
-        <a href="checkout.php?plan=starter" class="btn-checkout">Upgrade Now</a>
+        <button class="btn-checkout" disabled style="opacity:0.6;cursor:not-allowed;background:#ccc;">Coming Soon</button>
       <?php endif; ?>
       <ul class="features">
-        <li><strong><?php echo $planLimits['starter']['qr_codes_per_month']; ?></strong> QR Codes per bulan</li>
+        <li><strong><?php echo $planLimits['starter']['qr_codes_per_month']; ?></strong> QR Codes per month</li>
         <li><strong>Unlimited</strong> Scans</li>
-        <li>Fitur Analytics lengkap</li>
-        <li>Tanpa iklan</li>
-        <li>Custom logo, URL, warna</li>
+        <li>Full Analytics features</li>
+        <li>No ads</li>
+        <li>Custom logo, URL, color</li>
         <li>Email Support</li>
       </ul>
     </div>
 
     <!-- Pro Plan -->
-    <div class="plan-card <?php echo $currentUser['plan'] === 'pro' ? 'current-plan' : ''; ?>">
+    <div class="plan-card <?php echo $currentUser['plan'] === 'pro' ? 'current-plan' : ''; ?>" style="opacity: 0.7;">
       <h2>Pro Plan</h2>
-      <p class="price"><span>Rp</span><?php echo number_format($planLimits['pro']['price'], 0, ',', '.'); ?><span>/bulan</span></p>
-      <p class="annual">Pembayaran bulanan</p>
+      <p class="price"><span>Rp</span><?php echo number_format($planLimits['pro']['price'], 0, ',', '.'); ?><span>/month</span></p>
+      <p class="annual">Monthly payment</p>
       <?php if ($currentUser['plan'] === 'pro'): ?>
         <div class="current-badge">Current Plan</div>
       <?php else: ?>
-        <a href="checkout.php?plan=pro" class="btn-checkout">Upgrade Now</a>
+        <button class="btn-checkout" disabled style="opacity:0.6;cursor:not-allowed;background:#ccc;">Coming Soon</button>
       <?php endif; ?>
       <ul class="features">
-        <li><strong><?php echo $planLimits['pro']['qr_codes_per_month']; ?></strong> QR Codes per bulan</li>
+        <li><strong><?php echo $planLimits['pro']['qr_codes_per_month']; ?></strong> QR Codes per month</li>
         <li><strong>Unlimited</strong> Scans</li>
-        <li>Fitur Analytics lengkap</li>
-        <li>Tanpa iklan</li>
-        <li>Custom logo, URL, warna</li>
+        <li>Full Analytics features</li>
+        <li>No ads</li>
+        <li>Custom logo, URL, color</li>
         <li>Download PDF, CSV, Excel</li>
         <li>Priority Support</li>
       </ul>

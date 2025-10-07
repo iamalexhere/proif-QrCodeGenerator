@@ -79,7 +79,7 @@ if (isset($_GET['error'])) {
                 <h3>What you get:</h3>
                 <div class="feature-item">Generate 10 QR codes for month</div>
                 <div class="feature-item">Download your own</div>
-                <h3>For Newcomer Get 7 Day Trial Feature Premium </h3>
+                <h3>For Newcomers Get 30 Day Analytics Trial </h3>
                 <div class="feature-item">You can edit your own QR URL</div>
                 <div class="feature-item">Track scans with analytics</div>
                 <div class="feature-item">Download </div>

@@ -38,6 +38,30 @@ class Config {
         return isset(self::$config[$key]) ? self::$config[$key] : $default;
     }
     
+    /**
+     * Check if the application is in development mode
+     * @return bool
+     */
+    public static function isDevelopment() {
+        return self::get('APP_ENV', 'development') === 'development';
+    }
+    
+    /**
+     * Check if the application is in production mode
+     * @return bool
+     */
+    public static function isProduction() {
+        return self::get('APP_ENV', 'development') === 'production';
+    }
+    
+    /**
+     * Get the current environment
+     * @return string
+     */
+    public static function getEnvironment() {
+        return self::get('APP_ENV', 'development');
+    }
+    
     public static function getDatabaseConfig() {
         return [
             'host' => self::get('DB_HOST', 'localhost'),
@@ -157,7 +181,7 @@ class Config {
             'free' => [
                 'qr_codes_per_month' => 10,
                 'analytics_enabled' => false,
-                'trial_days' => 7,
+                'trial_days' => 30,
                 'ads_enabled' => true,
                 'custom_features' => true,
                 'export_enabled' => false

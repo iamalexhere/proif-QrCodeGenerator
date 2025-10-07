@@ -253,8 +253,8 @@ class Auth {
                 
                 return $emailUser;
             } else {
-                // Create new user with 7-day analytics trial
-                $trialEndsAt = date('Y-m-d H:i:s', strtotime('+7 days'));
+                // Create new user with 30-day analytics trial
+                $trialEndsAt = date('Y-m-d H:i:s', strtotime('+30 days'));
                 
                 $stmt = $this->db->prepare("
                     INSERT INTO users (google_id, email, name, picture, plan, trial_ends_at, last_login)

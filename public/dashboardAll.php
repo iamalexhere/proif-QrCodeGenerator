@@ -273,9 +273,9 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
           ?>
           <div class="trial-section">
             <?php if ($trialActive): ?>
-              <div class="trial-text">Analytics Trial: <?php echo $trialDaysLeft; ?> days left</div>
+              <div class="trial-text">30-Day Analytics Trial: <?php echo $trialDaysLeft; ?> days left</div>
             <?php else: ?>
-              <div class="trial-text">Analytics trial expired</div>
+              <div class="trial-text">30-day analytics trial expired</div>
             <?php endif; ?>
             <a href="payment.php" class="upgrade-btn">Upgrade Plan</a>
           </div>
@@ -421,32 +421,74 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
                   <?php if (!empty($link['qr_image'])): ?>
                     <img src="data:image/png;base64,<?php echo base64_encode($link['qr_image']); ?>" alt="QR Code" class="qr-image">
                   <?php else: ?>
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image">
+                    <!-- QR tidak tersimpan di database, tampilkan placeholder -->
+                    <div class="qr-placeholder" style="width: 140px; height: 140px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border: 2px dashed #ccc; border-radius: 8px;">
+                      <span style="color: #666; font-size: 12px; text-align: center;">QR Code<br>Not Available</span>
+                    </div>
                   <?php endif; ?>
 
                   <div class="actions">
                     <!-- Statistik, diambil dari view_details-->
-                    <div class="qr-stats">
-                      <div class="stat-box">
+                    <?php $hasAnalyticsAccess = Auth::hasAnalyticsAccess($currentUser); ?>
+                    <div class="qr-stats <?php echo !$hasAnalyticsAccess ? 'analytics-locked' : ''; ?>" style="position: relative;">
+                      <?php if (!$hasAnalyticsAccess): ?>
+                        <div class="analytics-overlay" style="
+                          position: absolute;
+                          top: 0;
+                          left: 0;
+                          right: 0;
+                          bottom: 0;
+                          background: rgba(255, 255, 255, 0.9);
+                          backdrop-filter: blur(4px);
+                          -webkit-backdrop-filter: blur(4px);
+                          display: flex;
+                          flex-direction: column;
+                          align-items: center;
+                          justify-content: center;
+                          border-radius: 8px;
+                          z-index: 10;
+                        ">
+                          <div style="text-align: center; color: #666;">
+                            <div style="font-size: 24px; margin-bottom: 8px;">🔒</div>
+                            <div style="font-weight: bold; margin-bottom: 4px;">Analytics Locked</div>
+                            <div style="font-size: 12px; margin-bottom: 12px;">30-day trial expired</div>
+                            <a href="payment.php" style="
+                              background: #007bff;
+                              color: white;
+                              padding: 6px 12px;
+                              border-radius: 4px;
+                              text-decoration: none;
+                              font-size: 12px;
+                              font-weight: bold;
+                            ">Upgrade Plan</a>
+                          </div>
+                        </div>
+                      <?php endif; ?>
+                      
+                      <div class="stat-box" style="<?php echo !$hasAnalyticsAccess ? 'filter: blur(2px);' : ''; ?>">
                         <div class="stat-icon">📊</div>
-                        <span class="stat-value"><?php echo number_format($link['scan_count'] ?? 0); ?></span>
+                        <span class="stat-value"><?php echo $hasAnalyticsAccess ? number_format($link['scan_count'] ?? 0) : '•••'; ?></span>
                         <div class="stat-label">Total Scans</div>
                       </div>
-                      <div class="stat-box">
+                      <div class="stat-box" style="<?php echo !$hasAnalyticsAccess ? 'filter: blur(2px);' : ''; ?>">
                         <div class="stat-icon">📱</div>
-                        <span class="stat-value"><?php echo $link['top_device'] ?? 'N/A'; ?></span>
+                        <span class="stat-value"><?php echo $hasAnalyticsAccess ? ($link['top_device'] ?? 'N/A') : '•••'; ?></span>
                         <div class="stat-label">Top Device</div>
                       </div>
-                      <div class="stat-box">
+                      <div class="stat-box" style="<?php echo !$hasAnalyticsAccess ? 'filter: blur(2px);' : ''; ?>">
                         <div class="stat-icon">🌍</div>
-                        <span class="stat-value"><?php echo $link['top_city'] ?? 'N/A'; ?></span>
+                        <span class="stat-value"><?php echo $hasAnalyticsAccess ? ($link['top_city'] ?? 'N/A') : '•••'; ?></span>
                         <div class="stat-label">Top City</div>
                       </div>
                     </div>
 
                     <!-- tombol view details, donwload, dan resume /pause -->
-                    <button class="btn btn-edit" onclick="window.location.href='view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php'">✏️ View Details</button>
-                    <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
+                    <?php if ($hasAnalyticsAccess): ?>
+                      <button class="btn btn-edit" onclick="window.location.href='view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardAll.php'">✏️ View Details</button>
+                    <?php else: ?>
+                      <button class="btn btn-edit" style="opacity: 0.6; cursor: not-allowed;" onclick="alert('Analytics features require an active plan. Please upgrade to view detailed analytics.'); event.preventDefault();" title="Upgrade required">🔒 View Details</button>
+                    <?php endif; ?>
+                    <button class="btn btn-download" onclick="downloadQR('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['short_url']); ?>')">⬇️ Download</button>
                     <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['status']); ?>')">
                       <?php echo ($link['status'] === 'active') ? '⏸️ Pause' : '▶️ Resume'; ?>
                     </button>
