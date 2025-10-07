@@ -1,8 +1,43 @@
 // Copy ke clipboard
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        showNotification('Link copied to clipboard!', 'success'); // Tampilkan notifikasi sukses
-    });
+function copyToClipboard(text, event = null) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    // --- coba Clipboard API dulu ---
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                showNotification('Link copied to clipboard!', 'success');
+            })
+            .catch(err => {
+                console.error('Clipboard API failed:', err);
+                fallbackCopyText(text);
+            });
+    } else {
+        // --- fallback otomatis ---
+        fallbackCopyText(text);
+    }
+}
+
+function fallbackCopyText(text) {
+    // Buat input temporary
+    const tempInput = document.createElement('input');
+    tempInput.value = text;
+    tempInput.style.position = 'fixed';
+    tempInput.style.opacity = 0;
+    document.body.appendChild(tempInput);
+
+    // Pilih & copy
+    tempInput.select();
+    tempInput.setSelectionRange(0, text.length);
+    document.execCommand('copy');
+
+    // Hapus elemen sementara
+    document.body.removeChild(tempInput);
+
+    showNotification('Link copied to clipboard!', 'success');
 }
 
 // Download QR Code

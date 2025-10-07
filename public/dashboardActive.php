@@ -338,8 +338,14 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
                   <div class="info-item">
                     <span class="info-label">Short Link</span>
                     <?php $fullShortUrl = Config::getShortUrlBase() . '/' . $link['short_url'];?>
-                    <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>')">
-                      <?php echo htmlspecialchars($fullShortUrl); ?> <span>📋</span>
+                    <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" 
+                      class="short-link" 
+                      target="_blank"
+                      onclick="event.preventDefault(); window.open('<?php echo htmlspecialchars($fullShortUrl); ?>', '_blank');">
+                      <?php echo htmlspecialchars($fullShortUrl); ?> 
+                      <span class="copy-icon" 
+                            title="Copy short URL" 
+                            onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>', event)">📋</span>
                     </a>
                   </div>
                 </div>
