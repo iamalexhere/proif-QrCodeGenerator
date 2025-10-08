@@ -7,6 +7,10 @@ body {
     box-sizing: border-box;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 .container {
     display: flex;
     width: 100%;
@@ -127,7 +131,7 @@ body {
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: 12px 12px;
+    padding: 12px;
     background: #48bb78;
     color: white;
     border: none;
@@ -262,7 +266,6 @@ body {
     border-color: #48bb78;
 }
 
-/* Performance Indicator */
 .performance-indicator {
     position: absolute;
     top: 20px;
@@ -451,13 +454,18 @@ body {
 
 .stat-box {
     text-align: center;
-    padding: 20px 16px;
+    padding: 24px 18px;
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     border-radius: 16px;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid #e2e8f0;
     position: relative;
     overflow: hidden;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .stat-box::before {
@@ -536,12 +544,6 @@ body {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.qr-image:hover {
-    transform: scale(1.08) rotate(2deg);
-    box-shadow: 0 12px 32px rgba(72, 187, 120, 0.2);
-    border-color: #48bb78;
-}
-
 /* Action Buttons */
 .actions {
     display: flex;
@@ -589,10 +591,6 @@ body {
 .btn-edit {
     background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
     color: white;
-    display: flex;
-    justify-content: center;
-    width: auto;
-    min-width: 150px;
 }
 
 .btn-edit:hover {
@@ -698,7 +696,6 @@ body {
 
 /* ==================== EMPTY STATE ==================== */
 .empty-state {
-    grid-column: 1 / -1;
     text-align: center;
     padding: 60px 20px;
     background: white;
@@ -726,81 +723,329 @@ body {
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */
-@media (max-width: 1200px) {
-    .dashboard {
-        max-width: 800px;
+
+/* Tablet Landscape & Small Laptop (<= 1024px) */
+@media (max-width: 1024px) {
+    .main-content {
+        margin-left: 240px;
+        padding: 24px;
+    }
+
+    .sidebar {
+        width: 240px;
+    }
+
+    .qr-visual {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .actions {
+        width: 100%;
+        order: 2;
+    }
+
+    .qr-image {
+        order: 1;
+        width: 160px;
+        height: 160px;
     }
 }
 
-@media (max-width: 968px) {
+/* Tablet Portrait (<= 768px) */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        box-shadow: none;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 20px;
+    }
+
+    .sidebar-header {
+        text-align: left;
+        margin-bottom: 0;
+    }
+
+    .nav-menu {
+        display: none;
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+
     .dashboard {
-        max-width: 600px;
+        max-width: 100%;
+        gap: 20px;
+    }
+
+    .qr-card {
+        padding: 24px;
+    }
+
+    .qr-visual {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .qr-image {
+        width: 150px;
+        height: 150px;
     }
 
     .qr-stats {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 12px;
+    }
+
+    .stat-box {
+        min-height: 100px;
+        padding: 18px;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .card-title h3 {
+        font-size: 1.2rem;
     }
 }
 
-/* ==================== MOBILE OPTIMIZED ==================== */
+/* ==================== MOBILE SIDEBAR ==================== */
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
     }
 
-    /* Sidebar tetap ada tapi jadi compact di atas */
     .sidebar {
         width: 100%;
         height: auto;
         position: relative;
-        padding: 15px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+        border-radius: 0 0 24px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 100%;
     }
 
+    /* Header dengan spacing*/
     .sidebar-header {
-        margin-bottom: 12px;
+        text-align: center;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 600px;
     }
 
     .sidebar-header h2 {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 6px;
+        letter-spacing: -0.5px;
     }
 
     .sidebar-header p {
-        font-size: 0.8rem;
+        font-size: 0.875rem;
+        color: #cbd5e0;
+        margin: 0;
+        font-weight: 400;
     }
 
-    /* Navigasi jadi vertikal stack, bukan horizontal scroll */
+    /* Search container*/
+    .search-container {
+        width: 100%;
+        max-width: 600px;
+        margin-bottom: 20px;
+    }
+
+    .search-container form {
+        width: 100%;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 12px 16px;
+        padding-left: 42px;
+        border-radius: 12px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.95);
+        font-size: 0.9rem;
+        outline: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-input:focus {
+        border-color: #60a5fa;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    }
+
+    /* Menu navigasi vertikal*/
     .nav-menu {
-        display: flex;
+        display: flex !important;
         flex-direction: column;
-        gap: 8px;
-        overflow-x: visible;
-        overflow-y: visible;
-        padding-bottom: 0;
+        gap: 10px;
+        padding: 0;
+        margin: 0 0 16px 0;
+        list-style: none;
+        width: 100%;
+        max-width: 600px;
     }
 
     .nav-item {
-        flex-shrink: 1;
-        margin-bottom: 0;
         width: 100%;
+        margin: 0;
     }
 
     .nav-link {
-        white-space: normal;
-        padding: 10px 12px;
-        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        color: #e2e8f0;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
     }
 
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-1px);
+    }
+
+    .nav-link.active {
+        background: rgba(96, 165, 250, 0.2);
+        border-color: #60a5fa;
+        color: #ffffff;
+    }
+
+    .nav-link .nav-icon {
+        font-size: 1.4rem;
+        margin-right: 12px;
+    }
+
+    .nav-link .nav-text {
+        flex: 1;
+        font-size: 0.95rem;
+        font-weight: 500;
+        text-align: left;
+    }
+
+    .nav-link .nav-count {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        min-width: 28px;
+        text-align: center;
+    }
+
+    .nav-link.active .nav-count {
+        background: #60a5fa;
+        color: #ffffff;
+    }
+
+    /* Footer dengan tombol*/
     .sidebar-footer {
-        margin-top: 12px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex !important;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        max-width: 600px;
+    }
+
+    .create-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px 20px;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: #ffffff;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+    }
+
+    .create-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(72, 187, 120, 0.4);
+        background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+    }
+
+    .create-btn-icon {
+        font-size: 1.3rem;
+        font-weight: 700;
     }
 
     .trial-section {
-        margin-top: 8px;
-        padding: 10px 8px;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 14px 16px;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
     }
 
+    .trial-text {
+        color: #cbd5e0;
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    .upgrade-btn {
+        display: block;
+        width: 100%;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        color: #ffffff;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+    }
+
+    .upgrade-btn:hover {
+        background: linear-gradient(135deg, #3182ce 0%, #2563eb 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(66, 153, 225, 0.4);
+    }
+
+    /* Main content*/
     .main-content {
         margin-left: 0;
         padding: 20px;
@@ -814,7 +1059,91 @@ body {
     .header p {
         font-size: 0.9rem;
     }
+}
 
+/* Mobile sangat kecil (≤480px)*/
+@media (max-width: 480px) {
+    .sidebar {
+        padding: 18px 16px;
+        border-radius: 0 0 20px 20px;
+        gap: 14px;
+    }
+
+    .sidebar-header,
+    .search-container,
+    .nav-menu,
+    .sidebar-footer {
+        max-width: 100%;
+    }
+
+    .sidebar-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .sidebar-header p {
+        font-size: 0.8rem;
+    }
+
+    .search-container {
+        margin-bottom: 14px;
+    }
+
+    .search-input {
+        padding: 11px 14px;
+        font-size: 0.85rem;
+    }
+
+    .nav-menu {
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .nav-link {
+        padding: 12px 14px;
+    }
+
+    .nav-link .nav-icon {
+        font-size: 1.2rem;
+        margin-right: 10px;
+    }
+
+    .nav-link .nav-text {
+        font-size: 0.9rem;
+    }
+
+    .nav-link .nav-count {
+        padding: 3px 8px;
+        font-size: 0.75rem;
+    }
+
+    .sidebar-footer {
+        margin-top: 14px;
+        padding-top: 14px;
+    }
+
+    .create-btn {
+        padding: 12px 18px;
+        font-size: 0.9rem;
+        gap: 6px;
+    }
+
+    .trial-section {
+        padding: 12px 14px;
+    }
+
+    .trial-text {
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+    }
+
+    .upgrade-btn {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+    }
+}
+
+/* ==================== CARD & BUTTON ==================== */
+@media (max-width: 768px) {
     .dashboard {
         gap: 20px;
     }
@@ -866,7 +1195,7 @@ body {
         gap: 8px;
     }
 
-    /* FIX: Semua tombol harus full width di mobile */
+
     .btn {
         width: 100% !important;
         font-size: 0.8rem;
@@ -874,15 +1203,9 @@ body {
         gap: 6px;
         min-width: 0 !important;
         max-width: 100% !important;
-    }
-
-    /* FIX: Khusus tombol View Details */
-    .btn-edit {
-        width: 100% !important;
-        min-width: 0 !important;
-        max-width: 100% !important;
         display: flex !important;
         justify-content: center !important;
+        align-items: center !important;
     }
 
     .create-card {
@@ -973,21 +1296,11 @@ body {
         gap: 6px;
     }
 
-    /* FIX: Pastikan semua tombol sama di layar kecil */
     .btn {
         font-size: 0.75rem;
         padding: 9px 10px;
         gap: 4px;
         border-radius: 10px;
-        width: 100% !important;
-        min-width: 0 !important;
-        max-width: 100% !important;
-    }
-
-    .btn-edit {
-        width: 100% !important;
-        min-width: 0 !important;
-        max-width: 100% !important;
     }
 
     .qr-card {

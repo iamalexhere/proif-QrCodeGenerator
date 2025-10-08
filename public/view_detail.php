@@ -124,7 +124,6 @@ $linkCreatedAt = $linkData['created_at'] ? date('Y-m-d', strtotime($linkData['cr
     </main>
 
     <script>
-        // Pass PHP variables to JavaScript
         const linkId = <?php echo (int)$linkData['id']; ?>;
         const linkCreatedAt = "<?php echo $linkCreatedAt; ?>";
     </script>
