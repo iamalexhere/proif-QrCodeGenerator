@@ -6,12 +6,44 @@ body{
     "left right";
     margin: 0;
     height: 100vh;
-    font-family: Arial, sans-serif;
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.logo {
-    font-size: 3rem;
-    margin-bottom: 10px;
+/* Logo Container */
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-image {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.brand-title {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.brand-subtitle {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
 }
 
 header{
@@ -165,4 +197,39 @@ h1 {
     border-color: #667eea;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+        "header"
+        "left";
+    }
+    
+    .side-panel {
+        display: none;
+    }
+    
+    .logo-image {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .brand-title {
+        font-size: 24px;
+    }
+    
+    .brand-subtitle {
+        font-size: 11px;
+    }
+    
+    header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .section-login {
+        padding: 1rem;
+    }
 }

@@ -56,13 +56,22 @@ if (isset($_GET['error'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login to QR Code Generator</title>
+    <title>Login - AAARO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/login.css">
+    <link rel="icon" href="images/logo-aaaro.png" type="image/x-icon">
 </head>
 <body>
     <Header>
-        <div class="logo">🔗</div>
-        <h1>QR Code Generator</h1>
+        <div class="logo-container">
+            <img src="images/logo-aaaro.png" alt="AAARO Logo" class="logo-image">
+            <div class="brand-text">
+                <div class="brand-title">AAARO</div>
+                <div class="brand-subtitle">Complexity, simplified</div>
+            </div>
+        </div>
     </Header>
     <div class="main">
         <div class="section-login">
@@ -122,7 +131,7 @@ if (isset($_GET['error'])) {
             </div> -->
             <div class="term-and-condition">
                 <span>
-                    By logging in with an account, you agree to AARO's <a href="">Terms of Service</a>, <a href="">Privacy Policy</a> and <a href="">Acceptable Use Policy</a>.
+                    By logging in with an account, you agree to AAARO's <a href="">Terms of Service</a>, <a href="">Privacy Policy</a> and <a href="">Acceptable Use Policy</a>.
                 </span>
             </div>
             

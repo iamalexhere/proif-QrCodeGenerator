@@ -110,19 +110,12 @@ $planLimits = Config::getPlanLimits();
   </section>
 
   <!-- Terms & Conditions -->
-  <section style="max-width:800px;margin:40px auto;background:#fff;border:1px solid #ddd;border-radius:12px;padding:30px;">
-    <h2 style="margin-bottom:10px;color:#1d2d50;">Terms & Conditions</h2>
-    <p style="margin-bottom:15px;">By subscribing to any plan, you agree to the following terms and conditions:</p>
-    <ol style="margin-left:20px;">
-      <li>Subscriptions are billed annually. Refunds are only provided for cancellations within the first 7 days.</li>
-      <li>You are responsible for maintaining the security of your account credentials. We are not liable for any loss or damage resulting from unauthorized use of your account.</li>
-      <li>Dynamic QR codes created under your plan will remain active as long as your subscription is active. Upon expiration, codes may be paused or disabled.</li>
-      <li>We reserve the right to modify features, pricing, and terms of service at any time. Changes will be communicated via email prior to implementation.</li>
-      <li>Plans are for individual use unless otherwise specified. Reselling or sharing accounts without written permission is prohibited.</li>
-      <li>We are not responsible for losses or damages caused by third-party integrations or misuse of QR codes generated through our service.</li>
-      <li>Failure to comply with these terms may result in suspension or termination of your account without refund.</li>
-    </ol>
-    <p style="margin-top:15px;">For full legal details, please review our <a href="#" style="color:#00aaff;">Full Terms & Conditions</a>.</p>
-  </section>
+  <section style="max-width:800px;margin:40px auto;background:#fff;border:1px solid #ddd;border-radius:12px;padding:30px;text-align:center;">
+    <h2 style="margin-bottom:20px;color:#1d2d50;">Terms & Conditions</h2>
+    <p style="margin-bottom:20px;font-size:16px;color:#666;">By subscribing to any plan, you agree to our terms and conditions.</p>
+    <a href="terms.php" target="_blank" style="display:inline-block;background:#00aaff;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;transition:background 0.3s ease;">
+      📄 Read Full Terms & Conditions
+    </a>
+    </section>
 </body>
 </html>

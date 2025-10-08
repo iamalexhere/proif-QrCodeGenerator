@@ -17,30 +17,36 @@ if ($isLoggedIn) {
 
 <head>
     <meta charset="UTF-8">
-    <title>QR Code Generator</title>
-    <meta name="title" content="IF Unpar QR Code Generator">
-    <meta name="description" content="Website untuk membuat QR Code dari URL">
+    <title>AAARO - Link Shortener and QR Code Generator</title>
+    <meta name="title" content="Complexity, simplified">
+    <meta name="description" content="We are AAARO, the team that simplifies digital interactions to create instant, effortless connections">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" href="images/logoif.png" type="image/x-icon">
+    <link rel="icon" href="images/logo-aaaro.png" type="image/x-icon">
 </head>
 
 <body>
     <header>
         <nav class="navbar">
-            <img src='images/logoif.png'>
-            <a class="nav-link">
-                <div>QR Code Generator</div>
-            </a>
-
-            <?php if ($isLoggedIn): ?>
-                <div style="display:flex;align-items:center;gap:15px;">
-                    <span style="color:#666;">Welcome, <?php echo htmlspecialchars($currentUser['name']); ?></span>
-                    <a href="dashboardAll.php" class="btn-pro">Dashboard</a>
+            <div class="navbar-left">
+                <img src='images/logo-aaaro.png' alt="AAARO Logo">
+                <div class="brand-text">
+                    <div class="brand-title">AAARO</div>
+                    <div class="brand-subtitle">Complexity, simplified</div>
                 </div>
-            <?php else: ?>
-                <a href="login.php" class="btn-pro">Login to Create QR Codes</a>
-            <?php endif; ?>
+            </div>
+            
+            <div class="navbar-right">
+                <?php if ($isLoggedIn): ?>
+                    <span style="color:#666; font-size: 14px; margin-right: 15px;">Welcome, <?php echo htmlspecialchars($currentUser['name']); ?></span>
+                    <a href="dashboardAll.php" class="btn-pro">Dashboard</a>
+                <?php else: ?>
+                    <a href="login.php" class="btn-pro">Login to Create QR Codes</a>
+                <?php endif; ?>
+            </div>
         </nav>
     </header>
     <section>
@@ -188,19 +194,45 @@ if ($isLoggedIn) {
 
                 <div class="outputsection">
                     <h3>Output QR Code</h3>
-                    <div>
-                        <img id="qrImage" src='images/base.png'>
+                    <div id="qr-output-container">
+                        <!-- Empty state - shown initially -->
+                        <div id="empty-state" style="
+                            width: 300px; 
+                            height: 300px; 
+                            border: 2px dashed #ccc; 
+                            border-radius: 12px; 
+                            display: flex; 
+                            flex-direction: column; 
+                            align-items: center; 
+                            justify-content: center; 
+                            background: #f9f9f9;
+                            color: #666;
+                            text-align: center;
+                            margin: 0 auto;
+                        ">
+                            <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">📱</div>
+                            <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">No QR Code Generated</div>
+                            <div style="font-size: 14px; opacity: 0.7;">Enter a URL and click "Generate QR Code"</div>
+                        </div>
+                        
+                        <!-- QR Code result - hidden initially -->
+                        <div id="qr-result" style="display: none; text-align: center;">
+                            <img id="qrImage" style="max-width: 300px; border-radius: 8px;">
+                        </div>
                     </div>
-                    <div class=link-container>
-                        <div id="short-link-container">Short Link:<a href="" target="_blank"></a></div>
+                    
+                    <div class="link-container">
+                        <div id="short-link-container" style="display: none;">
+                            Short Link: <a href="" target="_blank" id="short-link"></a>
+                        </div>
                         <div id="download-links-container">
-                            <a id="download-png" class="btn" style="margin-right: 10px;">
+                            <a id="download-png" class="btn disabled" style="margin-right: 10px; opacity: 0.5; cursor: not-allowed; pointer-events: none;">
                                 <div>Download PNG</div>
                             </a>
-                            <a id="download-svg" class="btn" style="margin-right: 10px; background-color: #28a745;">
+                            <a id="download-svg" class="btn disabled" style="margin-right: 10px; background-color: #28a745; opacity: 0.5; cursor: not-allowed; pointer-events: none;">
                                 <div>Download SVG</div>
                             </a>
-                            <a id="download-pdf" class="btn" style="background-color: #dc3545;">
+                            <a id="download-pdf" class="btn disabled" style="background-color: #dc3545; opacity: 0.5; cursor: not-allowed; pointer-events: none;">
                                 <div>Download PDF</div>
                             </a>
                         </div>
@@ -210,12 +242,12 @@ if ($isLoggedIn) {
         </div>
     </section>
 
-    <!--footer>
+    <footer>
         <div>
-        Copyright &copy; 2024
-            <a class="text-body" href="https://informatika.unpar.ac.id/" >Informatika UNPAR</a>
+        Copyright &copy; 2025
+            <a class="text-body" href="https://aaaro.app/" >AAARO</a>
         </div>
-    </footer!-->
+    </footer>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -351,35 +383,55 @@ if ($isLoggedIn) {
             const downloadSvg = document.getElementById('download-svg');
             const downloadPdf = document.getElementById('download-pdf');
             const shortLinkContainer = document.getElementById('short-link-container');
+            const shortLink = document.getElementById('short-link');
+            const emptyState = document.getElementById('empty-state');
+            const qrResult = document.getElementById('qr-result');
             
-            // Reset UI
-            qrImage.style.opacity = 0.5;
-            [downloadPng, downloadSvg, downloadPdf].forEach(btn => btn.classList.add('disabled'));
-            shortLinkContainer.innerHTML = 'Memproses...';
+            // Show processing state
+            emptyState.innerHTML = `
+                <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">⏳</div>
+                <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Generating QR Code...</div>
+                <div style="font-size: 14px; opacity: 0.7;">Please wait</div>
+            `;
 
             try {
                 // Generate PNG first (untuk preview)
                 const pngData = await generateQRCode('png');
                 
-                // Update UI dengan PNG
-                qrImage.src = 'data:image/png;base64,' + pngData.image;
-                qrImage.style.opacity = 1;
+                // Hide empty state and show QR result
+                emptyState.style.display = 'none';
+                qrResult.style.display = 'block';
                 
-                // Update short link
+                // Update QR image
+                qrImage.src = 'data:image/png;base64,' + pngData.image;
+                
+                // Show and update short link
                 if (pngData.short_link) {
-                    shortLinkContainer.innerHTML = `Short Link:<a href="${pngData.short_link}" target="_blank">${pngData.short_link}</a>`;
+                    shortLinkContainer.style.display = 'block';
+                    shortLink.href = pngData.short_link;
+                    shortLink.textContent = pngData.short_link;
                 }
                 
                 // Store PNG data
                 qrData.png = pngData;
                 
                 // Enable download buttons
-                [downloadPng, downloadSvg, downloadPdf].forEach(btn => btn.classList.remove('disabled'));
+                [downloadPng, downloadSvg, downloadPdf].forEach(btn => {
+                    btn.classList.remove('disabled');
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    btn.style.pointerEvents = 'auto';
+                });
                 
             } catch (error) {
-                alert('Terjadi kesalahan saat mengirim data!');
+                // Show error state
+                emptyState.innerHTML = `
+                    <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">❌</div>
+                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px; color: #dc3545;">Generation Failed</div>
+                    <div style="font-size: 14px; opacity: 0.7;">Please try again</div>
+                `;
                 console.error('Error:', error);
-                shortLinkContainer.innerHTML = 'Gagal memproses permintaan.';
+                alert('Failed to generate QR code. Please try again.');
             }
         });
 
