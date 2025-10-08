@@ -37,13 +37,20 @@ CREATE TABLE clicks (
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
+    google_id VARCHAR(255) UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    subscription_plan VARCHAR(20) NOT NULL DEFAULT 'free',
-    subscription_until DATE NULL DEFAULT NULL,
+    name VARCHAR(255),
+    picture TEXT,
+    username VARCHAR(50) NULL UNIQUE,
+    password_hash VARCHAR(255) NULL,
+    plan VARCHAR(20) NOT NULL DEFAULT 'free',
+    plan_expires_at DATETIME NULL,
+    trial_ends_at DATETIME NULL,
+    last_login DATETIME NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_google_id (google_id),
+    INDEX idx_email (email)
 );
 
 ALTER TABLE links
@@ -56,6 +63,37 @@ CREATE TABLE link_analytics_summary (
   today_clicks INT DEFAULT 0,
   last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (link_id) REFERENCES links(id) ON DELETE CASCADE
+);
+
+-- User monthly quota tracking
+CREATE TABLE user_quotas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    month_year VARCHAR(7) NOT NULL,
+    qr_codes_created INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_user_month (user_id, month_year),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Payment transactions
+CREATE TABLE transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    plan VARCHAR(20) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(3) DEFAULT 'IDR',
+    payment_method VARCHAR(50),
+    payment_status VARCHAR(20) DEFAULT 'pending',
+    transaction_id VARCHAR(255) UNIQUE,
+    expires_at DATETIME NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_transaction_id (transaction_id),
+    INDEX idx_payment_status (payment_status)
 );
 
 DELIMITER $$

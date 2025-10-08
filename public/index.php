@@ -1,25 +1,52 @@
+<?php
+require_once __DIR__ . '/../classes/Auth.php';
+require_once __DIR__ . '/../config/Config.php';
+
+// Check if user is logged in
+$isLoggedIn = Auth::isLoggedIn();
+$currentUser = null;
+$quotaInfo = null;
+
+if ($isLoggedIn) {
+    $currentUser = Auth::getCurrentUser();
+    $quotaInfo = Auth::canCreateQRCode($currentUser['id']);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>QR Code Generator</title>
-    <meta name="title" content="IF Unpar QR Code Generator">
-    <meta name="description" content="Website untuk membuat QR Code dari URL">
+    <title>AAARO - Link Shortener and QR Code Generator</title>
+    <meta name="title" content="Complexity, simplified">
+    <meta name="description" content="We are AAARO, the team that simplifies digital interactions to create instant, effortless connections">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" href="images/logoif.png" type="image/x-icon">
+    <link rel="icon" href="images/logo-aaaro.png" type="image/x-icon">
 </head>
 
 <body>
     <header>
         <nav class="navbar">
-            <img src='images/logoif.png'>
-            <a class="nav-link">
-                <div>QR Code Generator</div>
-            </a>
-
-            <a href="dashboardAll.php" class="btn-pro">Try QRCode Generator PRO</a>
+            <div class="navbar-left">
+                <img src='images/logo-aaaro.png' alt="AAARO Logo">
+                <div class="brand-text">
+                    <div class="brand-title">AAARO</div>
+                    <div class="brand-subtitle">Complexity, simplified</div>
+                </div>
+            </div>
+            
+            <div class="navbar-right">
+                <?php if ($isLoggedIn): ?>
+                    <span style="color:#666; font-size: 14px; margin-right: 15px;">Welcome, <?php echo htmlspecialchars($currentUser['name']); ?></span>
+                    <a href="dashboardAll.php" class="btn-pro">Dashboard</a>
+                <?php else: ?>
+                    <a href="login.php" class="btn-pro">Login to Create QR Codes</a>
+                <?php endif; ?>
+            </div>
         </nav>
     </header>
     <section>
@@ -132,27 +159,80 @@
                             <input type="color" name="qr_color" id="qr_color" value="#000000">
                         </div>
                         
-                        <div class="form-submit"> 
-                            <button type="submit" class="btn">Generate QR Code</button>
-                        </div>
+                        <?php if ($isLoggedIn): ?>
+                            <!-- Quota Display -->
+                            <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; margin: 15px 0;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <span><strong>Monthly Quota:</strong></span>
+                                    <span><?php echo $quotaInfo['used']; ?> / <?php echo $quotaInfo['limit']; ?> QR Codes</span>
+                                </div>
+                                <div style="background: #e9ecef; border-radius: 10px; height: 8px; overflow: hidden;">
+                                    <div style="background: <?php echo $quotaInfo['used'] >= $quotaInfo['limit'] ? '#dc3545' : '#28a745'; ?>; height: 100%; width: <?php echo ($quotaInfo['used'] / $quotaInfo['limit']) * 100; ?>%;"></div>
+                                </div>
+                                <?php if (!$quotaInfo['canCreate']): ?>
+                                    <p style="color: #dc3545; margin-top: 10px; font-size: 14px;">⚠️ Monthly limit reached. <a href="payment.php">Upgrade your plan</a> to create more QR codes.</p>
+                                <?php endif; ?>
+                            </div>
+                            
+                            <div class="form-submit"> 
+                                <button type="submit" class="btn" <?php echo !$quotaInfo['canCreate'] ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : ''; ?>>
+                                    <?php echo $quotaInfo['canCreate'] ? 'Generate QR Code' : 'Quota Exceeded'; ?>
+                                </button>
+                            </div>
+                        <?php else: ?>
+                            <!-- Login Required Message -->
+                            <div style="padding: 20px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; margin: 15px 0; text-align: center;">
+                                <h4 style="color: #856404; margin-bottom: 10px;">🔐 Login Required</h4>
+                                <p style="color: #856404; margin-bottom: 15px;">Please log in with your Google account to create QR codes.</p>
+                                <a href="login.php" class="btn" style="background: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px;">
+                                    Login with Google
+                                </a>
+                            </div>
+                        <?php endif; ?>
                     </form>
                 </div>
 
                 <div class="outputsection">
                     <h3>Output QR Code</h3>
-                    <div>
-                        <img id="qrImage" src='images/base.png'>
+                    <div id="qr-output-container">
+                        <!-- Empty state - shown initially -->
+                        <div id="empty-state" style="
+                            width: 300px; 
+                            height: 300px; 
+                            border: 2px dashed #ccc; 
+                            border-radius: 12px; 
+                            display: flex; 
+                            flex-direction: column; 
+                            align-items: center; 
+                            justify-content: center; 
+                            background: #f9f9f9;
+                            color: #666;
+                            text-align: center;
+                            margin: 0 auto;
+                        ">
+                            <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">📱</div>
+                            <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">No QR Code Generated</div>
+                            <div style="font-size: 14px; opacity: 0.7;">Enter a URL and click "Generate QR Code"</div>
+                        </div>
+                        
+                        <!-- QR Code result - hidden initially -->
+                        <div id="qr-result" style="display: none; text-align: center;">
+                            <img id="qrImage" style="max-width: 300px; border-radius: 8px;">
+                        </div>
                     </div>
-                    <div class=link-container>
-                        <div id="short-link-container">Short Link:<a href="" target="_blank"></a></div>
+                    
+                    <div class="link-container">
+                        <div id="short-link-container" style="display: none;">
+                            Short Link: <a href="" target="_blank" id="short-link"></a>
+                        </div>
                         <div id="download-links-container">
-                            <a id="download-png" class="btn" style="margin-right: 10px;">
+                            <a id="download-png" class="btn disabled" style="margin-right: 10px; opacity: 0.5; cursor: not-allowed; pointer-events: none;">
                                 <div>Download PNG</div>
                             </a>
-                            <a id="download-svg" class="btn" style="margin-right: 10px; background-color: #28a745;">
+                            <a id="download-svg" class="btn disabled" style="margin-right: 10px; background-color: #28a745; opacity: 0.5; cursor: not-allowed; pointer-events: none;">
                                 <div>Download SVG</div>
                             </a>
-                            <a id="download-pdf" class="btn" style="background-color: #dc3545;">
+                            <a id="download-pdf" class="btn disabled" style="background-color: #dc3545; opacity: 0.5; cursor: not-allowed; pointer-events: none;">
                                 <div>Download PDF</div>
                             </a>
                         </div>
@@ -162,12 +242,12 @@
         </div>
     </section>
 
-    <!--footer>
+    <footer>
         <div>
-        Copyright &copy; 2024
-            <a class="text-body" href="https://informatika.unpar.ac.id/" >Informatika UNPAR</a>
+        Copyright &copy; 2025
+            <a class="text-body" href="https://aaaro.app/" >AAARO</a>
         </div>
-    </footer!-->
+    </footer>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -284,40 +364,74 @@
         qrForm.addEventListener('submit', async function(event) {
             event.preventDefault();
             
+            // Check if user is logged in
+            <?php if (!$isLoggedIn): ?>
+                alert('Please log in to create QR codes.');
+                window.location.href = 'login.php';
+                return;
+            <?php endif; ?>
+            
+            // Check quota
+            <?php if ($isLoggedIn && !$quotaInfo['canCreate']): ?>
+                alert('You have reached your monthly QR code limit. Please upgrade your plan.');
+                window.location.href = 'payment.php';
+                return;
+            <?php endif; ?>
+            
             const qrImage = document.getElementById('qrImage');
             const downloadPng = document.getElementById('download-png');
             const downloadSvg = document.getElementById('download-svg');
             const downloadPdf = document.getElementById('download-pdf');
             const shortLinkContainer = document.getElementById('short-link-container');
+            const shortLink = document.getElementById('short-link');
+            const emptyState = document.getElementById('empty-state');
+            const qrResult = document.getElementById('qr-result');
             
-            // Reset UI
-            qrImage.style.opacity = 0.5;
-            [downloadPng, downloadSvg, downloadPdf].forEach(btn => btn.classList.add('disabled'));
-            shortLinkContainer.innerHTML = 'Memproses...';
+            // Show processing state
+            emptyState.innerHTML = `
+                <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">⏳</div>
+                <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Generating QR Code...</div>
+                <div style="font-size: 14px; opacity: 0.7;">Please wait</div>
+            `;
 
             try {
                 // Generate PNG first (untuk preview)
                 const pngData = await generateQRCode('png');
                 
-                // Update UI dengan PNG
-                qrImage.src = 'data:image/png;base64,' + pngData.image;
-                qrImage.style.opacity = 1;
+                // Hide empty state and show QR result
+                emptyState.style.display = 'none';
+                qrResult.style.display = 'block';
                 
-                // Update short link
+                // Update QR image
+                qrImage.src = 'data:image/png;base64,' + pngData.image;
+                
+                // Show and update short link
                 if (pngData.short_link) {
-                    shortLinkContainer.innerHTML = `Short Link:<a href="${pngData.short_link}" target="_blank">${pngData.short_link}</a>`;
+                    shortLinkContainer.style.display = 'block';
+                    shortLink.href = pngData.short_link;
+                    shortLink.textContent = pngData.short_link;
                 }
                 
                 // Store PNG data
                 qrData.png = pngData;
                 
                 // Enable download buttons
-                [downloadPng, downloadSvg, downloadPdf].forEach(btn => btn.classList.remove('disabled'));
+                [downloadPng, downloadSvg, downloadPdf].forEach(btn => {
+                    btn.classList.remove('disabled');
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    btn.style.pointerEvents = 'auto';
+                });
                 
             } catch (error) {
-                alert('Terjadi kesalahan saat mengirim data!');
+                // Show error state
+                emptyState.innerHTML = `
+                    <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">❌</div>
+                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px; color: #dc3545;">Generation Failed</div>
+                    <div style="font-size: 14px; opacity: 0.7;">Please try again</div>
+                `;
                 console.error('Error:', error);
-                shortLinkContainer.innerHTML = 'Gagal memproses permintaan.';
+                alert('Failed to generate QR code. Please try again.');
             }
         });
 

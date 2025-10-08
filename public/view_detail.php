@@ -33,14 +33,24 @@ if (!$linkData) {
 <head>
   <meta charset="UTF-8">
   <title>View QR Code Details</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/view_detail.css"> 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <!-- Navbar dengan tombol back dinamis -->
   <header class="navbar">
-    <div class="logo">QR Code Generator</div>
-    <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
+    <div class="navbar-left">
+      <div class="brand-text">
+        <div class="brand-title">AAARO</div>
+        <div class="brand-subtitle">Complexity, simplified</div>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
+    </div>
   </header>
 
   <main class="edit-container">
