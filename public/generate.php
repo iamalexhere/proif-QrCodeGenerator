@@ -35,20 +35,74 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 try {
     if (isset($_POST['url-input']) && !empty($_POST['url-input'])) {
         
-        // --- CHECK USER QUOTA BEFORE CREATING QR CODE ---
-        $quotaCheck = Auth::canCreateQRCode($currentUser['id']);
-        if (!$quotaCheck['canCreate']) {
+        // --- CHECK USER QUOTA WITH ATOMIC TRANSACTION ---
+        $db = Database::getInstance()->getConnection();
+        $db->begin_transaction();
+        
+        try {
+            // Lock the user quota row for update to prevent race conditions
+            $monthYear = date('Y-m');
+            $limit = Config::getPlanLimit($currentUser['plan'], 'qr_codes_per_month', 10);
+            
+            // Get or create quota record with lock
+            $stmt = $db->prepare("
+                INSERT INTO user_quotas (user_id, month_year, qr_codes_created)
+                VALUES (?, ?, 0)
+                ON DUPLICATE KEY UPDATE qr_codes_created = qr_codes_created
+            ");
+            $stmt->bind_param("is", $currentUser['id'], $monthYear);
+            $stmt->execute();
+            $stmt->close();
+            
+            // Now lock and check the quota
+            $stmt = $db->prepare("
+                SELECT qr_codes_created 
+                FROM user_quotas 
+                WHERE user_id = ? AND month_year = ?
+                FOR UPDATE
+            ");
+            $stmt->bind_param("is", $currentUser['id'], $monthYear);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $quota = $result->fetch_assoc();
+            $stmt->close();
+            
+            $used = $quota ? $quota['qr_codes_created'] : 0;
+            
+            if ($used >= $limit) {
+                $db->rollback();
+                ob_clean();
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'error' => 'Monthly QR code limit reached',
+                    'quota_info' => [
+                        'used' => $used,
+                        'limit' => $limit,
+                        'plan' => $currentUser['plan']
+                    ],
+                    'upgrade_required' => true
+                ]);
+                exit;
+            }
+            
+            // Reserve the quota slot immediately
+            $stmt = $db->prepare("
+                UPDATE user_quotas 
+                SET qr_codes_created = qr_codes_created + 1
+                WHERE user_id = ? AND month_year = ?
+            ");
+            $stmt->bind_param("is", $currentUser['id'], $monthYear);
+            $stmt->execute();
+            $stmt->close();
+            
+            // Commit the quota reservation
+            $db->commit();
+            
+        } catch (Exception $e) {
+            $db->rollback();
             ob_clean();
             header('Content-Type: application/json; charset=utf-8');
-            echo json_encode([
-                'error' => 'Monthly QR code limit reached',
-                'quota_info' => [
-                    'used' => $quotaCheck['used'],
-                    'limit' => $quotaCheck['limit'],
-                    'plan' => $currentUser['plan']
-                ],
-                'upgrade_required' => true
-            ]);
+            echo json_encode(['error' => 'Quota check failed: ' . $e->getMessage()]);
             exit;
         }
         
@@ -61,17 +115,69 @@ try {
 
         // --- LOGIKA PEMILIHAN LOGO (DENGAN PRIORITAS) ---
 
-        // Prioritas 1: Cek apakah ada logo kustom yang diunggah
+        // Priority 1: Check if custom logo is uploaded with validation
         if (isset($_FILES['custom-logo']) && $_FILES['custom-logo']['error'] === UPLOAD_ERR_OK) {
+            $uploadedFile = $_FILES['custom-logo'];
+            
+            // Validate file size (max 5MB)
+            $maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+            if ($uploadedFile['size'] > $maxFileSize) {
+                ob_clean();
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['error' => 'Logo file too large. Maximum size is 5MB.']);
+                exit;
+            }
+            
+            // Validate file type by MIME type and extension
+            $allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+            $allowedExtensions = ['png', 'jpg', 'jpeg'];
+            
+            $fileMimeType = mime_content_type($uploadedFile['tmp_name']);
+            $fileExtension = strtolower(pathinfo($uploadedFile['name'], PATHINFO_EXTENSION));
+            
+            if (!in_array($fileMimeType, $allowedMimeTypes) || !in_array($fileExtension, $allowedExtensions)) {
+                ob_clean();
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['error' => 'Invalid file type. Only PNG and JPG files are allowed.']);
+                exit;
+            }
+            
+            // Validate that it's actually an image by trying to get image info
+            $imageInfo = getimagesize($uploadedFile['tmp_name']);
+            if ($imageInfo === false) {
+                ob_clean();
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['error' => 'Invalid image file. File appears to be corrupted.']);
+                exit;
+            }
+            
+            // Additional security: check image dimensions (reasonable limits)
+            $maxWidth = 2000;
+            $maxHeight = 2000;
+            if ($imageInfo[0] > $maxWidth || $imageInfo[1] > $maxHeight) {
+                ob_clean();
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['error' => "Image dimensions too large. Maximum size is {$maxWidth}x{$maxHeight} pixels."]);
+                exit;
+            }
+            
+            // Create upload directory if it doesn't exist
             $uploadDir = 'uploads/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
-            $fileName = uniqid() . '-' . basename($_FILES['custom-logo']['name']);
+            
+            // Generate secure filename
+            $fileName = uniqid() . '_' . time() . '.' . $fileExtension;
             $uploadPath = $uploadDir . $fileName;
 
-            if (move_uploaded_file($_FILES['custom-logo']['tmp_name'], $uploadPath)) {
-                $logoPathForDb = $uploadPath; // Simpan path logo kustom
+            if (move_uploaded_file($uploadedFile['tmp_name'], $uploadPath)) {
+                $logoPathForDb = $uploadPath; // Save custom logo path
+            } else {
+                ob_clean();
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['error' => 'Failed to upload logo file.']);
+                exit;
             }
         } 
         // Prioritas 2: Jika tidak ada logo kustom, cek apakah ada logo bawaan yang dipilih
@@ -96,9 +202,10 @@ try {
             $shortCode = $result['short_code'];
             $isExistingUrl = $result['existing'] ?? false;
             
-            // Only increment quota for NEW QR codes, not existing ones
-            if (!$isExistingUrl) {
-                Auth::incrementQRCodeUsage($currentUser['id']);
+            // Quota already incremented atomically above
+            // Only decrement if this is an existing URL (since we already reserved a slot)
+            if ($isExistingUrl) {
+                Auth::decrementQRCodeUsage($currentUser['id']);
             }
         } catch (Exception $e) {
             // Fallback ke URL asli jika gagal
@@ -138,19 +245,19 @@ try {
                     $pngWriter = new PngWriter();
                     $pngResult = $pngWriter->write($qrCode, logo: $logoToUse);
                     
-                    // Create PDF dengan TCPDF
+                    // Create PDF with TCPDF
                     $pdf = new TCPDF();
                     $pdf->AddPage();
                     $pdf->SetFont('helvetica', 'B', 16);
                     $pdf->Cell(0, 10, 'QR Code', 0, 1, 'C');
                     
-                    // Add QR code image ke PDF
-                    // Try direct image embedding first
+                    // Add QR code image to PDF with proper cleanup
+                    $tempFile = null;
                     try {
-                        // Use TCPDF's Image method with string data
+                        // Try direct image embedding first
                         $pdf->Image('@' . $pngResult->getString(), 55, 30, 100, 100, 'PNG');
                     } catch (Exception $directImageError) {
-                        // Fallback to temporary file method
+                        // Fallback to temporary file method with guaranteed cleanup
                         $tempDir = sys_get_temp_dir();
                         if (empty($tempDir) || !is_writable($tempDir)) {
                             // Fallback to uploads directory
@@ -160,10 +267,7 @@ try {
                             }
                         }
                         
-                        $tempFile = $tempDir . '/qr_' . uniqid() . '.png';
-                        if (empty($tempFile)) {
-                            throw new Exception('Could not create temporary file for PDF generation');
-                        }
+                        $tempFile = $tempDir . '/qr_' . uniqid() . '_' . time() . '.png';
                         
                         $writeResult = file_put_contents($tempFile, $pngResult->getString());
                         if ($writeResult === false) {
@@ -172,18 +276,12 @@ try {
                         
                         // Verify file exists and has content
                         if (!file_exists($tempFile) || filesize($tempFile) === 0) {
+                            @unlink($tempFile);
                             throw new Exception('Temporary QR code file is empty or not created');
                         }
                         
-                        // Add image to PDF with error handling
-                        try {
-                            $pdf->Image($tempFile, 55, 30, 100, 100, 'PNG');
-                        } catch (Exception $imageError) {
-                            @unlink($tempFile);
-                            throw new Exception('Could not add QR code image to PDF: ' . $imageError->getMessage());
-                        }
-                        
-                        @unlink($tempFile);
+                        // Add image to PDF
+                        $pdf->Image($tempFile, 55, 30, 100, 100, 'PNG');
                     }
                     
                     // Add URL info
@@ -195,6 +293,7 @@ try {
                     $imageData = $pdf->Output('', 'S');
                     $mimeType = 'application/pdf';
                     $fileExtension = 'pdf';
+                    
                 } catch (Exception $pdfError) {
                     // Log the error and return it
                     @error_log('PDF generation error: ' . $pdfError->getMessage());
@@ -202,6 +301,11 @@ try {
                     header('Content-Type: application/json; charset=utf-8');
                     echo json_encode(['error' => 'PDF generation failed: ' . $pdfError->getMessage()]);
                     exit;
+                } finally {
+                    // Always cleanup temporary file if it was created
+                    if ($tempFile && file_exists($tempFile)) {
+                        @unlink($tempFile);
+                    }
                 }
                 break;
                 

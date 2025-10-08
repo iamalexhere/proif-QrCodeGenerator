@@ -21,7 +21,7 @@ function downloadQR(shortCode, filename, format = 'png') {
     showNotification(`QR Code downloaded as ${format.toUpperCase()} successfully!`, 'success');
 }
 
-// Show download format dropdown
+// Show download format dropdown with mobile optimization
 function showDownloadOptions(shortCode, filename) {
     // Create dropdown menu
     const dropdown = document.createElement('div');
@@ -44,7 +44,10 @@ function showDownloadOptions(shortCode, filename) {
         </div>
     `;
     
-    // Add styles
+    // Detect if mobile device
+    const isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Add styles with mobile optimization
     dropdown.style.cssText = `
         position: fixed;
         top: 0;
@@ -54,25 +57,28 @@ function showDownloadOptions(shortCode, filename) {
         background: rgba(0, 0, 0, 0.5);
         z-index: 1000;
         display: flex;
-        align-items: center;
+        align-items: ${isMobile ? 'flex-end' : 'center'};
         justify-content: center;
+        padding: ${isMobile ? '0' : '20px'};
     `;
     
     const content = dropdown.querySelector('.download-dropdown-content');
     content.style.cssText = `
         background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        min-width: 250px;
+        border-radius: ${isMobile ? '12px 12px 0 0' : '12px'};
+        padding: ${isMobile ? '24px 20px 32px' : '20px'};
+        box-shadow: 0 ${isMobile ? '-4px' : '10px'} 30px rgba(0, 0, 0, 0.3);
+        min-width: ${isMobile ? '100%' : '280px'};
+        max-width: ${isMobile ? '100%' : '350px'};
         text-align: center;
+        ${isMobile ? 'margin: 0; border-radius: 12px 12px 0 0;' : ''}
     `;
     
     const header = dropdown.querySelector('.download-dropdown-header');
     header.style.cssText = `
-        font-size: 18px;
+        font-size: ${isMobile ? '20px' : '18px'};
         font-weight: bold;
-        margin-bottom: 15px;
+        margin-bottom: ${isMobile ? '20px' : '15px'};
         color: #333;
     `;
     
@@ -81,41 +87,68 @@ function showDownloadOptions(shortCode, filename) {
         option.style.cssText = `
             display: block;
             width: 100%;
-            padding: 12px 15px;
-            margin: 8px 0;
+            padding: ${isMobile ? '16px 20px' : '12px 15px'};
+            margin: ${isMobile ? '12px 0' : '8px 0'};
             border: none;
             border-radius: 8px;
             background: #f8f9fa;
             color: #333;
             cursor: pointer;
-            font-size: 14px;
+            font-size: ${isMobile ? '16px' : '14px'};
             transition: background 0.2s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         `;
         
-        option.addEventListener('mouseenter', () => {
-            if (!option.classList.contains('cancel')) {
-                option.style.background = '#007bff';
-                option.style.color = 'white';
-            } else {
-                option.style.background = '#dc3545';
-                option.style.color = 'white';
-            }
-        });
-        
-        option.addEventListener('mouseleave', () => {
-            option.style.background = '#f8f9fa';
-            option.style.color = '#333';
-        });
+        // Enhanced touch events for mobile
+        if (isMobile) {
+            option.addEventListener('touchstart', () => {
+                if (!option.classList.contains('cancel')) {
+                    option.style.background = '#007bff';
+                    option.style.color = 'white';
+                } else {
+                    option.style.background = '#dc3545';
+                    option.style.color = 'white';
+                }
+            });
+            
+            option.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    option.style.background = '#f8f9fa';
+                    option.style.color = '#333';
+                }, 150);
+            });
+        } else {
+            option.addEventListener('mouseenter', () => {
+                if (!option.classList.contains('cancel')) {
+                    option.style.background = '#007bff';
+                    option.style.color = 'white';
+                } else {
+                    option.style.background = '#dc3545';
+                    option.style.color = 'white';
+                }
+            });
+            
+            option.addEventListener('mouseleave', () => {
+                option.style.background = '#f8f9fa';
+                option.style.color = '#333';
+            });
+        }
     });
     
     document.body.appendChild(dropdown);
     
-    // Close on outside click
+    // Close on outside click/touch
     dropdown.addEventListener('click', (e) => {
         if (e.target === dropdown) {
             hideDownloadOptions();
         }
     });
+    
+    // Prevent body scroll on mobile when dropdown is open
+    if (isMobile) {
+        document.body.style.overflow = 'hidden';
+    }
 }
 
 // Hide download options dropdown
@@ -124,6 +157,8 @@ function hideDownloadOptions() {
     if (dropdown) {
         dropdown.remove();
     }
+    // Restore body scroll on mobile
+    document.body.style.overflow = '';
 }
 
 // Mengubah status QR Code (pause / resume)
