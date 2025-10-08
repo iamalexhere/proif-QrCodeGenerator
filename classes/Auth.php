@@ -394,4 +394,31 @@ class Auth {
         $stmt->execute();
         $stmt->close();
     }
+    
+    /**
+     * Decrement user's QR code usage for current month (when deleting QR codes)
+     * @param int|null $userId
+     */
+    public static function decrementQRCodeUsage($userId = null) {
+        if (!$userId) {
+            $userId = self::getCurrentUserId();
+        }
+        
+        if (!$userId) {
+            return;
+        }
+        
+        $monthYear = date('Y-m');
+        $auth = self::getInstance();
+        
+        // Only decrement if count is greater than 0
+        $stmt = $auth->db->prepare("
+            UPDATE user_quotas 
+            SET qr_codes_created = GREATEST(0, qr_codes_created - 1)
+            WHERE user_id = ? AND month_year = ? AND qr_codes_created > 0
+        ");
+        $stmt->bind_param("is", $userId, $monthYear);
+        $stmt->execute();
+        $stmt->close();
+    }
 }

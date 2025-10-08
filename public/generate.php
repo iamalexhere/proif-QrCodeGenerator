@@ -94,9 +94,12 @@ try {
             $result = $urlShortener->createShortUrl($longUrl, $currentUser['id'], $customUrlInput, $logoPathForDb, $qrColor);
             $shortUrl = $result['short_url'];
             $shortCode = $result['short_code'];
+            $isExistingUrl = $result['existing'] ?? false;
             
-            // Increment user's QR code usage quota
-            Auth::incrementQRCodeUsage($currentUser['id']);
+            // Only increment quota for NEW QR codes, not existing ones
+            if (!$isExistingUrl) {
+                Auth::incrementQRCodeUsage($currentUser['id']);
+            }
         } catch (Exception $e) {
             // Fallback ke URL asli jika gagal
             $shortUrl = $longUrl;
@@ -211,20 +214,40 @@ try {
                 break;
         }
 
-        //Menyimpan gambar ke DB links dengan format png
-        if ($format === 'png' && $imageData !== null) {
-            try {
-                $db = Database::getInstance()->getConnection();
+        // === MENYIMPAN GAMBAR QR KE DATABASE ===
+        // Always ensure we have a PNG QR image stored in database for fallback
+        try {
+            $db = Database::getInstance()->getConnection();
+            
+            // Check if QR image already exists for this short code
+            $checkStmt = $db->prepare("SELECT qr_image FROM links WHERE short_url = ?");
+            $checkStmt->bind_param("s", $shortCode);
+            $checkStmt->execute();
+            $checkResult = $checkStmt->get_result();
+            $existingData = $checkResult->fetch_assoc();
+            $checkStmt->close();
+            
+            // If no QR image exists or if we're generating PNG, save it
+            if (empty($existingData['qr_image']) || $format === 'png') {
+                $pngImageData = $imageData;
+                
+                // If current format is not PNG, generate PNG for database storage
+                if ($format !== 'png') {
+                    $pngWriter = new PngWriter();
+                    $pngResult = $pngWriter->write($qrCode, logo: $logoToUse);
+                    $pngImageData = $pngResult->getString();
+                }
+                
+                // Save PNG image to database
                 $stmt = $db->prepare("UPDATE links SET qr_image = ? WHERE short_url = ?");
-                // "b" berarti kita mengirim data dalam format BLOB
                 $stmt->bind_param("bs", $null, $shortCode);
-                $stmt->send_long_data(0, $imageData);
+                $stmt->send_long_data(0, $pngImageData);
                 $stmt->execute();
                 $stmt->close();
-            } catch (Exception $e) {
-                // Jika gagal menyimpan gambar, tidak apa-apa, lanjutkan saja
-                error_log("Gagal menyimpan gambar QR ke DB: " . $e->getMessage());
             }
+        } catch (Exception $e) {
+            // Log error but don't fail the request
+            error_log("Failed to save QR image to database: " . $e->getMessage());
         }
         
         // --- MENGIRIM RESPONSE KE FRONTEND ---
