@@ -49,7 +49,7 @@ try {
     // Verify state parameter if it was set (CSRF protection)
     if (isset($_GET['state']) && isset($_SESSION['oauth_state'])) {
         if ($_GET['state'] !== $_SESSION['oauth_state']) {
-            error_log('OAuth state mismatch - possible CSRF attack');
+            error_log('OAuth state mismatch - Expected: ' . $_SESSION['oauth_state'] . ', Got: ' . $_GET['state']);
             header('Location: login.php?error=invalid_state');
             exit;
         }

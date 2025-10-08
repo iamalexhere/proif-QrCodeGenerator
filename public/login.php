@@ -131,7 +131,7 @@ if (isset($_GET['error'])) {
             </div> -->
             <div class="term-and-condition">
                 <span>
-                    By logging in with an account, you agree to AAARO's <a href="">Terms of Service</a>, <a href="">Privacy Policy</a> and <a href="">Acceptable Use Policy</a>.
+                    By logging in with an account, you agree to AAARO's <a href="terms.php">Terms and Conditions</a>.
                 </span>
             </div>
             

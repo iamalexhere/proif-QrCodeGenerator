@@ -453,8 +453,9 @@ function getDisplayName($link) {
                     <?php else: ?>
                       <button class="btn btn-edit" style="opacity: 0.6; cursor: not-allowed;" onclick="alert('Analytics features require an active plan. Please upgrade to view detailed analytics.'); event.preventDefault();" title="Upgrade required">🔒 View Details</button>
                     <?php endif; ?>
-                    <button class="btn btn-download" onclick="downloadQR('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['short_url']); ?>')">⬇️ Download</button>
+                    <button class="btn btn-download" onclick="showDownloadOptions('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['short_url']); ?>')">⬇️ Download</button>
                     <button class="btn btn-resume" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', 'paused')">▶️ Resume</button>
+                    <button class="btn btn-delete" onclick="deleteQRCode('<?php echo htmlspecialchars($link['short_url']); ?>')" style="background: #dc3545;">🗑️ Delete</button>
                   </div>
                 </div>
               </div>

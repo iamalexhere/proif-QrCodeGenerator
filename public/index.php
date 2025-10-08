@@ -169,6 +169,16 @@ if ($isLoggedIn) {
                                 <div style="background: #e9ecef; border-radius: 10px; height: 8px; overflow: hidden;">
                                     <div style="background: <?php echo $quotaInfo['used'] >= $quotaInfo['limit'] ? '#dc3545' : '#28a745'; ?>; height: 100%; width: <?php echo ($quotaInfo['used'] / $quotaInfo['limit']) * 100; ?>%;"></div>
                                 </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 12px; color: #666;">
+                                    <span style="display: flex; align-items: center;">
+                                        <span style="width: 8px; height: 8px; background: #28a745; border-radius: 50%; margin-right: 4px;"></span>
+                                        Available
+                                    </span>
+                                    <span style="display: flex; align-items: center;">
+                                        <span style="width: 8px; height: 8px; background: #dc3545; border-radius: 50%; margin-right: 4px;"></span>
+                                        Limit Reached
+                                    </span>
+                                </div>
                                 <?php if (!$quotaInfo['canCreate']): ?>
                                     <p style="color: #dc3545; margin-top: 10px; font-size: 14px;">⚠️ Monthly limit reached. <a href="payment.php">Upgrade your plan</a> to create more QR codes.</p>
                                 <?php endif; ?>
@@ -226,13 +236,13 @@ if ($isLoggedIn) {
                             Short Link: <a href="" target="_blank" id="short-link"></a>
                         </div>
                         <div id="download-links-container">
-                            <a id="download-png" class="btn disabled" style="margin-right: 10px; opacity: 0.5; cursor: not-allowed; pointer-events: none;">
+                            <a id="download-png" class="btn disabled" style="margin-right: 10px; opacity: 0.5; cursor: not-allowed; pointer-events: none;" title="Generate a QR code first to enable downloads">
                                 <div>Download PNG</div>
                             </a>
-                            <a id="download-svg" class="btn disabled" style="margin-right: 10px; background-color: #28a745; opacity: 0.5; cursor: not-allowed; pointer-events: none;">
+                            <a id="download-svg" class="btn disabled" style="margin-right: 10px; background-color: #28a745; opacity: 0.5; cursor: not-allowed; pointer-events: none;" title="Generate a QR code first to enable downloads">
                                 <div>Download SVG</div>
                             </a>
-                            <a id="download-pdf" class="btn disabled" style="background-color: #dc3545; opacity: 0.5; cursor: not-allowed; pointer-events: none;">
+                            <a id="download-pdf" class="btn disabled" style="background-color: #dc3545; opacity: 0.5; cursor: not-allowed; pointer-events: none;" title="Generate a QR code first to enable downloads">
                                 <div>Download PDF</div>
                             </a>
                         </div>
@@ -256,39 +266,39 @@ if ($isLoggedIn) {
         const defaultLogoRadios = document.querySelectorAll('input[name="default-logo"]');
         const resetLogoButton = document.getElementById('reset-logo');
 
-        // Variabel untuk menyimpan data QR code dalam berbagai format
+        // Variable to store QR code data in various formats
         let qrData = {
             png: null,
             svg: null,
             pdf: null
         };
 
-        // Fungsi untuk mereset pilihan radio logo bawaan
+        // Function to reset default logo radio selections
         function deselectDefaultLogos() {
             defaultLogoRadios.forEach(radio => radio.checked = false);
         }
 
-        // Jika pengguna memilih file kustom, reset pilihan logo bawaan
+        // If user selects custom file, reset default logo selections
         customLogoInput.addEventListener('change', function() {
             if (this.files.length > 0) {
                 deselectDefaultLogos();
             }
         });
 
-        // Jika pengguna memilih logo bawaan, reset pilihan file kustom
+        // If user selects default logo, reset custom file selection
         defaultLogoRadios.forEach(radio => {
             radio.addEventListener('change', function() {
-                customLogoInput.value = ''; // Mengosongkan input file
+                customLogoInput.value = ''; // Clear file input
             });
         });
 
-        // Fungsi tombol reset
+        // Reset button function
         resetLogoButton.addEventListener('click', function() {
             deselectDefaultLogos();
             customLogoInput.value = '';
         });
 
-        // Fungsi untuk generate QR code dalam format tertentu
+        // Function to generate QR code in specific format
         async function generateQRCode(format) {
             const formData = new FormData(qrForm);
             formData.set('format', format);
@@ -322,7 +332,70 @@ if ($isLoggedIn) {
             }
         }
 
-        // Fungsi untuk download file
+        // Function to show success notification
+        function showSuccessNotification(title, message) {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.success-notification');
+            existingNotifications.forEach(notification => notification.remove());
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'success-notification';
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <div style="font-size: 24px; margin-right: 12px;">✅</div>
+                    <div style="font-weight: 600; color: #155724;">${title}</div>
+                </div>
+                <div style="color: #155724; font-size: 14px; margin-bottom: 12px;">${message}</div>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="this.parentElement.parentElement.remove()" style="
+                        background: #28a745; 
+                        color: white; 
+                        border: none; 
+                        padding: 6px 12px; 
+                        border-radius: 4px; 
+                        cursor: pointer;
+                        font-size: 12px;
+                    ">Got it!</button>
+                </div>
+            `;
+            
+            // Style the notification
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #d4edda;
+                border: 1px solid #c3e6cb;
+                border-radius: 8px;
+                padding: 16px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                max-width: 350px;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        // Function to download file
         function downloadFile(dataUrl, filename, mimeType) {
             try {
                 // For PDF files, use blob approach for better compatibility
@@ -360,7 +433,7 @@ if ($isLoggedIn) {
             }
         }
 
-        // Event listener untuk form submit (generate PNG)
+        // Event listener for form submit (generate PNG)
         qrForm.addEventListener('submit', async function(event) {
             event.preventDefault();
             
@@ -395,7 +468,7 @@ if ($isLoggedIn) {
             `;
 
             try {
-                // Generate PNG first (untuk preview)
+                // Generate PNG first (for preview)
                 const pngData = await generateQRCode('png');
                 
                 // Hide empty state and show QR result
@@ -423,6 +496,9 @@ if ($isLoggedIn) {
                     btn.style.pointerEvents = 'auto';
                 });
                 
+                // Show success notification
+                showSuccessNotification('QR Code generated successfully!', 'Your QR code is ready for download.');
+                
             } catch (error) {
                 // Show error state
                 emptyState.innerHTML = `
@@ -435,7 +511,7 @@ if ($isLoggedIn) {
             }
         });
 
-        // Event listener untuk download PNG
+        // Event listener for download PNG
         document.getElementById('download-png').addEventListener('click', async function(e) {
             e.preventDefault();
             if (this.classList.contains('disabled')) return;
@@ -447,11 +523,11 @@ if ($isLoggedIn) {
                 const dataUrl = `data:${qrData.png.mime_type};base64,${qrData.png.image}`;
                 downloadFile(dataUrl, `qr_code.${qrData.png.file_extension}`, qrData.png.mime_type);
             } catch (error) {
-                alert('Gagal mengunduh file PNG!');
+                alert('Failed to download PNG file!');
             }
         });
 
-        // Event listener untuk download SVG
+        // Event listener for download SVG
         document.getElementById('download-svg').addEventListener('click', async function(e) {
             e.preventDefault();
             if (this.classList.contains('disabled')) return;
@@ -465,12 +541,12 @@ if ($isLoggedIn) {
                 const dataUrl = `data:${qrData.svg.mime_type};base64,${qrData.svg.image}`;
                 downloadFile(dataUrl, `qr_code.${qrData.svg.file_extension}`, qrData.svg.mime_type);
             } catch (error) {
-                alert('Gagal mengunduh file SVG!');
+                alert('Failed to download SVG file!');
                 this.innerHTML = '<div>Download SVG</div>';
             }
         });
 
-        // Event listener untuk download PDF
+        // Event listener for download PDF
         document.getElementById('download-pdf').addEventListener('click', async function(e) {
             e.preventDefault();
             if (this.classList.contains('disabled')) return;
@@ -493,7 +569,7 @@ if ($isLoggedIn) {
                 
             } catch (error) {
                 console.error('PDF download error:', error);
-                alert('Gagal mengunduh file PDF: ' + error.message);
+                alert('Failed to download PDF file: ' + error.message);
                 this.innerHTML = '<div>Download PDF</div>';
             }
         });

@@ -35,6 +35,62 @@ if (empty($kodePendek)) {
     exit;
 }
 
+// === FUNGSI UNTUK MENAMPILKAN HALAMAN LINK YANG DI-PAUSE ===
+function showPausedLinkPage($shortCode) {
+    $baseUrl = Config::getBaseUrl();
+    $cssPath = rtrim($baseUrl, '/') . '/css/redirect.css';
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Link Temporarily Unavailable - AAARO</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="<?php echo htmlspecialchars($cssPath); ?>">
+        <meta name="robots" content="noindex, nofollow">
+    </head>
+    <body>
+        <div class="container">
+            <?php if (file_exists(__DIR__ . '/images/logo-aaaro.png')): ?>
+            <div class="logo">
+                <?php 
+                $imagePath = rtrim($baseUrl, '/') . '/images/logo-aaaro.png';
+                ?>
+                <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="AAARO Logo">
+            </div>
+            <?php endif; ?>
+            
+            <h1 style="color: #ff6b6b;">⏸️ LINK TEMPORARILY UNAVAILABLE</h1>
+            
+            <div class="redirect-info">
+                <p style="font-size: 18px; color: #666; margin: 20px 0;">
+                    This short link has been temporarily paused by its owner.
+                </p>
+                <p style="font-size: 16px; color: #888;">
+                    <strong>Short Code:</strong> <?php echo htmlspecialchars($shortCode); ?>
+                </p>
+            </div>
+            
+            <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin: 30px 0; text-align: center;">
+                <h3 style="color: #856404; margin-bottom: 10px;">🔒 Access Restricted</h3>
+                <p style="color: #856404; margin: 0;">
+                    The owner of this QR code has temporarily disabled access. 
+                    Please contact them if you believe this is an error.
+                </p>
+            </div>
+            
+            <a href="<?php echo rtrim($baseUrl, '/'); ?>" class="skip-button" style="background: #007bff; text-decoration: none;">
+                ← Go to AAARO Homepage
+            </a>
+        </div>
+    </body>
+    </html>
+    <?php
+}
+
 // === PROSES REDIRECT ===
 try {
     // Inisialisasi URL Shortener
@@ -43,12 +99,16 @@ try {
     // --- Mengambil data link (termasuk ID) ---
     $linkData = $urlShortener->getLinkDataByShortCode($kodePendek);
 
-    // Cari URL asli berdasarkan kode pendek dan catat klik
-    //$urlAsli = $urlShortener->recordClick($kodePendek);
-    
     // Jika kode pendek tidak ditemukan
     if (!$linkData) {
         header('Location: ../');
+        exit;
+    }
+
+    // === CEK STATUS LINK ===
+    // Jika link di-pause, tampilkan halaman error
+    if ($linkData['status'] === 'paused') {
+        showPausedLinkPage($kodePendek);
         exit;
     }
 

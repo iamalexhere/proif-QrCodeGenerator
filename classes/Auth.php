@@ -30,6 +30,21 @@ class Auth {
      */
     public static function startSession() {
         if (session_status() === PHP_SESSION_NONE) {
+            // Configure session for HTTPS environments
+            $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
+                      || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+                      || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on');
+            
+            // Set session cookie parameters for security
+            session_set_cookie_params([
+                'lifetime' => 0, // Session cookie (expires when browser closes)
+                'path' => '/',
+                'domain' => '', // Let PHP determine the domain
+                'secure' => $isHttps, // Only send over HTTPS if available
+                'httponly' => true, // Prevent JavaScript access
+                'samesite' => 'Lax' // CSRF protection
+            ]);
+            
             session_start();
         }
     }
@@ -389,6 +404,33 @@ class Auth {
             INSERT INTO user_quotas (user_id, month_year, qr_codes_created)
             VALUES (?, ?, 1)
             ON DUPLICATE KEY UPDATE qr_codes_created = qr_codes_created + 1
+        ");
+        $stmt->bind_param("is", $userId, $monthYear);
+        $stmt->execute();
+        $stmt->close();
+    }
+    
+    /**
+     * Decrement user's QR code usage for current month (when deleting QR codes)
+     * @param int|null $userId
+     */
+    public static function decrementQRCodeUsage($userId = null) {
+        if (!$userId) {
+            $userId = self::getCurrentUserId();
+        }
+        
+        if (!$userId) {
+            return;
+        }
+        
+        $monthYear = date('Y-m');
+        $auth = self::getInstance();
+        
+        // Only decrement if count is greater than 0
+        $stmt = $auth->db->prepare("
+            UPDATE user_quotas 
+            SET qr_codes_created = GREATEST(0, qr_codes_created - 1)
+            WHERE user_id = ? AND month_year = ? AND qr_codes_created > 0
         ");
         $stmt->bind_param("is", $userId, $monthYear);
         $stmt->execute();

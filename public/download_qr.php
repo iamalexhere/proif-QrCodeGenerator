@@ -93,7 +93,20 @@ if (!empty($qrData['qr_image'])) {
         header('Cache-Control: no-cache, must-revalidate');
         header('Pragma: no-cache');
         
-        echo $result->getString();
+        $generatedImageData = $result->getString();
+        
+        // Save this generated image to database for future use
+        try {
+            $updateStmt = $db->prepare("UPDATE links SET qr_image = ? WHERE short_url = ? AND user_id = ?");
+            $updateStmt->bind_param("bsi", $null, $shortCode, $currentUser['id']);
+            $updateStmt->send_long_data(0, $generatedImageData);
+            $updateStmt->execute();
+            $updateStmt->close();
+        } catch (Exception $saveError) {
+            error_log('Failed to save generated QR image to database: ' . $saveError->getMessage());
+        }
+        
+        echo $generatedImageData;
         exit;
         
     } catch (Exception $e) {
