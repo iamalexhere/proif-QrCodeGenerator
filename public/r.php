@@ -52,6 +52,47 @@ try {
         exit;
     }
 
+    // 🔒 Cek apakah QR sedang paused
+    if (isset($linkData['status']) && $linkData['status'] === 'paused') {
+        // Tampilkan halaman pemberitahuan QR tidak aktif
+        echo "<!DOCTYPE html>
+        <html lang='id'>
+        <head>
+            <meta charset='UTF-8'>
+            <title>QR Code Nonaktif</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background: #f9f9f9;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    text-align: center;
+                }
+                .box {
+                    background: white;
+                    border: 2px solid #333;
+                    padding: 2rem 3rem;
+                    box-shadow: 6px 6px 0px #333;
+                    max-width: 400px;
+                }
+                h1 { color: #e74c3c; margin-bottom: 1rem; }
+                p { color: #333; }
+            </style>
+        </head>
+        <body>
+            <div class='box'>
+                <h1>QR Code Paused</h1>
+                <p>This QR code is currently unavailable.</p>
+                <p>Please try again later.</p>
+            </div>
+        </body>
+        </html>";
+        exit;
+    }
+
+
     // Simpan ID dan URL asli ke variabel
     $urlAsli = $linkData['original_url'];
     $linkId = $linkData['id'];
