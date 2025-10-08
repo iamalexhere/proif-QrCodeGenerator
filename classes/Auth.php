@@ -30,6 +30,21 @@ class Auth {
      */
     public static function startSession() {
         if (session_status() === PHP_SESSION_NONE) {
+            // Configure session for HTTPS environments
+            $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
+                      || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+                      || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on');
+            
+            // Set session cookie parameters for security
+            session_set_cookie_params([
+                'lifetime' => 0, // Session cookie (expires when browser closes)
+                'path' => '/',
+                'domain' => '', // Let PHP determine the domain
+                'secure' => $isHttps, // Only send over HTTPS if available
+                'httponly' => true, // Prevent JavaScript access
+                'samesite' => 'Lax' // CSRF protection
+            ]);
+            
             session_start();
         }
     }

@@ -49,22 +49,12 @@ try {
     // Verify state parameter if it was set (CSRF protection)
     if (isset($_GET['state']) && isset($_SESSION['oauth_state'])) {
         if ($_GET['state'] !== $_SESSION['oauth_state']) {
-            // Log detailed state mismatch info for debugging
             error_log('OAuth state mismatch - Expected: ' . $_SESSION['oauth_state'] . ', Got: ' . $_GET['state']);
-            error_log('Session ID: ' . session_id());
-            error_log('Session data: ' . print_r($_SESSION, true));
-            
-            // Temporary: Skip state validation for debugging (REMOVE IN PRODUCTION)
-            error_log('WARNING: Skipping state validation for debugging - REMOVE THIS IN PRODUCTION');
-            // header('Location: login.php?error=invalid_state');
-            // exit;
+            header('Location: login.php?error=invalid_state');
+            exit;
         }
         // Clear the state
         unset($_SESSION['oauth_state']);
-    } else {
-        // Log missing state info
-        error_log('OAuth state missing - GET state: ' . (isset($_GET['state']) ? $_GET['state'] : 'not set'));
-        error_log('Session state: ' . (isset($_SESSION['oauth_state']) ? $_SESSION['oauth_state'] : 'not set'));
     }
     
     // Attempt to login with Google
