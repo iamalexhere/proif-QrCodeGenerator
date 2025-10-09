@@ -48,9 +48,16 @@ $linkCreatedAt = $linkData['created_at'] ? date('Y-m-d', strtotime($linkData['cr
 </head>
 <body>
     <header class="navbar">
-        <div class="logo">QR Code Generator</div>
-        <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
-    </header>
+    <div class="navbar-left">
+      <div class="brand-text">
+        <div class="brand-title">AAARO</div>
+        <div class="brand-subtitle">Complexity, simplified</div>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
+    </div>
+  </header>
 
     <main class="edit-container">
         <section class="edit-left">
