@@ -378,16 +378,20 @@ function getDisplayName($link) {
                   </div>
                   <div class="info-item">
                     <span class="info-label">Short Link</span>
-                    <?php $fullShortUrl = Config::getShortUrlBase() . '/' . $link['short_url'];?>
-                    <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" 
-                      class="short-link" 
-                      target="_blank"
-                      onclick="event.preventDefault(); window.open('<?php echo htmlspecialchars($fullShortUrl); ?>', '_blank');">
-                      <?php echo htmlspecialchars($fullShortUrl); ?> 
-                      <span class="copy-icon" 
-                            title="Copy short URL" 
-                            onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>', event)">📋</span>
-                    </a>
+                    <div class="url-display">
+                      <?php $fullShortUrl = Config::getShortUrlBase() . '/' . $link['short_url'];?>
+                      <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" 
+                        class="short-link" 
+                        target="_blank"
+                        onclick="event.preventDefault(); window.open('<?php echo htmlspecialchars($fullShortUrl); ?>', '_blank');">
+                        <?php echo htmlspecialchars($fullShortUrl); ?> 
+                      </a>
+                      <span
+                        title="Copy short URL" 
+                        onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>', event)">
+                        <img class="copy-icon" src="images/copy_icon.png" alt="copy_icon">
+                      </span>
+                    </div>
                   </div>
                 </div>
 

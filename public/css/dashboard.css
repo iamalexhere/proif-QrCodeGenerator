@@ -412,11 +412,13 @@ body {
     font-family: 'Courier New', monospace;
     font-size: 0.85rem;
     color: #475569;
-    max-height: 60px;
+    max-height: 50px;
     overflow: hidden;
     text-overflow: ellipsis;
     transition: all 0.3s ease;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    display: flex;
+    justify-content: space-between;
 }
 
 .url-display:hover {
@@ -434,6 +436,7 @@ body {
     gap: 6px;
     font-size: 0.95rem;
     transition: all 0.3s ease;
+    text-decoration: underline;
 }
 
 .short-link:hover {
@@ -1305,4 +1308,10 @@ body {
     .qr-card {
         padding: 18px;
     }
+}
+
+.copy-icon{
+    height: 25px;
+    width: 25px;
+    cursor: pointer;
 }
