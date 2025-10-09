@@ -229,7 +229,7 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
       </div>
 
       <!-- MENU SIDEBAR -->
-      <ul class="nav-menu">
+      <!-- <ul class="nav-menu">
         <li class="nav-item">
           <a href="dashboardAll.php" class="nav-link <?php echo ($current_page_name == 'dashboardAll.php') ? 'active' : ''; ?>">
             <span class="nav-icon">📊</span>
@@ -251,10 +251,10 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
             <span class="nav-count"><?php echo $paused_qrs; ?></span>
           </a>
         </li>
-      </ul>
+      </ul> -->
 
       <!-- Quota Display -->
-      <div class="quota-section" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+      <div class="quota-section" style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span style="font-size: 14px; color: #666;">Monthly Quota:</span>
           <span style="font-size: 14px; font-weight: bold;"><?php echo $quotaInfo['used']; ?> / <?php echo $quotaInfo['limit']; ?></span>
@@ -332,6 +332,34 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
+        
+      <!-- nav -->
+      <div class="navigator">
+        <div>
+          <a href="dashboardAll.php" class="nav-link <?php echo ($current_page_name == 'dashboardAll.php') ? 'active' : ''; ?>">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">All QR Codes</span>
+            <span class="nav-count"><?php echo $total_qrs; ?></span>
+          </a>
+        </div>
+        
+        <div>
+          <a href="dashboardActive.php" class="nav-link <?php echo ($current_page_name == 'dashboardActive.php') ? 'active' : ''; ?>">
+            <span class="nav-icon">✅</span>
+            <span class="nav-text">Active QR Codes</span>
+            <span class="nav-count"><?php echo $active_qrs; ?></span>
+          </a>
+        </div>
+
+        <div>
+          <a href="dashboardPause.php" class="nav-link <?php echo ($current_page_name == 'dashboardPause.php') ? 'active' : ''; ?>">
+            <span class="nav-icon">⏸️</span>
+            <span class="nav-text">Paused QR Codes</span>
+            <span class="nav-count"><?php echo $paused_qrs; ?></span>
+          </a>
+        </div>
+      </div>
+
       <div class="header">
         <h1 id="page-title">Active QR Codes</h1>
         <p id="page-subtitle">
