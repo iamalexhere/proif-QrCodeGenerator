@@ -61,19 +61,46 @@ class UrlShortener {
      * 
      * Fungsi utama untuk mengkonversi URL panjang menjadi URL pendek.
      * Proses yang dilakukan:
-     * 1. Generate kode pendek yang unik
-     * 2. Cek keunikan kode di database
-     * 3. Buat URL pendek lengkap
-     * 4. Simpan semua data ke database
+     * 1. Cek apakah URL sudah ada untuk user ini
+     * 2. Generate kode pendek yang unik (jika belum ada)
+     * 3. Cek keunikan kode di database
+     * 4. Buat URL pendek lengkap
+     * 5. Simpan semua data ke database
      * 
      * @param string $originalUrl URL asli yang akan dipendekkan
+     * @param int $userId ID user yang membuat QR code
      * @param string $customUrl URL custom (opsional)
      * @param string $logoPath Path ke file logo untuk QR code (opsional)
      * @param string $qrColor Warna QR code dalam format hex (default: #000000)
      * @return array Data URL pendek yang berhasil dibuat
      * @throws Exception Jika gagal menyimpan ke database
      */
-    public function createShortUrl($originalUrl, $customUrl = '', $logoPath = '', $qrColor = '#000000') {
+    public function createShortUrl($originalUrl, $userId, $customUrl = '', $logoPath = '', $qrColor = '#000000') {
+        // === CEK APAKAH URL SUDAH ADA UNTUK USER INI ===
+        $stmt = $this->db->prepare("SELECT id, short_url, original_url FROM links WHERE original_url = ? AND user_id = ? LIMIT 1");
+        $stmt->bind_param("si", $originalUrl, $userId);
+        $stmt->execute();
+        $existingResult = $stmt->get_result();
+        
+        if ($existingResult->num_rows > 0) {
+            // URL sudah ada, kembalikan data yang sudah ada
+            $existingData = $existingResult->fetch_assoc();
+            $stmt->close();
+            
+            // Buat URL pendek lengkap dari kode yang sudah ada
+            $baseUrl = Config::get('SHORT_DOMAIN', 'localhost/qr/r');
+            $shortUrl = (strpos($baseUrl, 'http') === 0 ? '' : 'http://') . $baseUrl . '/' . $existingData['short_url'];
+            
+            return [
+                'id' => $existingData['id'],
+                'short_url' => $shortUrl,
+                'short_code' => $existingData['short_url'],
+                'original_url' => $existingData['original_url'],
+                'existing' => true // Flag untuk menandai ini adalah data yang sudah ada
+            ];
+        }
+        $stmt->close();
+        
         // === GENERATE KODE PENDEK YANG UNIK ===
         // Loop sampai mendapat kode yang belum ada di database
         do {
@@ -93,9 +120,9 @@ class UrlShortener {
         $shortUrl = (strpos($baseUrl, 'http') === 0 ? '' : 'http://') . $baseUrl . '/' . $shortCode;
         
         // === SIMPAN KE DATABASE ===
-        $sql = "INSERT INTO links (original_url, short_url, custom_url, logo_path, qr_color) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO links (user_id, original_url, short_url, custom_url, logo_path, qr_color) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("sssss", $originalUrl, $shortCode, $customUrl, $logoPath, $qrColor);
+        $stmt->bind_param("isssss", $userId, $originalUrl, $shortCode, $customUrl, $logoPath, $qrColor);
         
         if ($stmt->execute()) {
             $insertId = $this->db->insert_id;
@@ -106,7 +133,8 @@ class UrlShortener {
                 'id' => $insertId,
                 'short_url' => $shortUrl,
                 'short_code' => $shortCode,
-                'original_url' => $originalUrl
+                'original_url' => $originalUrl,
+                'existing' => false // Flag untuk menandai ini adalah data baru
             ];
         } else {
             $stmt->close();

@@ -7,6 +7,7 @@
  * dan statistik total QR untuk sidebar.
  * 
  * Struktur utama:
+ * Authentication & User Check
  * Koneksi Database & Inisialisasi
  * Logika Pencarian (Search)
  * Hitung Total Data & Pagination
@@ -15,14 +16,21 @@
  * Tampilkan Tampilan HTML (Sidebar + Konten + Pagination)
  *****************************************************/
 
-// KONEKSI DATABASE
-
-// Memanggil file Database.php untuk menggunakan kelas Database
-// Database.php berisi konfigurasi koneksi dan metode getInstance() agar hanya satu koneksi yang digunakan (Singleton Pattern)
+// AUTHENTICATION & USER CHECK
+require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../config/Config.php';
 
-// Membuat koneksi tunggal (singleton) ke database MySQL
+// Require authentication
+Auth::requireAuth();
+$currentUser = Auth::getCurrentUser();
+
+if (!$currentUser) {
+    header('Location: login.php');
+    exit;
+}
+
+// KONEKSI DATABASE
 $db = Database::getInstance()->getConnection();
 
 // KONFIGURASI PAGINATION
@@ -44,8 +52,8 @@ $current_page = max(1, $current_page);
 // Ambil kata kunci pencarian dari URL (?search=)
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-// Default kondisi WHERE hanya menampilkan QR aktif
-$where_clause = "WHERE l.status = 'active'";
+// Default kondisi WHERE menampilkan QR aktif milik user yang login
+$where_clause = "WHERE l.status = 'active' AND l.user_id = ?";
 
 // Variabel untuk parameter pencarian (akan digunakan di prepared statement)
 $search_param = '';
@@ -64,16 +72,19 @@ if (!empty($search_query)) {
 if (!empty($search_query)) {
     // Jika sedang melakukan pencarian, gunakan prepared statement untuk keamanan (hindari SQL Injection)
     $stmt = $db->prepare("SELECT COUNT(*) as total FROM links l " . $where_clause);
-    // Bind parameter pencarian ke query
-    $stmt->bind_param('ss', $search_param, $search_param);
+    // Bind parameter user_id dan pencarian ke query
+    $stmt->bind_param('iss', $currentUser['id'], $search_param, $search_param);
     $stmt->execute();
     // Ambil total hasil pencarian
     $total_items = $stmt->get_result()->fetch_assoc()['total'];
     $stmt->close();
 } else {
-    // Jika tidak ada pencarian, cukup hitung total link dengan status active
-    $count_query = $db->query("SELECT COUNT(*) as total FROM links WHERE status = 'active'");
-    $total_items = $count_query->fetch_assoc()['total'];
+    // Jika tidak ada pencarian, hitung total link aktif milik user
+    $stmt = $db->prepare("SELECT COUNT(*) as total FROM links l " . $where_clause);
+    $stmt->bind_param('i', $currentUser['id']);
+    $stmt->execute();
+    $total_items = $stmt->get_result()->fetch_assoc()['total'];
+    $stmt->close();
 }
 
 // Hitung jumlah total halaman berdasarkan total item
@@ -110,12 +121,15 @@ $base_query = "
 if (!empty($search_query)) {
     // Jika ada pencarian, gunakan prepared statement agar aman
     $stmt = $db->prepare($base_query . $where_clause . " ORDER BY l.created_at DESC LIMIT ? OFFSET ?");
-    $stmt->bind_param('ssii', $search_param, $search_param, $items_per_page, $offset);
+    $stmt->bind_param('issii', $currentUser['id'], $search_param, $search_param, $items_per_page, $offset);
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
-    // Jika tidak ada pencarian, ambil semua link aktif berdasarkan urutan waktu pembuatan
-    $result = $db->query($base_query . " WHERE l.status = 'active' ORDER BY l.created_at DESC LIMIT $items_per_page OFFSET $offset");
+    // Jika tidak ada pencarian, ambil link aktif milik user berdasarkan urutan waktu pembuatan
+    $stmt = $db->prepare($base_query . $where_clause . " ORDER BY l.created_at DESC LIMIT ? OFFSET ?");
+    $stmt->bind_param('iii', $currentUser['id'], $items_per_page, $offset);
+    $stmt->execute();
+    $result = $stmt->get_result();
 }
 
 // Simpan hasil query ke dalam array untuk digunakan di tampilan HTML
@@ -142,10 +156,12 @@ if ($result) {
 
 
 
-// HITUNG STATISTIK UNTUK SIDEBAR
-// Statistik total QR (aktif + paused)
-// Query ini tidak menggunakan pagination atau filter search
-$all_links_result = $db->query("SELECT status FROM links");
+// HITUNG STATISTIK UNTUK SIDEBAR (USER-SPECIFIC)
+// Statistik total QR milik user yang login
+$stmt = $db->prepare("SELECT status FROM links WHERE user_id = ?");
+$stmt->bind_param('i', $currentUser['id']);
+$stmt->execute();
+$all_links_result = $stmt->get_result();
 
 $total_qrs = 0;   // Jumlah semua QR
 $active_qrs = 0;  // Jumlah QR aktif
@@ -161,6 +177,12 @@ if ($all_links_result) {
         }
     }
 }
+$stmt->close();
+
+// Get user quota information
+$quotaInfo = Auth::canCreateQRCode($currentUser['id']);
+$planLimits = Config::getPlanLimits();
+$userPlan = $planLimits[$currentUser['plan']] ?? $planLimits['free'];
 
 // Ambil nama file PHP yang sedang dibuka untuk keperluan highlight menu di sidebar
 $current_page_name = basename($_SERVER['PHP_SELF']);
@@ -231,16 +253,78 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
         </li>
       </ul>
 
+      <!-- Quota Display -->
+      <div class="quota-section" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 14px; color: #666;">Monthly Quota:</span>
+          <span style="font-size: 14px; font-weight: bold;"><?php echo $quotaInfo['used']; ?> / <?php echo $quotaInfo['limit']; ?></span>
+        </div>
+        <div style="background: #e9ecef; border-radius: 10px; height: 6px; overflow: hidden;">
+          <div style="background: <?php echo $quotaInfo['used'] >= $quotaInfo['limit'] ? '#dc3545' : '#28a745'; ?>; height: 100%; width: <?php echo ($quotaInfo['used'] / $quotaInfo['limit']) * 100; ?>%;"></div>
+        </div>
+        <div style="margin-top: 8px; font-size: 12px; color: #666;">
+          <?php echo ucfirst($currentUser['plan']); ?> Plan
+        </div>
+      </div>
+
       <!-- Bagian bawah sidebar -->
       <div class="sidebar-footer">
-        <a href="createQR.php" class="create-btn">
-          <span class="create-btn-icon">+</span>
-          Create New QR Code
-        </a>
+        <?php if ($quotaInfo['canCreate']): ?>
+          <a href="index.php" class="create-btn">
+            <span class="create-btn-icon">+</span>
+            Create New QR Code
+          </a>
+        <?php else: ?>
+          <div class="create-btn" style="opacity: 0.6; cursor: not-allowed; background: #ccc;">
+            <span class="create-btn-icon">⚠️</span>
+            Quota Exceeded
+          </div>
+        <?php endif; ?>
 
-        <div class="trial-section">
-          <div class="trial-text">Start Free Trial for 7 days</div>
-          <a href="payment.php" class="upgrade-btn">Upgrade</a>
+        <?php if ($currentUser['plan'] === 'free'): ?>
+          <?php 
+          $trialActive = Auth::hasAnalyticsAccess($currentUser);
+          $trialDaysLeft = 0;
+          if ($currentUser['trial_ends_at']) {
+              $trialEnd = new DateTime($currentUser['trial_ends_at']);
+              $now = new DateTime();
+              $diff = $now->diff($trialEnd);
+              $trialDaysLeft = $trialActive ? $diff->days : 0;
+          }
+          ?>
+          <div class="trial-section">
+            <?php if ($trialActive): ?>
+              <div class="trial-text">30-Day Analytics Trial: <?php echo $trialDaysLeft; ?> days left</div>
+            <?php else: ?>
+              <div class="trial-text">30-day analytics trial expired</div>
+            <?php endif; ?>
+            <a href="payment.php" class="upgrade-btn">Upgrade Plan</a>
+          </div>
+        <?php else: ?>
+          <div class="trial-section">
+            <div class="trial-text"><?php echo ucfirst($currentUser['plan']); ?> Plan Active</div>
+            <a href="payment.php" class="upgrade-btn">Manage Plan</a>
+          </div>
+        <?php endif; ?>
+
+        <!-- User Profile Section -->
+        <div class="user-profile" style="margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #e0e0e0;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="<?php echo htmlspecialchars($currentUser['picture'] ?? 'images/default-avatar.png'); ?>" 
+                 alt="Profile" 
+                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-weight: 600; font-size: 14px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <?php echo htmlspecialchars($currentUser['name']); ?>
+              </div>
+              <div style="font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <?php echo htmlspecialchars($currentUser['email']); ?>
+              </div>
+            </div>
+            <a href="logout.php" style="color: #dc3545; text-decoration: none; font-size: 12px;" title="Logout">
+              🚪
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -358,34 +442,76 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
                     <!-- QR disimpan di database dalam format BLOB -->
                     <img src="data:image/png;base64,<?php echo base64_encode($link['qr_image']); ?>" alt="QR Code" class="qr-image">
                   <?php else: ?>
-                    <!-- QR di-generate dari API eksternal -->
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=<?php echo urlencode($link['short_url']); ?>" alt="QR Code" class="qr-image">
+                    <!-- QR tidak tersimpan di database, tampilkan placeholder atau generate via endpoint -->
+                    <div class="qr-placeholder" style="width: 140px; height: 140px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border: 2px dashed #ccc; border-radius: 8px;">
+                      <span style="color: #666; font-size: 12px; text-align: center;">QR Code<br>Not Available</span>
+                    </div>
                   <?php endif; ?>
 
                   <!-- Untuk mengambil Statistik diambil dari view_details-->
                   <div class="actions">
-                    <div class="qr-stats">
-                      <div class="stat-box">
+                    <?php $hasAnalyticsAccess = Auth::hasAnalyticsAccess($currentUser); ?>
+                    <div class="qr-stats <?php echo !$hasAnalyticsAccess ? 'analytics-locked' : ''; ?>" style="position: relative;">
+                      <?php if (!$hasAnalyticsAccess): ?>
+                        <div class="analytics-overlay" style="
+                          position: absolute;
+                          top: 0;
+                          left: 0;
+                          right: 0;
+                          bottom: 0;
+                          background: rgba(255, 255, 255, 0.9);
+                          backdrop-filter: blur(4px);
+                          -webkit-backdrop-filter: blur(4px);
+                          display: flex;
+                          flex-direction: column;
+                          align-items: center;
+                          justify-content: center;
+                          border-radius: 8px;
+                          z-index: 10;
+                        ">
+                          <div style="text-align: center; color: #666;">
+                            <div style="font-size: 24px; margin-bottom: 8px;">🔒</div>
+                            <div style="font-weight: bold; margin-bottom: 4px;">Analytics Locked</div>
+                            <div style="font-size: 12px; margin-bottom: 12px;">30-day trial expired</div>
+                            <a href="payment.php" style="
+                              background: #007bff;
+                              color: white;
+                              padding: 6px 12px;
+                              border-radius: 4px;
+                              text-decoration: none;
+                              font-size: 12px;
+                              font-weight: bold;
+                            ">Upgrade Plan</a>
+                          </div>
+                        </div>
+                      <?php endif; ?>
+                      
+                      <div class="stat-box" style="<?php echo !$hasAnalyticsAccess ? 'filter: blur(2px);' : ''; ?>">
                         <div class="stat-icon">📊</div>
-                        <span class="stat-value"><?php echo number_format($link['scan_count'] ?? 0); ?></span>
+                        <span class="stat-value"><?php echo $hasAnalyticsAccess ? number_format($link['scan_count'] ?? 0) : '•••'; ?></span>
                         <div class="stat-label">Total Scans</div>
                       </div>
-                      <div class="stat-box">
+                      <div class="stat-box" style="<?php echo !$hasAnalyticsAccess ? 'filter: blur(2px);' : ''; ?>">
                         <div class="stat-icon">📱</div>
-                        <span class="stat-value"><?php echo $link['top_device'] ?? 'N/A'; ?></span>
+                        <span class="stat-value"><?php echo $hasAnalyticsAccess ? ($link['top_device'] ?? 'N/A') : '•••'; ?></span>
                         <div class="stat-label">Top Device</div>
                       </div>
-                      <div class="stat-box">
+                      <div class="stat-box" style="<?php echo !$hasAnalyticsAccess ? 'filter: blur(2px);' : ''; ?>">
                         <div class="stat-icon">🌍</div>
-                        <span class="stat-value"><?php echo $link['top_city'] ?? 'N/A'; ?></span>
+                        <span class="stat-value"><?php echo $hasAnalyticsAccess ? ($link['top_city'] ?? 'N/A') : '•••'; ?></span>
                         <div class="stat-label">Top City</div>
                       </div>
                     </div>
 
                     <!-- Tombol untuk melakukan view details, donwload, dan resume/pause -->
-                    <button class="btn btn-edit" onclick="window.location.href='view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardActive.php'">✏️ View Details</button>
-                    <button class="btn btn-download" onclick="downloadQR('<?php echo urlencode($link['short_url']); ?>', 'qr_code')">⬇️ Download</button>
+                    <?php if ($hasAnalyticsAccess): ?>
+                      <button class="btn btn-edit" onclick="window.location.href='view_detail.php?code=<?php echo htmlspecialchars($link['short_url']); ?>&return=dashboardActive.php'">✏️ View Details</button>
+                    <?php else: ?>
+                      <button class="btn btn-edit" style="opacity: 0.6; cursor: not-allowed;" onclick="alert('Analytics features require an active plan. Please upgrade to view detailed analytics.'); event.preventDefault();" title="Upgrade required">🔒 View Details</button>
+                    <?php endif; ?>
+                    <button class="btn btn-download" onclick="showDownloadOptions('<?php echo htmlspecialchars($link['short_url']); ?>', '<?php echo htmlspecialchars($link['short_url']); ?>')">⬇️ Download</button>
                     <button class="btn btn-pause" onclick="toggleStatus('<?php echo htmlspecialchars($link['short_url']); ?>', 'active')">⏸️ Pause</button>
+                    <button class="btn btn-delete" onclick="deleteQRCode('<?php echo htmlspecialchars($link['short_url']); ?>')" style="background: #dc3545;">🗑️ Delete</button>
                   </div>
                 </div>
               </div>

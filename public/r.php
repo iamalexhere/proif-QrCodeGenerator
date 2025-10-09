@@ -35,6 +35,62 @@ if (empty($kodePendek)) {
     exit;
 }
 
+// === FUNGSI UNTUK MENAMPILKAN HALAMAN LINK YANG DI-PAUSE ===
+function showPausedLinkPage($shortCode) {
+    $baseUrl = Config::getBaseUrl();
+    $cssPath = rtrim($baseUrl, '/') . '/css/redirect.css';
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Link Temporarily Unavailable - AAARO</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="<?php echo htmlspecialchars($cssPath); ?>">
+        <meta name="robots" content="noindex, nofollow">
+    </head>
+    <body>
+        <div class="container">
+            <?php if (file_exists(__DIR__ . '/images/logo-aaaro.png')): ?>
+            <div class="logo">
+                <?php 
+                $imagePath = rtrim($baseUrl, '/') . '/images/logo-aaaro.png';
+                ?>
+                <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="AAARO Logo">
+            </div>
+            <?php endif; ?>
+            
+            <h1 style="color: #ff6b6b;">⏸️ LINK TEMPORARILY UNAVAILABLE</h1>
+            
+            <div class="redirect-info">
+                <p style="font-size: 18px; color: #666; margin: 20px 0;">
+                    This short link has been temporarily paused by its owner.
+                </p>
+                <p style="font-size: 16px; color: #888;">
+                    <strong>Short Code:</strong> <?php echo htmlspecialchars($shortCode); ?>
+                </p>
+            </div>
+            
+            <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin: 30px 0; text-align: center;">
+                <h3 style="color: #856404; margin-bottom: 10px;">🔒 Access Restricted</h3>
+                <p style="color: #856404; margin: 0;">
+                    The owner of this QR code has temporarily disabled access. 
+                    Please contact them if you believe this is an error.
+                </p>
+            </div>
+            
+            <a href="<?php echo rtrim($baseUrl, '/'); ?>" class="skip-button" style="background: #007bff; text-decoration: none;">
+                ← Go to AAARO Homepage
+            </a>
+        </div>
+    </body>
+    </html>
+    <?php
+}
+
 // === PROSES REDIRECT ===
 try {
     // Inisialisasi URL Shortener
@@ -43,12 +99,16 @@ try {
     // --- Mengambil data link (termasuk ID) ---
     $linkData = $urlShortener->getLinkDataByShortCode($kodePendek);
 
-    // Cari URL asli berdasarkan kode pendek dan catat klik
-    //$urlAsli = $urlShortener->recordClick($kodePendek);
-    
     // Jika kode pendek tidak ditemukan
     if (!$linkData) {
         header('Location: ../');
+        exit;
+    }
+
+    // === CEK STATUS LINK ===
+    // Jika link di-pause, tampilkan halaman error
+    if ($linkData['status'] === 'paused') {
+        showPausedLinkPage($kodePendek);
         exit;
     }
 
@@ -92,7 +152,16 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mengalihkan...</title>
+    <title>AAARO - Mengalihkan...</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <?php 
+    // Get the base URL for CSS path
+    $baseUrl = Config::getBaseUrl();
+    $cssPath = rtrim($baseUrl, '/') . '/css/redirect.css';
+    ?>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($cssPath); ?>">
     <!-- Auto refresh ke URL tujuan setelah waktu yang ditentukan -->
     <meta http-equiv="refresh" content="<?php echo $waktuTampilIklan; ?>;url=<?php echo htmlspecialchars($urlAsli); ?>">
     
@@ -115,225 +184,21 @@ try {
     </script>
     <?php endif; ?>
     <?php endif; ?>
-    
-    <style>
-        /* === RESET DASAR === */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        /* === STYLING BODY === */
-        body {
-            font-family: 'Courier New', monospace;
-            background: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #000000;
-            padding: 2rem;
-        }
-        
-        /* === CONTAINER UTAMA === */
-        .container {
-            background: #ffffff;
-            border: 4px solid #000000;
-            padding: 3rem;
-            text-align: left;
-            max-width: 700px;
-            width: 100%;
-            box-shadow: 8px 8px 0px #000000;
-        }
-        
-        /* === AREA LOGO === */
-        .logo {
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        
-        .logo img {
-            max-height: 80px;
-            width: auto;
-            border: 2px solid #000000;
-        }
-        
-        /* === JUDUL HALAMAN === */
-        h1 {
-            color: #000000;
-            margin-bottom: 2rem;
-            font-size: 2.5rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-bottom: 4px solid #000000;
-            padding-bottom: 1rem;
-        }
-        
-        /* === INFO REDIRECT === */
-        .redirect-info {
-            margin-bottom: 2rem;
-            color: #000000;
-            line-height: 1.4;
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-        
-        /* === COUNTDOWN TIMER === */
-        .countdown {
-            font-size: 4rem;
-            font-weight: 900;
-            color: #000000;
-            margin: 2rem 0;
-            text-align: center;
-            border: 4px solid #000000;
-            padding: 1rem;
-            background: #ffffff;
-            letter-spacing: 4px;
-        }
-        
-        /* === CONTAINER IKLAN === */
-        .ad-container {
-            margin: 2rem 0;
-            min-height: 280px;
-            background: #ffffff;
-            border: 4px solid #000000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            position: relative;
-        }
-        
-        /* === PLACEHOLDER IKLAN === */
-        .ad-placeholder {
-            color: #000000;
-            font-size: 1.2rem;
-            text-align: center;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        
-        /* === MOBILE AD CONTAINER === */
-        .mobile-ad-container {
-            margin: 2rem 0;
-            text-align: center;
-            display: none; /* Hidden by default, shown on mobile */
-        }
-        
-        /* === ADSENSE STYLING === */
-        .adsbygoogle {
-            display: block;
-            margin: 0 auto;
-        }
-        
-        /* === PROGRESS BAR === */
-        .progress-bar {
-            width: 100%;
-            height: 12px;
-            background: #ffffff;
-            border: 3px solid #000000;
-            overflow: hidden;
-            margin: 2rem 0;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: #000000;
-            transition: width 0.1s ease;
-        }
-        
-        /* === TOMBOL SKIP === */
-        .skip-button {
-            background: #000000;
-            color: #ffffff;
-            border: 3px solid #000000;
-            padding: 1rem 2rem;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-family: 'Courier New', monospace;
-            font-size: 1rem;
-            transition: all 0.1s ease;
-        }
-        
-        .skip-button:hover {
-            background: #ffffff;
-            color: #000000;
-            box-shadow: 4px 4px 0px #000000;
-            transform: translate(-2px, -2px);
-        }
-        
-        /* === INFO URL TUJUAN === */
-        .destination-url {
-            background: #ffffff;
-            padding: 1.5rem;
-            border: 3px solid #000000;
-            border-left: 8px solid #000000;
-            margin: 2rem 0;
-            word-break: break-all;
-            font-weight: 700;
-        }
-        
-        .destination-url strong {
-            color: #000000;
-            text-transform: uppercase;
-        }
-        
-        /* === RESPONSIVE MOBILE === */
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-            
-            .container {
-                padding: 2rem;
-                box-shadow: 4px 4px 0px #000000;
-            }
-            
-            h1 {
-                font-size: 2rem;
-                letter-spacing: 1px;
-            }
-            
-            .countdown {
-                font-size: 2.5rem;
-                letter-spacing: 2px;
-            }
-            
-            .skip-button {
-                padding: 0.8rem 1.5rem;
-                font-size: 0.9rem;
-            }
-            
-            /* Show mobile ad on mobile devices */
-            .mobile-ad-container {
-                display: block;
-            }
-            
-            /* Hide main ad container on very small screens if mobile ad is present */
-            .ad-container {
-                min-height: 200px;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Logo IF UNPAR jika tersedia -->
-        <?php if (file_exists(__DIR__ . '/images/logoif.png')): ?>
+        <?php if (file_exists(__DIR__ . '/images/logo-aaaro.png')): ?>
         <div class="logo">
-            <img src="images/logoif.png" alt="Logo IF UNPAR">
+            <?php 
+            $baseUrl = Config::getBaseUrl();
+            $imagePath = rtrim($baseUrl, '/') . '/images/logo-aaaro.png';
+            ?>
+            <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="AAARO Logo">
         </div>
         <?php endif; ?>
         
         <!-- Judul Halaman -->
-        <h1>🚀 Mengalihkan Anda...</h1>
+        <h1>🚀 MENGALIHKAN ANDA...</h1>
         
         <!-- Informasi Redirect -->
         <div class="redirect-info">
