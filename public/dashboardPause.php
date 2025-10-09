@@ -258,7 +258,7 @@ function getDisplayName($link) {
       </ul> -->
 
       <!-- Quota Display -->
-      <div class="quota-section" style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+      <div class="quota-section" style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 8px; width: 100%; max-width: 600px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span style="font-size: 14px; color: #666;">Monthly Quota:</span>
           <span style="font-size: 14px; font-weight: bold;"><?php echo $quotaInfo['used']; ?> / <?php echo $quotaInfo['limit']; ?></span>
