@@ -480,16 +480,16 @@ body {
     transition: opacity 0.4s ease;
 }
 
-.stat-box:hover::before {
+/* .stat-box:hover::before {
     opacity: 1;
-}
+} */
 
-.stat-box:hover {
+/* .stat-box:hover {
     transform: translateY(-4px) scale(1.02);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border-color: #48bb78;
-}
+} */
 
 .stat-icon {
     font-size: 2rem;
@@ -498,9 +498,9 @@ body {
     transition: transform 0.4s ease;
 }
 
-.stat-box:hover .stat-icon {
+/* .stat-box:hover .stat-icon {
     transform: scale(1.15);
-}
+} */
 
 .stat-value {
     font-size: 1.6rem;
@@ -677,7 +677,6 @@ body {
 }
 
 .create-card:hover .create-icon {
-    /*transform: rotate(90deg);*/
     background: rgba(255, 255, 255, 0.25);
 }
 
