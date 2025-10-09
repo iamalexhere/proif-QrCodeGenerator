@@ -36,8 +36,8 @@
 .search-container::before {
     content: "🔍";
     position: absolute;
-    left: 32px;
-    top: 35%;
+    left: 15px;
+    top: 50%;
     transform: translateY(-50%);
     font-size: 15px;
     pointer-events: none;
