@@ -322,7 +322,7 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
               </div>
             </div>
             <a href="logout.php" style="color: #dc3545; text-decoration: none; font-size: 12px;" title="Logout">
-              🚪
+              <img class="img_logout" src="images/logout_icon.png" alt="logout_icon">
             </a>
           </div>
         </div>
