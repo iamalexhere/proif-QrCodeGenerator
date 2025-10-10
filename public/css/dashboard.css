@@ -19,21 +19,25 @@ body {
 
 /* ==================== SIDEBAR ==================== */
 .sidebar {
+    /* Menghilangkan scrollbar pada desktop */
     width: 280px;
     background: #4a5568;
     backdrop-filter: blur(10px);
     border-radius: 0;
     padding: 20px 20px 25px 20px;
     position: fixed;
+    /* Membuat sidebar tetap */
     top: 0;
     left: 0;
     height: 100vh;
-    overflow-y: auto;
+    overflow-y: hidden;
+    /* Mencegah scroll pada sidebar di desktop */
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
     z-index: 100;
     box-sizing: border-box;
+    /* Tambahkan scroll pada bagian yang dibutuhkan saja (misal: nav-menu/footer jika panjang) */
 }
 
 .sidebar-header {
@@ -56,6 +60,7 @@ body {
 }
 
 .nav-menu {
+    /* Navigasi menu yang asli (dihilangkan dari HTML) */
     list-style: none;
     padding: 0;
     margin: 0;
@@ -194,7 +199,7 @@ body {
     background: #3182ce;
 }
 
-/* ==================== NAVIGATION HEADER ==================== */
+/* ==================== NAVIGATION HEADER (DESKTOP/TABLET) ==================== */
 .navigator {
     display: flex;
     position: fixed;
@@ -755,6 +760,17 @@ body {
     background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
 }
 
+.btn-delete {
+    background: linear-gradient(135deg, #dc3545 0%, #b82c3b 100%);
+    color: white;
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #b82c3b 0%, #9a232f 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(220, 53, 69, 0.3);
+}
+
 .btn-secondary {
     background: #718096;
     color: white;
@@ -852,8 +868,99 @@ body {
     cursor: pointer;
 }
 
+/* ==================== PAGINATION ==================== */
+.pagination-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    gap: 15px;
+    padding: 20px 0;
+}
+
+.pagination {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pagination-btn {
+    padding: 10px 15px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #4a5568;
+    background-color: #f7fafc;
+    border: 1px solid #e2e8f0;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 40px;
+    text-align: center;
+}
+
+.pagination-btn:hover:not(.active):not(.disabled) {
+    background-color: #edf2f7;
+    border-color: #cbd5e0;
+    color: #2d3748;
+}
+
+.pagination-btn.active {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    color: white;
+    border-color: #4299e1;
+    cursor: default;
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+}
+
+.pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    background-color: #f7fafc;
+    color: #a0aec0;
+}
+
+.pagination-prev,
+.pagination-next {
+    min-width: 70px;
+}
+
+.pagination-ellipsis {
+    padding: 10px 5px;
+    color: #a0aec0;
+    font-weight: 600;
+}
+
+.pagination-info {
+    font-size: 0.9rem;
+    color: #718096;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+}
+
+.search-active-badge {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
 /* ==================== RESPONSIVE - TABLET ==================== */
 @media (max-width: 1024px) {
+    .sidebar {
+        width: 240px;
+    }
+
+    .main-content {
+        margin-left: 240px;
+        padding: 0 24px 24px 24px;
+    }
+
     .navigator {
         left: 240px;
         width: calc(100% - 240px);
@@ -883,15 +990,6 @@ body {
         padding: 3px 8px;
     }
 
-    .main-content {
-        margin-left: 240px;
-        padding: 0 24px 24px 24px;
-    }
-
-    .sidebar {
-        width: 240px;
-    }
-
     .qr-visual {
         flex-direction: column;
         align-items: center;
@@ -912,6 +1010,8 @@ body {
 
 /* ==================== RESPONSIVE - MOBILE ==================== */
 @media (max-width: 768px) {
+
+    /* Sembunyikan navigasi di bagian atas untuk mobile */
     .navigator {
         display: none;
     }
@@ -925,6 +1025,7 @@ body {
     }
 
     .sidebar {
+        /* Sidebar menjadi bagian atas halaman, tidak fixed */
         width: 100%;
         height: auto;
         position: relative;
@@ -936,28 +1037,13 @@ body {
         flex-direction: column;
         align-items: center;
         max-width: 100%;
+        overflow-y: visible;
+        /* Izinkan scroll jika konten sidebar panjang */
     }
 
     .sidebar-header {
-        text-align: center;
-        margin-bottom: 20px;
         width: 100%;
         max-width: 600px;
-    }
-
-    .sidebar-header h2 {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #ffffff;
-        margin-bottom: 6px;
-        letter-spacing: -0.5px;
-    }
-
-    .sidebar-header p {
-        font-size: 0.875rem;
-        color: #cbd5e0;
-        margin: 0;
-        font-weight: 400;
     }
 
     .search-container {
@@ -966,168 +1052,15 @@ body {
         margin-bottom: 20px;
     }
 
-    .search-container form {
-        width: 100%;
-    }
-
-    .search-input {
-        width: 100%;
-        padding: 12px 16px;
-        padding-left: 42px;
-        border-radius: 12px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.95);
-        font-size: 0.9rem;
-        outline: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .search-input:focus {
-        border-color: #60a5fa;
-        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
-    }
-
+    /* Ganti Nav Menu (di HTML Anda masih kosong, tapi ini untuk jaga-jaga) */
     .nav-menu {
-        display: flex !important;
-        flex-direction: column;
-        gap: 10px;
-        padding: 0;
-        margin: 0 0 16px 0;
-        list-style: none;
-        width: 100%;
-        max-width: 600px;
-    }
-
-    .nav-item {
-        width: 100%;
-        margin: 0;
-    }
-
-    .nav-link {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 16px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        color: #e2e8f0;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-    }
-
-    .nav-link:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-1px);
-    }
-
-    .nav-link.active {
-        background: rgba(96, 165, 250, 0.2);
-        border-color: #60a5fa;
-        color: #ffffff;
-    }
-
-    .nav-link .nav-icon {
-        font-size: 1.4rem;
-        margin-right: 12px;
-    }
-
-    .nav-link .nav-text {
-        flex: 1;
-        font-size: 0.95rem;
-        font-weight: 500;
-        text-align: left;
-    }
-
-    .nav-link .nav-count {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        min-width: 28px;
-        text-align: center;
-    }
-
-    .nav-link.active .nav-count {
-        background: #60a5fa;
-        color: #ffffff;
+        display: none;
+        /* Sembunyikan nav-menu asli di mobile */
     }
 
     .sidebar-footer {
-        margin-top: 16px;
-        padding-top: 16px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex !important;
-        flex-direction: column;
-        gap: 12px;
         width: 100%;
         max-width: 600px;
-    }
-
-    .create-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        width: 100%;
-        padding: 14px 20px;
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        color: #ffffff;
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
-    }
-
-    .create-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(72, 187, 120, 0.4);
-        background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
-    }
-
-    .create-btn-icon {
-        font-size: 1.3rem;
-        font-weight: 700;
-    }
-
-    .trial-section {
-        background: rgba(255, 255, 255, 0.08);
-        padding: 14px 16px;
-        border-radius: 12px;
-        text-align: center;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        width: 100%;
-    }
-
-    .trial-text {
-        color: #cbd5e0;
-        font-size: 0.85rem;
-        margin-bottom: 10px;
-        font-weight: 500;
-    }
-
-    .upgrade-btn {
-        display: block;
-        width: 100%;
-        padding: 12px 24px;
-        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-        color: #ffffff;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
-    }
-
-    .upgrade-btn:hover {
-        background: linear-gradient(135deg, #3182ce 0%, #2563eb 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(66, 153, 225, 0.4);
     }
 
     .main-content {
@@ -1136,8 +1069,10 @@ body {
         width: 100%;
     }
 
+    /* Header diubah agar tidak terpotong oleh navigator yang disembunyikan */
     .header {
         margin-top: 20px;
+        /* Diubah dari 100px */
     }
 
     .header h1 {
@@ -1148,6 +1083,99 @@ body {
         font-size: 0.9rem;
     }
 
+    /* ==================== RESPONSIVE NAV BAR (di main-content) ==================== */
+    /* Mengambil peran .navigator untuk tampilan mobile */
+    .main-content .navigator {
+        /* Ganti display: none; */
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 kolom untuk 3 menu */
+        gap: 10px;
+        position: relative;
+        /* Tidak fixed lagi */
+        width: 100%;
+        left: 0;
+        height: auto;
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
+        border-bottom: none;
+        margin-bottom: 20px;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .main-content .navigator>div {
+        flex: none;
+        max-width: 100%;
+    }
+
+    .main-content .navigator .nav-link {
+        /* Style card navigasi untuk mobile */
+        padding: 12px;
+        flex-direction: column;
+        /* Icon di atas teks */
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        height: 100px;
+        border-radius: 16px;
+        background: white;
+        color: #4a5568;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .main-content .navigator .nav-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        background: #f7fafc;
+    }
+
+    .main-content .navigator .nav-link.active {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: #ffffff;
+        border-color: #48bb78;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+    }
+
+    .main-content .navigator .nav-link.active::after {
+        display: none;
+    }
+
+    .main-content .navigator .nav-icon {
+        font-size: 1.8rem;
+        margin: 0 0 4px 0;
+        filter: none;
+    }
+
+    .main-content .navigator .nav-text {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0;
+        text-transform: uppercase;
+    }
+
+    .main-content .navigator .nav-count {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #4a5568;
+        color: white;
+        font-size: 0.7rem;
+        padding: 2px 7px;
+        font-weight: 600;
+        border-radius: 10px;
+    }
+
+    .main-content .navigator .nav-link.active .nav-count {
+        background: white;
+        color: #48bb78;
+    }
+
+    /* CARD STYLING */
     .dashboard {
         max-width: 100%;
         gap: 20px;
@@ -1237,86 +1265,34 @@ body {
 
 /* ==================== RESPONSIVE - SMALL MOBILE ==================== */
 @media (max-width: 480px) {
-    .sidebar {
-        padding: 18px 16px;
-        border-radius: 0 0 20px 20px;
-        gap: 14px;
+    .main-content {
+        padding: 15px;
     }
 
-    .sidebar-header,
-    .search-container,
-    .nav-menu,
-    .sidebar-footer {
-        max-width: 100%;
-    }
-
-    .sidebar-header h2 {
-        font-size: 1.3rem;
-    }
-
-    .sidebar-header p {
-        font-size: 0.8rem;
-    }
-
-    .search-container {
-        margin-bottom: 14px;
-    }
-
-    .search-input {
-        padding: 11px 14px;
-        font-size: 0.85rem;
-    }
-
-    .nav-menu {
+    .main-content .navigator {
+        grid-template-columns: repeat(3, 1fr);
         gap: 8px;
-        margin-bottom: 14px;
     }
 
-    .nav-link {
-        padding: 12px 14px;
+    .main-content .navigator .nav-link {
+        height: 85px;
+        padding: 8px;
+        border-radius: 12px;
     }
 
-    .nav-link .nav-icon {
-        font-size: 1.2rem;
-        margin-right: 10px;
-    }
-
-    .nav-link .nav-text {
-        font-size: 0.9rem;
-    }
-
-    .nav-link .nav-count {
-        padding: 3px 8px;
-        font-size: 0.75rem;
-    }
-
-    .sidebar-footer {
-        margin-top: 14px;
-        padding-top: 14px;
-    }
-
-    .create-btn {
-        padding: 12px 18px;
-        font-size: 0.9rem;
-        gap: 6px;
-    }
-
-    .trial-section {
-        padding: 12px 14px;
-    }
-
-    .trial-text {
-        font-size: 0.8rem;
-        margin-bottom: 8px;
-    }
-
-    .upgrade-btn {
-        padding: 10px 20px;
-        font-size: 0.85rem;
-    }
-
-    .header h1 {
+    .main-content .navigator .nav-icon {
         font-size: 1.5rem;
+    }
+
+    .main-content .navigator .nav-text {
+        font-size: 0.7rem;
+    }
+
+    .main-content .navigator .nav-count {
+        top: 6px;
+        right: 6px;
+        padding: 1px 6px;
+        font-size: 0.6rem;
     }
 
     .card-header {
@@ -1341,64 +1317,70 @@ body {
         text-align: center;
         margin-top: 8px;
         padding: 6px 12px;
-    }
-
-    .qr-content {
-        gap: 18px;
+        font-size: 0.65rem;
     }
 
     .url-display {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         padding: 10px 12px;
     }
 
     .qr-stats {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
+        gap: 5px;
     }
 
     .stat-box {
-        padding: 10px 6px;
+        padding: 8px 4px;
+        min-height: 80px;
+        border-radius: 12px;
     }
 
     .stat-icon {
-        font-size: 1.2rem;
-        margin-bottom: 4px;
+        font-size: 1.1rem;
     }
 
     .stat-value {
         font-size: 1rem;
-        margin-bottom: 2px;
     }
 
     .stat-label {
-        font-size: 0.55rem;
-        letter-spacing: 0.5px;
+        font-size: 0.5rem;
+        letter-spacing: 0.4px;
     }
 
     .qr-visual {
-        padding: 14px;
-        gap: 12px;
+        padding: 10px;
+        gap: 10px;
     }
 
     .qr-image {
-        width: 140px;
-        height: 140px;
-        padding: 16px;
+        width: 120px;
+        height: 120px;
+        padding: 14px;
     }
 
     .actions {
-        gap: 6px;
+        gap: 4px;
     }
 
     .btn {
-        font-size: 0.75rem;
-        padding: 9px 10px;
-        gap: 4px;
-        border-radius: 10px;
+        font-size: 0.7rem;
+        padding: 8px 10px;
+        border-radius: 8px;
     }
 
-    .qr-card {
-        padding: 18px;
+    .pagination-container {
+        padding: 15px 0;
+    }
+
+    .pagination-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        min-width: 35px;
+        border-radius: 8px;
+    }
+
+    .pagination-info {
+        font-size: 0.8rem;
     }
 }
