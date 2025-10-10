@@ -19,25 +19,20 @@ body {
 
 /* ==================== SIDEBAR ==================== */
 .sidebar {
-    /* Menghilangkan scrollbar pada desktop */
     width: 280px;
     background: #4a5568;
     backdrop-filter: blur(10px);
     border-radius: 0;
     padding: 20px 20px 25px 20px;
     position: fixed;
-    /* Membuat sidebar tetap */
     top: 0;
     left: 0;
     height: 100vh;
-    overflow-y: hidden;
-    /* Mencegah scroll pada sidebar di desktop */
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
     z-index: 100;
     box-sizing: border-box;
-    /* Tambahkan scroll pada bagian yang dibutuhkan saja (misal: nav-menu/footer jika panjang) */
 }
 
 .sidebar-header {
@@ -60,7 +55,6 @@ body {
 }
 
 .nav-menu {
-    /* Navigasi menu yang asli (dihilangkan dari HTML) */
     list-style: none;
     padding: 0;
     margin: 0;
@@ -1010,8 +1004,6 @@ body {
 
 /* ==================== RESPONSIVE - MOBILE ==================== */
 @media (max-width: 768px) {
-
-    /* Sembunyikan navigasi di bagian atas untuk mobile */
     .navigator {
         display: none;
     }
@@ -1025,7 +1017,6 @@ body {
     }
 
     .sidebar {
-        /* Sidebar menjadi bagian atas halaman, tidak fixed */
         width: 100%;
         height: auto;
         position: relative;
@@ -1038,7 +1029,6 @@ body {
         align-items: center;
         max-width: 100%;
         overflow-y: visible;
-        /* Izinkan scroll jika konten sidebar panjang */
     }
 
     .sidebar-header {
@@ -1052,10 +1042,8 @@ body {
         margin-bottom: 20px;
     }
 
-    /* Ganti Nav Menu (di HTML Anda masih kosong, tapi ini untuk jaga-jaga) */
     .nav-menu {
         display: none;
-        /* Sembunyikan nav-menu asli di mobile */
     }
 
     .sidebar-footer {
@@ -1069,10 +1057,8 @@ body {
         width: 100%;
     }
 
-    /* Header diubah agar tidak terpotong oleh navigator yang disembunyikan */
     .header {
         margin-top: 20px;
-        /* Diubah dari 100px */
     }
 
     .header h1 {
@@ -1084,15 +1070,11 @@ body {
     }
 
     /* ==================== RESPONSIVE NAV BAR (di main-content) ==================== */
-    /* Mengambil peran .navigator untuk tampilan mobile */
     .main-content .navigator {
-        /* Ganti display: none; */
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        /* 3 kolom untuk 3 menu */
         gap: 10px;
         position: relative;
-        /* Tidak fixed lagi */
         width: 100%;
         left: 0;
         height: auto;
@@ -1115,7 +1097,6 @@ body {
         /* Style card navigasi untuk mobile */
         padding: 12px;
         flex-direction: column;
-        /* Icon di atas teks */
         justify-content: center;
         align-items: center;
         text-align: center;
