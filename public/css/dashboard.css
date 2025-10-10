@@ -24,7 +24,6 @@ body {
     backdrop-filter: blur(10px);
     border-radius: 0;
     padding: 20px 20px 25px 20px;
-    /* box-shadow: 5px 0 25px rgba(0, 0, 0, 0.1); */
     position: fixed;
     top: 0;
     left: 0;
@@ -195,6 +194,143 @@ body {
     background: #3182ce;
 }
 
+/* ==================== NAVIGATION HEADER ==================== */
+.navigator {
+    display: flex;
+    position: fixed;
+    top: 0;
+    background: #848484;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    height: 80px;
+    left: 280px;
+    width: calc(100% - 280px);
+    padding: 15px 35px;
+    z-index: 90;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.1);
+}
+
+.navigator>div {
+    flex: 1;
+    max-width: 280px;
+}
+
+.navigator .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 14px;
+    color: #e2e8f0;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Efek shimmer saat hover */
+.navigator .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.15),
+            transparent);
+    transition: left 0.6s ease;
+}
+
+.navigator .nav-link:hover::before {
+    left: 100%;
+}
+
+.navigator .nav-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Active state dengan gradient */
+.navigator .nav-link.active {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: #ffffff;
+    border-color: #48bb78;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+}
+
+.navigator .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.5);
+}
+
+/* Icon styling */
+.navigator .nav-icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    transition: transform 0.3s ease;
+    margin-right: 0;
+    width: auto;
+}
+
+.navigator .nav-link:hover .nav-icon,
+.navigator .nav-link.active .nav-icon {
+    transform: scale(1.15) rotate(5deg);
+}
+
+/* Text styling */
+.navigator .nav-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* Count badge */
+.navigator .nav-count {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    min-width: 28px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.navigator .nav-link.active .nav-count {
+    background: rgba(255, 255, 255, 0.95);
+    color: #38a169;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.navigator .nav-link:hover .nav-count {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
 /* ==================== MAIN CONTENT ==================== */
 .main-content {
     flex: 1;
@@ -208,7 +344,7 @@ body {
     text-align: center;
     margin-bottom: 30px;
     color: #2d3748;
-    margin-top: 90px;
+    margin-top: 100px;
 }
 
 .header h1 {
@@ -484,27 +620,12 @@ body {
     transition: opacity 0.4s ease;
 }
 
-/* .stat-box:hover::before {
-    opacity: 1;
-} */
-
-/* .stat-box:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-color: #48bb78;
-} */
-
 .stat-icon {
     font-size: 2rem;
     margin-bottom: 10px;
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
     transition: transform 0.4s ease;
 }
-
-/* .stat-box:hover .stat-icon {
-    transform: scale(1.15);
-} */
 
 .stat-value {
     font-size: 1.6rem;
@@ -725,22 +846,43 @@ body {
     font-size: 1rem;
 }
 
-.navigator {
-    display: flex;
-    position: absolute;
-    background-color: #5b6e8f;
-    justify-content: space-between;
-    height: 80px;
-    left: 280px;              /* mulai setelah sidebar */
-    width: calc(100% - 280px);
-    padding: 15px 35px;
-    align-items: center;
+.copy-icon {
+    height: 25px;
+    width: 25px;
+    cursor: pointer;
 }
 
-/* ==================== RESPONSIVE DESIGN ==================== */
-
-/* Tablet Landscape & Small Laptop (<= 1024px) */
+/* ==================== RESPONSIVE - TABLET ==================== */
 @media (max-width: 1024px) {
+    .navigator {
+        left: 240px;
+        width: calc(100% - 240px);
+        gap: 12px;
+        padding: 12px 24px;
+    }
+
+    .navigator>div {
+        max-width: 240px;
+    }
+
+    .navigator .nav-link {
+        padding: 12px 16px;
+        gap: 8px;
+    }
+
+    .navigator .nav-icon {
+        font-size: 1.3rem;
+    }
+
+    .navigator .nav-text {
+        font-size: 0.85rem;
+    }
+
+    .navigator .nav-count {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+    }
+
     .main-content {
         margin-left: 240px;
         padding: 0 24px 24px 24px;
@@ -766,91 +908,18 @@ body {
         width: 160px;
         height: 160px;
     }
-
-    .navigator {
-        width: calc(100% - 240px);
-        margin: 0 0 0 -40px;
-    }
 }
 
-/* Tablet Portrait (<= 768px) */
+/* ==================== RESPONSIVE - MOBILE ==================== */
 @media (max-width: 768px) {
+    .navigator {
+        display: none;
+    }
+
     body {
         flex-direction: column;
     }
 
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-        box-shadow: none;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        padding: 15px 20px;
-    }
-
-    .sidebar-header {
-        text-align: left;
-        margin-bottom: 0;
-    }
-
-    .nav-menu {
-        display: none;
-    }
-
-    .sidebar-footer {
-        display: none;
-    }
-
-    .main-content {
-        margin-left: 0;
-        padding: 20px;
-    }
-
-    .dashboard {
-        max-width: 100%;
-        gap: 20px;
-    }
-
-    .qr-card {
-        padding: 24px;
-    }
-
-    .qr-visual {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .qr-image {
-        width: 150px;
-        height: 150px;
-    }
-
-    .qr-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-
-    .stat-box {
-        min-height: 100px;
-        padding: 18px;
-    }
-
-    .card-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .card-title h3 {
-        font-size: 1.2rem;
-    }
-}
-
-/* ==================== MOBILE SIDEBAR ==================== */
-@media (max-width: 768px) {
     .container {
         flex-direction: column;
     }
@@ -869,7 +938,6 @@ body {
         max-width: 100%;
     }
 
-    /* Header dengan spacing*/
     .sidebar-header {
         text-align: center;
         margin-bottom: 20px;
@@ -892,7 +960,6 @@ body {
         font-weight: 400;
     }
 
-    /* Search container*/
     .search-container {
         width: 100%;
         max-width: 600px;
@@ -921,7 +988,6 @@ body {
         box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
     }
 
-    /* Menu navigasi vertikal*/
     .nav-menu {
         display: flex !important;
         flex-direction: column;
@@ -989,7 +1055,6 @@ body {
         color: #ffffff;
     }
 
-    /* Footer dengan tombol*/
     .sidebar-footer {
         margin-top: 16px;
         padding-top: 16px;
@@ -1065,11 +1130,14 @@ body {
         box-shadow: 0 6px 16px rgba(66, 153, 225, 0.4);
     }
 
-    /* Main content*/
     .main-content {
         margin-left: 0;
         padding: 20px;
         width: 100%;
+    }
+
+    .header {
+        margin-top: 20px;
     }
 
     .header h1 {
@@ -1079,9 +1147,95 @@ body {
     .header p {
         font-size: 0.9rem;
     }
+
+    .dashboard {
+        max-width: 100%;
+        gap: 20px;
+    }
+
+    .qr-card {
+        padding: 20px;
+        border-radius: 20px;
+    }
+
+    .qr-visual {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 16px;
+    }
+
+    .qr-image {
+        width: 160px;
+        height: 160px;
+        order: 1;
+        margin: 0 auto;
+    }
+
+    .qr-stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .stat-box {
+        min-height: 100px;
+        padding: 14px 8px;
+    }
+
+    .stat-icon {
+        font-size: 1.4rem;
+        margin-bottom: 6px;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 0.6rem;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .card-title h3 {
+        font-size: 1.2rem;
+    }
+
+    .actions {
+        width: 100%;
+        order: 2;
+        gap: 8px;
+    }
+
+    .btn {
+        width: 100% !important;
+        font-size: 0.8rem;
+        padding: 10px 12px;
+        gap: 6px;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    .create-card {
+        min-height: 180px;
+    }
+
+    .create-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+    }
 }
 
-/* Mobile sangat kecil (≤480px)*/
+/* ==================== RESPONSIVE - SMALL MOBILE ==================== */
 @media (max-width: 480px) {
     .sidebar {
         padding: 18px 16px;
@@ -1160,86 +1314,7 @@ body {
         padding: 10px 20px;
         font-size: 0.85rem;
     }
-}
 
-/* ==================== CARD & BUTTON ==================== */
-@media (max-width: 768px) {
-    .dashboard {
-        gap: 20px;
-    }
-
-    .qr-card {
-        padding: 20px;
-        border-radius: 20px;
-    }
-
-    .qr-stats {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-    }
-
-    .stat-box {
-        padding: 14px 8px;
-    }
-
-    .stat-icon {
-        font-size: 1.4rem;
-        margin-bottom: 6px;
-    }
-
-    .stat-value {
-        font-size: 1.2rem;
-        margin-bottom: 4px;
-    }
-
-    .stat-label {
-        font-size: 0.6rem;
-    }
-
-    .qr-visual {
-        flex-direction: column;
-        padding: 16px;
-        gap: 16px;
-    }
-
-    .qr-image {
-        width: 160px;
-        height: 160px;
-        order: 1;
-        margin: 0 auto;
-    }
-
-    .actions {
-        width: 100%;
-        order: 2;
-        gap: 8px;
-    }
-
-
-    .btn {
-        width: 100% !important;
-        font-size: 0.8rem;
-        padding: 10px 12px;
-        gap: 6px;
-        min-width: 0 !important;
-        max-width: 100% !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-    }
-
-    .create-card {
-        min-height: 180px;
-    }
-
-    .create-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 2rem;
-    }
-}
-
-@media (max-width: 480px) {
     .header h1 {
         font-size: 1.5rem;
     }
@@ -1326,10 +1401,4 @@ body {
     .qr-card {
         padding: 18px;
     }
-}
-
-.copy-icon{
-    height: 25px;
-    width: 25px;
-    cursor: pointer;
 }
