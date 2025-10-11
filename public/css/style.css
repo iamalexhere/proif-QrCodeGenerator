@@ -12,6 +12,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background-color: #e8eef3
 }
 
 
@@ -34,12 +35,13 @@ body {
 
 .inputsection {
     flex: 0 0 66.66667%;
-    max-width: 66.66667%;
+    max-width: 66%;
     border: 1px solid rgb(222, 226, 230);
     padding: 15px;
-    border-radius: 0.25rem;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    border-radius: 16px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-right: 0.667%;
 }
 
 
@@ -48,8 +50,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 3rem;
-    background-color: #ebedf0;
+    padding: 15px 15px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     position: relative;
 }
 
@@ -160,11 +163,11 @@ input[type="checkbox"] {
     border: 1px solid transparent;
     padding: 10px 20px;
     border-radius: 0.25rem;
-    background-color: #007bff;
+    background: #5288B7;
 }
 
 .btn:hover {
-    background-color: #0056b3;
+    background-color: #2D74B2;
 }
 
 #download-links-container {
@@ -232,12 +235,12 @@ input[type="checkbox"] {
     max-width: 33.33333%;
     border: 1px solid rgb(222, 226, 230);
     border-left: none;
-    border-radius: 0.25rem;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    border-radius: 16px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .shortlinkcontainer {
@@ -517,22 +520,19 @@ footer div {
 
 /* Tombol Pro di Navbar */
 .btn-pro {
-    margin-left: auto;
-    /* dorong ke kanan */
-    background-color: #28a745;
-    /* hijau */
+    background: #52b788;
     color: #fff;
-    padding: 8px 15px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 4px;
+    padding: 10px 20px;
+    border-radius: 8px;
     text-decoration: none;
-    transition: background-color 0.3s ease;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: 500;
 }
 
 .btn-pro:hover {
-    background-color: #218838;
-    /* hijau lebih gelap saat hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(82, 183, 136, 0.4);
+    background: #40916c;
 }
 
 /* Tombol Pro di bawah Output Section */

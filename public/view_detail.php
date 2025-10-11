@@ -42,6 +42,7 @@ $linkCreatedAt = $linkData['created_at'] ? date('Y-m-d', strtotime($linkData['cr
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="stylesheet" href="css/view_detail.css"> 
     <link rel="stylesheet" href="css/detail_responsive.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <title>View QR Code Details</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/view_detail.js"></script>
@@ -49,10 +50,11 @@ $linkCreatedAt = $linkData['created_at'] ? date('Y-m-d', strtotime($linkData['cr
 <body>
     <header class="navbar">
     <div class="navbar-left">
-      <div class="brand-text">
-        <div class="brand-title">AAARO</div>
-        <div class="brand-subtitle">Complexity, simplified</div>
-      </div>
+        <img src='images/logo-aaaro.png' alt="AAARO Logo">
+        <div class="brand-text">
+            <div class="brand-title">AAARO</div>
+            <div class="brand-subtitle">Complexity, simplified</div>
+        </div>
     </div>
     <div class="navbar-right">
       <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
