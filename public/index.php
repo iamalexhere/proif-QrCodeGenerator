@@ -32,11 +32,13 @@ if ($isLoggedIn) {
     <header>
         <nav class="navbar">
             <div class="navbar-left">
-                <img src='images/logo-aaaro.png' alt="AAARO Logo">
-                <div class="brand-text">
-                    <div class="brand-title">AAARO</div>
-                    <div class="brand-subtitle">Complexity, simplified</div>
-                </div>
+                <a href="<?php echo $isLoggedIn ? 'dashboardAll.php' : 'login.php'; ?>" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                    <img src='images/logo-aaaro.png' alt="AAARO Logo">
+                    <div class="brand-text">
+                        <div class="brand-title">AAARO</div>
+                        <div class="brand-subtitle">Complexity, simplified</div>
+                    </div>
+                </a>
             </div>
             
             <div class="navbar-right">

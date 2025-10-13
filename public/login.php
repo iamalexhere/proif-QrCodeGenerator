@@ -66,11 +66,13 @@ if (isset($_GET['error'])) {
 <body>
     <Header>
         <div class="logo-container">
-            <img src="images/logo-aaaro.png" alt="AAARO Logo" class="logo-image">
-            <div class="brand-text">
-                <div class="brand-title">AAARO</div>
-                <div class="brand-subtitle">Complexity, simplified</div>
-            </div>
+            <a href="index.php" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                <img src="images/logo-aaaro.png" alt="AAARO Logo" class="logo-image">
+                <div class="brand-text">
+                    <div class="brand-title">AAARO</div>
+                    <div class="brand-subtitle">Complexity, simplified</div>
+                </div>
+            </a>
         </div>
     </Header>
     <div class="main">

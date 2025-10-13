@@ -20,6 +20,7 @@ CREATE INDEX idx_created_at ON links(created_at);
 
 ALTER TABLE links ADD status VARCHAR(20) NOT NULL DEFAULT 'active' AFTER qr_color;
 ALTER TABLE links ADD qr_image LONGBLOB NULL;
+ALTER TABLE links ADD deleted_at TIMESTAMP NULL AFTER status;
 
 CREATE TABLE clicks (
   id int(11) NOT NULL AUTO_INCREMENT,
