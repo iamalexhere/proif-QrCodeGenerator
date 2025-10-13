@@ -50,6 +50,9 @@ if (!$linkData) {
     </div>
     <div class="navbar-right">
       <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
+      <a href="logout.php" style="color: #dc3545; text-decoration: none; font-size: 25px;" title="Logout">
+        🚪
+      </a>
     </div>
   </header>
 

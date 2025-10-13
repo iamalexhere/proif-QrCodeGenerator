@@ -43,6 +43,9 @@ if ($isLoggedIn) {
                 <?php if ($isLoggedIn): ?>
                     <span style="color:#666; font-size: 14px; margin-right: 15px;">Welcome, <?php echo htmlspecialchars($currentUser['name']); ?></span>
                     <a href="dashboardAll.php" class="btn-pro">Dashboard</a>
+                    <a href="logout.php" style="color: #dc3545; text-decoration: none; font-size: 25px;" title="Logout">
+                        🚪
+                    </a>
                 <?php else: ?>
                     <a href="login.php" class="btn-pro">Login to Create QR Codes</a>
                 <?php endif; ?>
