@@ -630,6 +630,11 @@ canvas {
     }
 }
 
+@media(max-width: 360px){
+    .brand-text{
+        display: none;
+    }    
+}
 
 .stat-card {
     overflow: hidden;
