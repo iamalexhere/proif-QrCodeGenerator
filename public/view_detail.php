@@ -58,7 +58,11 @@ $linkCreatedAt = $linkData['created_at'] ? date('Y-m-d', strtotime($linkData['cr
             </div>
         </div>
         <div class="navbar-right">
-        <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
+            
+            <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
+            <a href="logout.php" style="color: #dc3545; text-decoration: none; font-size: 12px;" title="Logout">
+              <img class="img_logout" src="images/logout_icon.png" alt="logout_icon">
+            </a>
         </div>
   </header>
 
