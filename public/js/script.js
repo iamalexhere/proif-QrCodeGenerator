@@ -1,15 +1,50 @@
 // Copy ke clipboard
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        showNotification('Link copied to clipboard!', 'success'); // Tampilkan notifikasi sukses
-    });
+function copyToClipboard(text, event = null) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    // --- coba Clipboard API dulu ---
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                showNotification('Link copied to clipboard!', 'success');
+            })
+            .catch(err => {
+                console.error('Clipboard API failed:', err);
+                fallbackCopyText(text);
+            });
+    } else {
+        // --- fallback otomatis ---
+        fallbackCopyText(text);
+    }
+}
+
+function fallbackCopyText(text) {
+    // Buat input temporary
+    const tempInput = document.createElement('input');
+    tempInput.value = text;
+    tempInput.style.position = 'fixed';
+    tempInput.style.opacity = 0;
+    document.body.appendChild(tempInput);
+
+    // Pilih & copy
+    tempInput.select();
+    tempInput.setSelectionRange(0, text.length);
+    document.execCommand('copy');
+
+    // Hapus elemen sementara
+    document.body.removeChild(tempInput);
+
+    showNotification('Link copied to clipboard!', 'success');
 }
 
 // Download QR Code in specific format
 function downloadQR(shortCode, filename, format = 'png') {
     // Use our multi-format download endpoint
     const downloadUrl = `download_qr_multi.php?code=${encodeURIComponent(shortCode)}&format=${format}`;
-    
+
     // Create a temporary link and trigger download
     const link = document.createElement('a');
     link.href = downloadUrl;
@@ -43,10 +78,10 @@ function showDownloadOptions(shortCode, filename) {
             </button>
         </div>
     `;
-    
+
     // Detect if mobile device
     const isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
+
     // Add styles with mobile optimization
     dropdown.style.cssText = `
         position: fixed;
@@ -61,7 +96,7 @@ function showDownloadOptions(shortCode, filename) {
         justify-content: center;
         padding: ${isMobile ? '0' : '20px'};
     `;
-    
+
     const content = dropdown.querySelector('.download-dropdown-content');
     content.style.cssText = `
         background: white;
@@ -73,7 +108,7 @@ function showDownloadOptions(shortCode, filename) {
         text-align: center;
         ${isMobile ? 'margin: 0; border-radius: 12px 12px 0 0;' : ''}
     `;
-    
+
     const header = dropdown.querySelector('.download-dropdown-header');
     header.style.cssText = `
         font-size: ${isMobile ? '20px' : '18px'};
@@ -81,7 +116,7 @@ function showDownloadOptions(shortCode, filename) {
         margin-bottom: ${isMobile ? '20px' : '15px'};
         color: #333;
     `;
-    
+
     const options = dropdown.querySelectorAll('.download-option');
     options.forEach(option => {
         option.style.cssText = `
@@ -99,7 +134,7 @@ function showDownloadOptions(shortCode, filename) {
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         `;
-        
+
         // Enhanced touch events for mobile
         if (isMobile) {
             option.addEventListener('touchstart', () => {
@@ -111,7 +146,7 @@ function showDownloadOptions(shortCode, filename) {
                     option.style.color = 'white';
                 }
             });
-            
+
             option.addEventListener('touchend', () => {
                 setTimeout(() => {
                     option.style.background = '#f8f9fa';
@@ -128,23 +163,23 @@ function showDownloadOptions(shortCode, filename) {
                     option.style.color = 'white';
                 }
             });
-            
+
             option.addEventListener('mouseleave', () => {
                 option.style.background = '#f8f9fa';
                 option.style.color = '#333';
             });
         }
     });
-    
+
     document.body.appendChild(dropdown);
-    
+
     // Close on outside click/touch
     dropdown.addEventListener('click', (e) => {
         if (e.target === dropdown) {
             hideDownloadOptions();
         }
     });
-    
+
     // Prevent body scroll on mobile when dropdown is open
     if (isMobile) {
         document.body.style.overflow = 'hidden';
@@ -208,18 +243,18 @@ function updateStatus(shortUrl, newStatus) {
         .then(data => {
             if (data.success) {
                 showNotification(
-                    `QR Code ${newStatus === 'active' ? 'resumed' : 'paused'} successfully!`,
+                    `QR Code ${newStatus === 'active' ? 'resumed' : 'paused'} successfully! Redirecting...`,
                     'success'
                 );
 
-                // Redirect atau reload halaman sesuai status
+                // Redirect sesuai status baru
                 setTimeout(() => {
                     if (newStatus === 'paused') {
                         window.location.href = 'dashboardPause.php';
                     } else {
-                        location.reload();
+                        window.location.href = 'dashboardActive.php';
                     }
-                }, 1000);
+                }, 2000); // 2 detik delay seperti contoh Anda
             } else {
                 showNotification(data.message || 'Failed to update status', 'error');
             }
@@ -251,26 +286,26 @@ function deleteQRCode(shortUrl) {
     // Handle delete confirmation
     document.getElementById('confirm-delete').addEventListener('click', () => {
         confirmBox.remove();
-        
+
         // Show loading notification
         showNotification('Deleting QR Code...', 'info');
-        
+
         // Send delete request
         fetch('updateStatus.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `short_url=${encodeURIComponent(shortUrl)}&action=delete`
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                showNotification('QR Code deleted successfully!', 'success');
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                showNotification(data.message || 'Failed to delete QR Code', 'error');
-            }
-        })
-        .catch(() => showNotification('An error occurred while deleting', 'error'));
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('QR Code deleted successfully!', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification(data.message || 'Failed to delete QR Code', 'error');
+                }
+            })
+            .catch(() => showNotification('An error occurred while deleting', 'error'));
     });
 
     // Handle cancel
@@ -290,7 +325,7 @@ function showNotification(msg, type) {
     let backgroundColor = '#f44336'; // default error
     if (type === 'success') backgroundColor = '#4CAF50';
     else if (type === 'info') backgroundColor = '#2196F3';
-    
+
     el.style.cssText = `
     position: fixed;
     top: 20px;

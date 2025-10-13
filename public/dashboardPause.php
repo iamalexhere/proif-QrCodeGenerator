@@ -200,6 +200,9 @@ function getDisplayName($link) {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <title>Dashboard QR Code - Paused</title>
   <link rel="stylesheet" href="css/dashboard.css">
   <link rel="stylesheet" href="css/searchbar.css">
@@ -230,7 +233,7 @@ function getDisplayName($link) {
         </form>
       </div>
 
-      <ul class="nav-menu">
+      <!-- <ul class="nav-menu">
         <li class="nav-item">
           <a href="dashboardAll.php" class="nav-link <?php echo ($current_page_name == 'dashboardAll.php') ? 'active' : ''; ?>">
             <span class="nav-icon">📊</span>
@@ -252,10 +255,10 @@ function getDisplayName($link) {
             <span class="nav-count"><?php echo $paused_qrs; ?></span>
           </a>
         </li>
-      </ul>
+      </ul> -->
 
       <!-- Quota Display -->
-      <div class="quota-section" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+      <div class="quota-section" style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 8px; width: 100%; max-width: 600px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span style="font-size: 14px; color: #666;">Monthly Quota:</span>
           <span style="font-size: 14px; font-weight: bold;"><?php echo $quotaInfo['used']; ?> / <?php echo $quotaInfo['limit']; ?></span>
@@ -322,7 +325,7 @@ function getDisplayName($link) {
               </div>
             </div>
             <a href="logout.php" style="color: #dc3545; text-decoration: none; font-size: 12px;" title="Logout">
-              🚪
+              <img class="img_logout" src="images/logout_icon.png" alt="logout_icon">
             </a>
           </div>
         </div>
@@ -331,6 +334,34 @@ function getDisplayName($link) {
 
     <!-- Main Content -->
     <div class="main-content">
+
+      <!-- nav -->
+      <div class="navigator">
+        <div>
+          <a href="dashboardAll.php" class="nav-link <?php echo ($current_page_name == 'dashboardAll.php') ? 'active' : ''; ?>">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">All QR Codes</span>
+            <span class="nav-count"><?php echo $total_qrs; ?></span>
+          </a>
+        </div>
+        
+        <div>
+          <a href="dashboardActive.php" class="nav-link <?php echo ($current_page_name == 'dashboardActive.php') ? 'active' : ''; ?>">
+            <span class="nav-icon">✅</span>
+            <span class="nav-text">Active QR Codes</span>
+            <span class="nav-count"><?php echo $active_qrs; ?></span>
+          </a>
+        </div>
+
+        <div>
+          <a href="dashboardPause.php" class="nav-link <?php echo ($current_page_name == 'dashboardPause.php') ? 'active' : ''; ?>">
+            <span class="nav-icon">⏸️</span>
+            <span class="nav-text">Paused QR Codes</span>
+            <span class="nav-count"><?php echo $paused_qrs; ?></span>
+          </a>
+        </div>
+      </div>
+
       <div class="header">
         <h1 id="page-title">Paused QR Codes</h1>
         <p id="page-subtitle">
@@ -375,11 +406,20 @@ function getDisplayName($link) {
                   </div>
                   <div class="info-item">
                     <span class="info-label">Short Link</span>
-                    <?php $fullShortUrl = Config::getShortUrlBase() . '/' . $link['short_url'];?>
-                    <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" class="short-link" onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>')">
-                      <?php echo htmlspecialchars($fullShortUrl); ?>
-                      <span>📋</span>
-                    </a>
+                    <div class="url-display">
+                      <?php $fullShortUrl = Config::getShortUrlBase() . '/' . $link['short_url'];?>
+                      <a href="<?php echo htmlspecialchars($fullShortUrl); ?>" 
+                        class="short-link" 
+                        target="_blank"
+                        onclick="event.preventDefault(); window.open('<?php echo htmlspecialchars($fullShortUrl); ?>', '_blank');">
+                        <?php echo htmlspecialchars($fullShortUrl); ?> 
+                      </a>
+                      <span
+                        title="Copy short URL" 
+                        onclick="copyToClipboard('<?php echo htmlspecialchars($fullShortUrl); ?>', event)">
+                        <img class="copy-icon" src="images/copy_icon.png" alt="copy_icon">
+                      </span>
+                    </div>
                   </div>
                 </div>
 
