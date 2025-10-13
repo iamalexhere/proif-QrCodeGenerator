@@ -18,6 +18,7 @@
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../config/Config.php';
+require_once __DIR__ . '/../classes/FaviconService.php';
 
 // Require authentication
 Auth::requireAuth();
@@ -42,14 +43,14 @@ $current_page = max(1, $current_page); // Pastikan minimal halaman = 1
 // FITUR PENCARIAN
 // Ambil kata kunci pencarian (jika ada)
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
-$where_clause = " WHERE user_id = ?";  // Always filter by user
+$where_clause = " WHERE user_id = ? AND deleted_at IS NULL";  // Always filter by user and exclude soft-deleted
 $search_param = '';  // Menyimpan parameter untuk prepared statement
 
 // Jika user mengetikkan sesuatu di search bar
 if (!empty($search_query)) {
     $search_param = '%' . $search_query . '%';
-    // Mencari berdasarkan custom_url atau original_url dengan user filter
-    $where_clause = " WHERE user_id = ? AND (custom_url LIKE ? OR original_url LIKE ?)";
+    // Mencari berdasarkan custom_url atau original_url dengan user filter and exclude soft-deleted
+    $where_clause = " WHERE user_id = ? AND deleted_at IS NULL AND (custom_url LIKE ? OR original_url LIKE ?)";
 }
 
 // HITUNG TOTAL DATA
@@ -137,8 +138,8 @@ if ($result) {
 }
 
 // HITUNG STATISTIK UNTUK SIDEBAR (USER-SPECIFIC)
-// Mengambil semua status QR milik user yang login
-$stmt = $db->prepare("SELECT status FROM links WHERE user_id = ?");
+// Mengambil semua status QR milik user yang login (exclude soft-deleted)
+$stmt = $db->prepare("SELECT status FROM links WHERE user_id = ? AND deleted_at IS NULL");
 $stmt->bind_param('i', $currentUser['id']);
 $stmt->execute();
 $all_links_result = $stmt->get_result();
@@ -184,6 +185,10 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
   <link rel="stylesheet" href="css/pagination.css">
   <link rel="stylesheet" href="css/device-responsive.css">
   <link rel="icon" href="images/logo-aaaro.png" type="image/x-icon">
+  
+  <!-- Favicon Preloading for Better Performance -->
+  <?php echo FaviconService::generatePreloadCSS(); ?>
+  
   <script src="js/script.js"></script>
 </head>
 
@@ -193,7 +198,13 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
     <!--SIDEBAR-->
     <div class="sidebar">
       <div class="sidebar-header">
-        <h2>QR Dashboard</h2>
+        <a href="dashboardAll.php" style="display: flex; align-items: center; text-decoration: none; color: inherit; margin-bottom: 10px;">
+          <img src="images/logo-aaaro.png" alt="AAARO Logo" style="width: 32px; height: 32px; margin-right: 10px;">
+          <div>
+            <div style="font-size: 18px; font-weight: 600; color: #ffffff;">AAARO</div>
+            <div style="font-size: 12px; color: #cccccc;">QR Dashboard</div>
+          </div>
+        </a>
         <p>Manage your QR codes</p>
       </div>
 
@@ -421,10 +432,29 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
               <div class="performance-indicator <?php echo ($link['status'] !== 'active') ? 'paused' : ''; ?>"></div>
 
               <div class="card-header">
-                <div class="qr-icon">QR</div>
+                <?php 
+                $websiteIcon = FaviconService::getEnhancedIcon($link['original_url']);
+                $domainName = FaviconService::getDomainName($link['original_url']);
+                ?>
+                <div class="qr-icon" style="position: relative;">
+                  <img src="<?php echo htmlspecialchars($websiteIcon['url']); ?>" 
+                       alt="<?php echo htmlspecialchars($domainName); ?>" 
+                       style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover;"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div style="display: none; width: 32px; height: 32px; background: #4773db; color: white; border-radius: 6px; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">
+                    QR
+                  </div>
+                </div>
                 <div class="card-title">
                   <h3><?php echo htmlspecialchars($display_name); ?></h3>
-                  <div class="created-date">Created: <?php echo date('F d, Y', strtotime($link['created_at'])); ?></div>
+                  <div class="created-date">
+                    Created: <?php echo date('F d, Y', strtotime($link['created_at'])); ?>
+                    <?php if ($websiteIcon['category'] !== 'Website'): ?>
+                      <span style="margin-left: 8px; padding: 2px 6px; background: #e3f2fd; color: #1976d2; border-radius: 12px; font-size: 10px; font-weight: 500;">
+                        <?php echo htmlspecialchars($websiteIcon['category']); ?>
+                      </span>
+                    <?php endif; ?>
+                  </div>
                 </div>
 
                 <span class="status-badge status-<?php echo htmlspecialchars($link['status']); ?>">

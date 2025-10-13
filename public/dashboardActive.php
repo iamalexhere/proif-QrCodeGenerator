@@ -20,6 +20,7 @@
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../config/Config.php';
+require_once __DIR__ . '/../classes/FaviconService.php';
 
 // Require authentication
 Auth::requireAuth();
@@ -52,8 +53,8 @@ $current_page = max(1, $current_page);
 // Ambil kata kunci pencarian dari URL (?search=)
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-// Default kondisi WHERE menampilkan QR aktif milik user yang login
-$where_clause = "WHERE l.status = 'active' AND l.user_id = ?";
+// Default kondisi WHERE menampilkan QR aktif milik user yang login (exclude soft-deleted)
+$where_clause = "WHERE l.status = 'active' AND l.user_id = ? AND l.deleted_at IS NULL";
 
 // Variabel untuk parameter pencarian (akan digunakan di prepared statement)
 $search_param = '';
@@ -157,8 +158,8 @@ if ($result) {
 
 
 // HITUNG STATISTIK UNTUK SIDEBAR (USER-SPECIFIC)
-// Statistik total QR milik user yang login
-$stmt = $db->prepare("SELECT status FROM links WHERE user_id = ?");
+// Statistik total QR milik user yang login (exclude soft-deleted)
+$stmt = $db->prepare("SELECT status FROM links WHERE user_id = ? AND deleted_at IS NULL");
 $stmt->bind_param('i', $currentUser['id']);
 $stmt->execute();
 $all_links_result = $stmt->get_result();
@@ -210,7 +211,13 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
     <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="sidebar-header">
-        <h2>QR Dashboard</h2>
+        <a href="dashboardAll.php" style="display: flex; align-items: center; text-decoration: none; color: inherit; margin-bottom: 10px;">
+          <img src="images/logo-aaaro.png" alt="AAARO Logo" style="width: 32px; height: 32px; margin-right: 10px;">
+          <div>
+            <div style="font-size: 18px; font-weight: 600; color: #ffffff;">AAARO</div>
+            <div style="font-size: 12px; color: #cccccc;">QR Dashboard</div>
+          </div>
+        </a>
         <p>Manage your QR codes</p>
       </div>
 
@@ -435,7 +442,19 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
               <div class="performance-indicator"></div>
 
               <div class="card-header">
-                <div class="qr-icon">QR</div>
+                <?php 
+                $websiteIcon = FaviconService::getWebsiteIcon($link['original_url']);
+                $domainName = FaviconService::getDomainName($link['original_url']);
+                ?>
+                <div class="qr-icon" style="position: relative;">
+                  <img src="<?php echo htmlspecialchars($websiteIcon['url']); ?>" 
+                       alt="<?php echo htmlspecialchars($domainName); ?>" 
+                       style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover;"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div style="display: none; width: 32px; height: 32px; background: #4773db; color: white; border-radius: 6px; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">
+                    QR
+                  </div>
+                </div>
                 <div class="card-title">
                   <h3><?php echo htmlspecialchars($display_name); ?></h3>
                   <div class="created-date">Created: <?php echo date('F d, Y', strtotime($link['created_at'])); ?></div>

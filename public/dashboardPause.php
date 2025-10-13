@@ -21,6 +21,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../config/Config.php';
+require_once __DIR__ . '/../classes/FaviconService.php';
 
 // Require authentication
 Auth::requireAuth();
@@ -41,7 +42,7 @@ $current_page = max(1, $current_page); // Minimal halaman 1
 
 // Search functionality
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
-$where_clause = "WHERE status != 'active' AND user_id = ?";
+$where_clause = "WHERE status != 'active' AND user_id = ? AND deleted_at IS NULL";
 $search_param = '';
 
 if (!empty($search_query)) {
@@ -127,8 +128,8 @@ if ($result) {
     }
 }
 
-// Hitung total QR untuk sidebar (USER-SPECIFIC)
-$stmt = $db->prepare("SELECT status FROM links WHERE user_id = ?");
+// Hitung total QR untuk sidebar (USER-SPECIFIC) (exclude soft-deleted)
+$stmt = $db->prepare("SELECT status FROM links WHERE user_id = ? AND deleted_at IS NULL");
 $stmt->bind_param('i', $currentUser['id']);
 $stmt->execute();
 $all_links_result = $stmt->get_result();
@@ -215,7 +216,13 @@ function getDisplayName($link) {
     <!-- Sidebar -->
     <div class="sidebar">
       <div class="sidebar-header">
-        <h2>QR Dashboard</h2>
+        <a href="dashboardAll.php" style="display: flex; align-items: center; text-decoration: none; color: inherit; margin-bottom: 10px;">
+          <img src="images/logo-aaaro.png" alt="AAARO Logo" style="width: 32px; height: 32px; margin-right: 10px;">
+          <div>
+            <div style="font-size: 18px; font-weight: 600; color: #ffffff;">AAARO</div>
+            <div style="font-size: 12px; color: #cccccc;">QR Dashboard</div>
+          </div>
+        </a>
         <p>Manage your QR codes</p>
       </div>
 
@@ -390,7 +397,19 @@ function getDisplayName($link) {
             <div class="qr-card" data-status="paused" data-qr-title="<?php echo htmlspecialchars(strtolower(getDisplayName($link))); ?>">
               <div class="performance-indicator paused"></div>
               <div class="card-header">
-                <div class="qr-icon">QR</div>
+                <?php 
+                $websiteIcon = FaviconService::getWebsiteIcon($link['original_url']);
+                $domainName = FaviconService::getDomainName($link['original_url']);
+                ?>
+                <div class="qr-icon" style="position: relative;">
+                  <img src="<?php echo htmlspecialchars($websiteIcon['url']); ?>" 
+                       alt="<?php echo htmlspecialchars($domainName); ?>" 
+                       style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover;"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div style="display: none; width: 32px; height: 32px; background: #4773db; color: white; border-radius: 6px; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">
+                    QR
+                  </div>
+                </div>
                 <div class="card-title">
                   <h3><?php echo htmlspecialchars(getDisplayName($link)); ?></h3>
                   <div class="created-date">Created: <?php echo date('F d, Y', strtotime($link['created_at'])); ?></div>

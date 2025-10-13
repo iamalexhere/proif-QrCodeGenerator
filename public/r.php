@@ -59,7 +59,9 @@ function showPausedLinkPage($shortCode) {
                 <?php 
                 $imagePath = rtrim($baseUrl, '/') . '/images/logo-aaaro.png';
                 ?>
-                <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="AAARO Logo">
+                <a href="<?php echo rtrim($baseUrl, '/'); ?>" style="display: inline-block;">
+                    <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="AAARO Logo">
+                </a>
             </div>
             <?php endif; ?>
             
@@ -193,7 +195,9 @@ try {
             $baseUrl = Config::getBaseUrl();
             $imagePath = rtrim($baseUrl, '/') . '/images/logo-aaaro.png';
             ?>
-            <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="AAARO Logo">
+            <a href="<?php echo rtrim($baseUrl, '/'); ?>" style="display: inline-block;">
+                <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="AAARO Logo">
+            </a>
         </div>
         <?php endif; ?>
         

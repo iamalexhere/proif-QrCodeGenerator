@@ -20,9 +20,18 @@ $planLimits = Config::getPlanLimits();
 <body>
   <!-- Header with back button -->
   <header class="pricing-header">
-    <a href="dashboardAll.php" style="text-decoration:none;display:inline-block;background:#00aaff;color:#fff;padding:6px 12px;border-radius:6px;font-weight:bold;margin-bottom:10px;">
-      ← Back to Dashboard
-    </a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <a href="dashboardAll.php" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+        <img src="images/logo-aaaro.png" alt="AAARO Logo" style="width: 32px; height: 32px; margin-right: 10px;">
+        <div>
+          <div style="font-size: 18px; font-weight: 600; color: #333;">AAARO</div>
+          <div style="font-size: 12px; color: #666;">Plans & Pricing</div>
+        </div>
+      </a>
+      <a href="dashboardAll.php" style="text-decoration:none;display:inline-block;background:#00aaff;color:#fff;padding:6px 12px;border-radius:6px;font-weight:bold;">
+        ← Back to Dashboard
+      </a>
+    </div>
     <h1>Plans & Pricing</h1>
     <p>Find a plan that suits your needs</p>
   </header>

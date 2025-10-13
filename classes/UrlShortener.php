@@ -76,8 +76,8 @@ class UrlShortener {
      * @throws Exception Jika gagal menyimpan ke database
      */
     public function createShortUrl($originalUrl, $userId, $customUrl = '', $logoPath = '', $qrColor = '#000000') {
-        // === CEK APAKAH URL SUDAH ADA UNTUK USER INI ===
-        $stmt = $this->db->prepare("SELECT id, short_url, original_url FROM links WHERE original_url = ? AND user_id = ? LIMIT 1");
+        // === CEK APAKAH URL SUDAH ADA UNTUK USER INI (exclude soft-deleted) ===
+        $stmt = $this->db->prepare("SELECT id, short_url, original_url FROM links WHERE original_url = ? AND user_id = ? AND deleted_at IS NULL LIMIT 1");
         $stmt->bind_param("si", $originalUrl, $userId);
         $stmt->execute();
         $existingResult = $stmt->get_result();
@@ -207,7 +207,7 @@ class UrlShortener {
         $stmt = $db->prepare("
             SELECT id, original_url, short_url, custom_url, status 
             FROM links 
-            WHERE short_url = ? OR custom_url = ? 
+            WHERE (short_url = ? OR custom_url = ?) AND deleted_at IS NULL
             LIMIT 1
         ");
         $stmt->bind_param("ss", $shortCode, $shortCode);

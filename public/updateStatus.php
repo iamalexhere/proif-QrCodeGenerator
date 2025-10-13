@@ -26,9 +26,9 @@ if (!$short_url) {
 
 try {
     if ($action === 'delete') {
-        // === DELETE QR CODE ===
-        // First verify the QR code belongs to the current user
-        $checkStmt = $db->prepare("SELECT id FROM links WHERE short_url = ? AND user_id = ?");
+        // === SOFT DELETE QR CODE ===
+        // First verify the QR code belongs to the current user and is not already deleted
+        $checkStmt = $db->prepare("SELECT id FROM links WHERE short_url = ? AND user_id = ? AND deleted_at IS NULL");
         $checkStmt->bind_param("si", $short_url, $currentUser['id']);
         $checkStmt->execute();
         $checkResult = $checkStmt->get_result();
@@ -36,16 +36,20 @@ try {
         if ($checkResult->num_rows === 0) {
             $response["message"] = "QR code not found or access denied";
         } else {
-            // Delete the QR code
-            $deleteStmt = $db->prepare("DELETE FROM links WHERE short_url = ? AND user_id = ?");
+            // Soft delete the QR code by setting deleted_at timestamp
+            $deleteStmt = $db->prepare("UPDATE links SET deleted_at = NOW() WHERE short_url = ? AND user_id = ? AND deleted_at IS NULL");
             $deleteStmt->bind_param("si", $short_url, $currentUser['id']);
             
             if ($deleteStmt->execute()) {
-                $response["success"] = true;
-                $response["message"] = "QR code deleted successfully";
-                
-                // Also decrement user's quota since QR code is deleted
-                Auth::decrementQRCodeUsage($currentUser['id']);
+                if ($deleteStmt->affected_rows > 0) {
+                    $response["success"] = true;
+                    $response["message"] = "QR code deleted successfully";
+                    
+                    // Also decrement user's quota since QR code is deleted (soft deleted)
+                    Auth::decrementQRCodeUsage($currentUser['id']);
+                } else {
+                    $response["message"] = "QR code not found or already deleted";
+                }
             } else {
                 $response["message"] = "Failed to delete QR code";
             }
@@ -58,8 +62,8 @@ try {
         if (!$status || !in_array($status, ['active', 'paused'])) {
             $response["message"] = "Valid status is required (active or paused)";
         } else {
-            // Update status with user verification
-            $stmt = $db->prepare("UPDATE links SET status = ? WHERE short_url = ? AND user_id = ?");
+            // Update status with user verification (exclude soft-deleted records)
+            $stmt = $db->prepare("UPDATE links SET status = ? WHERE short_url = ? AND user_id = ? AND deleted_at IS NULL");
             $stmt->bind_param("ssi", $status, $short_url, $currentUser['id']);
 
             if ($stmt->execute()) {

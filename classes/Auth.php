@@ -26,7 +26,7 @@ class Auth {
     }
     
     /**
-     * Start session if not already started
+     * Start session if not already started with enhanced security
      */
     public static function startSession() {
         if (session_status() === PHP_SESSION_NONE) {
@@ -34,6 +34,12 @@ class Auth {
             $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
                       || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
                       || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on');
+            
+            // Enhanced session security settings
+            ini_set('session.cookie_httponly', 1);
+            ini_set('session.use_only_cookies', 1);
+            ini_set('session.cookie_secure', $isHttps ? 1 : 0);
+            ini_set('session.use_strict_mode', 1);
             
             // Set session cookie parameters for security
             session_set_cookie_params([
@@ -46,7 +52,106 @@ class Auth {
             ]);
             
             session_start();
+            
+            // Additional session security checks
+            self::validateSession();
         }
+    }
+    
+    /**
+     * Regenerate session ID for security (prevents session fixation)
+     * Call this after successful authentication
+     */
+    public static function regenerateSession() {
+        self::startSession();
+        session_regenerate_id(true);
+    }
+    
+    /**
+     * Validate session security
+     * Checks for session hijacking attempts
+     */
+    private static function validateSession() {
+        // Check if session was started
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return;
+        }
+        
+        // Initialize session security markers if not set
+        if (!isset($_SESSION['_auth_created'])) {
+            $_SESSION['_auth_created'] = time();
+        }
+        
+        if (!isset($_SESSION['_auth_user_agent'])) {
+            $_SESSION['_auth_user_agent'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        }
+        
+        if (!isset($_SESSION['_auth_ip_address'])) {
+            $_SESSION['_auth_ip_address'] = self::getClientIpAddress();
+        }
+        
+        // Check for session timeout (24 hours)
+        if (isset($_SESSION['_auth_created']) && (time() - $_SESSION['_auth_created']) > 86400) {
+            self::destroySessionSecurely();
+            return;
+        }
+        
+        // Check for user agent changes (potential session hijacking)
+        $currentUserAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        if (isset($_SESSION['_auth_user_agent']) && $_SESSION['_auth_user_agent'] !== $currentUserAgent) {
+            error_log('Session security warning: User agent mismatch for session');
+            // Note: We don't automatically destroy session as user agents can change legitimately
+        }
+        
+        // Check for IP address changes (potential session hijacking)
+        $currentIp = self::getClientIpAddress();
+        if (isset($_SESSION['_auth_ip_address']) && $_SESSION['_auth_ip_address'] !== $currentIp) {
+            error_log('Session security warning: IP address mismatch for session');
+            // Note: We don't automatically destroy session as IPs can change legitimately (mobile networks, etc.)
+        }
+    }
+    
+    /**
+     * Get client IP address safely
+     */
+    private static function getClientIpAddress() {
+        $ipKeys = ['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'HTTP_CLIENT_IP', 'REMOTE_ADDR'];
+        
+        foreach ($ipKeys as $key) {
+            if (!empty($_SERVER[$key])) {
+                $ip = $_SERVER[$key];
+                // Handle comma-separated IPs (X-Forwarded-For can contain multiple IPs)
+                if (strpos($ip, ',') !== false) {
+                    $ip = trim(explode(',', $ip)[0]);
+                }
+                // Validate IP address
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                    return $ip;
+                }
+            }
+        }
+        
+        return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    }
+    
+    /**
+     * Destroy session securely
+     */
+    private static function destroySessionSecurely() {
+        // Clear all session variables
+        $_SESSION = array();
+        
+        // Delete the session cookie
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+        
+        // Destroy the session
+        session_destroy();
     }
     
     /**
@@ -135,8 +240,12 @@ class Auth {
                 return ['success' => false, 'error' => 'Failed to create or update user'];
             }
             
-            // Set session
+            // Set session with regeneration for security (prevents session fixation)
             self::startSession();
+            
+            // Regenerate session ID to prevent session fixation attacks
+            session_regenerate_id(true);
+            
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['user_name'] = $user['name'];
@@ -305,11 +414,19 @@ class Auth {
     }
     
     /**
-     * Logout user
+     * Logout user securely
      */
     public static function logout() {
         self::startSession();
-        session_destroy();
+        
+        // Log the logout for security audit
+        if (isset($_SESSION['user_id'])) {
+            error_log('User logout: user_id=' . $_SESSION['user_id']);
+        }
+        
+        // Use the secure session destruction method
+        self::destroySessionSecurely();
+        
         header('Location: login.php');
         exit;
     }
