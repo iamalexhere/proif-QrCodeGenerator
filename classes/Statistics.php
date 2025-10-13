@@ -19,7 +19,8 @@ class Statistics {
      * @param int $linkId ID dari link yang di-klik.
      */
     public function recordClick($linkId) {
-        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
+        // Get real IP address (check forwarded headers first)
+        $ipAddress = $this->getRealIpAddress();
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
 
         // Deteksi bot (skip kalau bot)
@@ -158,5 +159,47 @@ class Statistics {
         $stmt->bind_param("ii", $linkId, $days);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+    
+    /**
+     * Get the real IP address, checking forwarded headers first
+     * This is essential for testing and production environments behind proxies/load balancers
+     */
+    private function getRealIpAddress() {
+        // Check for forwarded IP headers (in order of preference)
+        $headers = [
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_REAL_IP', 
+            'HTTP_CLIENT_IP',
+            'HTTP_X_ORIGINATING_IP',
+            'HTTP_CF_CONNECTING_IP', // Cloudflare
+            'HTTP_X_CLUSTER_CLIENT_IP',
+            'REMOTE_ADDR'
+        ];
+        
+        foreach ($headers as $header) {
+            if (!empty($_SERVER[$header])) {
+                $ip = $_SERVER[$header];
+                
+                // Handle comma-separated IPs (X-Forwarded-For can contain multiple IPs)
+                if (strpos($ip, ',') !== false) {
+                    $ips = explode(',', $ip);
+                    $ip = trim($ips[0]); // Take the first IP
+                }
+                
+                // Validate IP format
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                    return $ip;
+                }
+                
+                // Allow private/local IPs for development
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
+            }
+        }
+        
+        // Fallback to REMOTE_ADDR
+        return $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
     }
 }
