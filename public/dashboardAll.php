@@ -300,9 +300,9 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
                 <?php echo htmlspecialchars($currentUser['email']); ?>
               </div>
             </div>
-            <a href="logout.php" style="color: #dc3545; text-decoration: none; font-size: 12px;" title="Logout">
+            <!-- <a href="logout.php" style="color: #dc3545; text-decoration: none; font-size: 12px;" title="Logout">
               🚪
-            </a>
+            </a> -->
           </div>
         </div>
       </div>
