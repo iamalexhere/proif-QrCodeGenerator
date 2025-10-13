@@ -183,7 +183,7 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
   <link rel="stylesheet" href="css/popUp.css">
   <link rel="stylesheet" href="css/pagination.css">
   <link rel="stylesheet" href="css/device-responsive.css">
-  
+  <link rel="icon" href="images/logo-aaaro.png" type="image/x-icon">
   <script src="js/script.js"></script>
 </head>
 

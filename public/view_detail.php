@@ -46,19 +46,20 @@ $linkCreatedAt = $linkData['created_at'] ? date('Y-m-d', strtotime($linkData['cr
     <title>View QR Code Details</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/view_detail.js"></script>
+    <link rel="icon" href="images/logo-aaaro.png" type="image/x-icon">
 </head>
 <body>
     <header class="navbar">
-    <div class="navbar-left">
-        <img src='images/logo-aaaro.png' alt="AAARO Logo">
-        <div class="brand-text">
-            <div class="brand-title">AAARO</div>
-            <div class="brand-subtitle">Complexity, simplified</div>
+        <div class="navbar-left">
+            <img src='images/logo-aaaro.png' alt="AAARO Logo">
+            <div class="brand-text">
+                <div class="brand-title">AAARO</div>
+                <div class="brand-subtitle">Complexity, simplified</div>
+            </div>
         </div>
-    </div>
-    <div class="navbar-right">
-      <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
-    </div>
+        <div class="navbar-right">
+        <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
+        </div>
   </header>
 
     <main class="edit-container">

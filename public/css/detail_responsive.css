@@ -217,12 +217,18 @@ canvas {
     }
 
     /* Navbar Mobile */
-    .navbar {
-        width: 100%;
-        padding: 12px 15px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
+
+    .brand-title{
+        font-size: 16px;
+    }
+    .brand-subtitle{
+        font-size: 8px;
+    }
+    .navbar{
+        padding: 12px 20px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .navbar .logo {
@@ -422,7 +428,7 @@ canvas {
     }
 
     .navbar {
-        padding: 10px 12px;
+        padding: 10px 12px; 
     }
 
     .navbar .logo {
