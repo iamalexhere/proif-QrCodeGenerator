@@ -528,10 +528,22 @@ class Auth {
     }
     
     /**
-     * Decrement user's QR code usage for current month (when deleting QR codes)
+     * Decrement user's QR code usage for current month
+     * 
+     * IMPORTANT: This should ONLY be used when a QR creation attempt finds an existing URL
+     * and no new QR code was actually created. This gives back the reserved quota slot.
+     * 
+     * DO NOT use this when deleting QR codes - quota should represent total monthly creations.
+     * 
      * @param int|null $userId
+     * @param bool $allowDecrement Safety flag to prevent misuse
      */
-    public static function decrementQRCodeUsage($userId = null) {
+    public static function decrementQRCodeUsage($userId = null, $allowDecrement = false) {
+        if (!$allowDecrement) {
+            error_log("WARNING: decrementQRCodeUsage() called without allowDecrement flag. This prevents quota abuse.");
+            return;
+        }
+        
         if (!$userId) {
             $userId = self::getCurrentUserId();
         }

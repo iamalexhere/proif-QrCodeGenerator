@@ -45,8 +45,9 @@ try {
                     $response["success"] = true;
                     $response["message"] = "QR code deleted successfully";
                     
-                    // Also decrement user's quota since QR code is deleted (soft deleted)
-                    Auth::decrementQRCodeUsage($currentUser['id']);
+                    // NOTE: We do NOT decrement quota when deleting QR codes
+                    // Quota represents total QR codes created per month, not active QR codes
+                    // Once created, it counts toward monthly limit regardless of deletion
                 } else {
                     $response["message"] = "QR code not found or already deleted";
                 }
