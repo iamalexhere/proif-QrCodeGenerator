@@ -203,9 +203,10 @@ try {
             $isExistingUrl = $result['existing'] ?? false;
             
             // Quota already incremented atomically above
-            // Only decrement if this is an existing URL (since we already reserved a slot)
+            // If URL already exists for this user, give back the quota slot since no new QR was created
+            // This is the ONLY valid use case for decrementing quota
             if ($isExistingUrl) {
-                Auth::decrementQRCodeUsage($currentUser['id']);
+                Auth::decrementQRCodeUsage($currentUser['id'], true); // true = allow decrement for existing URL
             }
         } catch (Exception $e) {
             // Fallback ke URL asli jika gagal
