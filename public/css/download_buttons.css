@@ -1,0 +1,155 @@
+/* Download Buttons Styling */
+.stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.stats-header h2 {
+    margin: 0;
+}
+
+.download-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-download {
+    background: linear-gradient(135deg, #52b788 0%, #40916c 100%);
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(82, 183, 136, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-download::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-download:hover::before {
+    left: 100%;
+}
+
+.btn-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(82, 183, 136, 0.5);
+    background: linear-gradient(135deg, #40916c 0%, #2d6a4f 100%);
+}
+
+.btn-download:active {
+    transform: translateY(0);
+}
+
+.btn-download svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* Responsive untuk Mobile */
+@media (max-width: 768px) {
+    .stats-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    /* .stats-header h2 {
+        font-size: 1.5rem;
+        text-align: center;
+        color: #1a5a3f;
+        font-weight: 700;
+    } */
+
+    .download-buttons {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        width: 100%;
+    }
+
+    .btn-download {
+        flex-direction: column;
+        justify-content: center;
+        gap: 6px;
+        padding: 16px 8px;
+        font-size: 0.75rem;
+        border-radius: 12px;
+        min-height: 70px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+
+    .btn-download svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-header {
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .stats-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .download-buttons {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .btn-download {
+        padding: 14px 6px;
+        font-size: 0.7rem;
+        border-radius: 10px;
+        min-height: 65px;
+    }
+
+    .btn-download svg {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+    .download-buttons {
+        gap: 6px;
+    }
+
+    .btn-download {
+        padding: 12px 4px;
+        font-size: 0.65rem;
+        min-height: 60px;
+    }
+
+    .btn-download svg {
+        width: 20px;
+        height: 20px;
+    }
+}
