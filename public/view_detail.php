@@ -41,10 +41,14 @@ $linkCreatedAt = $linkData['created_at'] ? date('Y-m-d', strtotime($linkData['cr
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="stylesheet" href="css/view_detail.css"> 
-    <link rel="stylesheet" href="css/detail_responsive.css"> 
+    <link rel="stylesheet" href="css/detail_responsive.css">
+    <link rel="stylesheet" href="css/download_buttons.css">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <title>View QR Code Details</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF untuk export PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="js/view_detail.js"></script>
     <link rel="icon" href="images/logo-aaaro.png" type="image/x-icon">
 </head>
@@ -58,7 +62,6 @@ $linkCreatedAt = $linkData['created_at'] ? date('Y-m-d', strtotime($linkData['cr
             </div>
         </div>
         <div class="navbar-right">
-            
             <a href="<?php echo htmlspecialchars($returnPage); ?>" class="btn-back">&larr; Back to Dashboard</a>
             <a href="logout.php" style="color: #dc3545; text-decoration: none; font-size: 12px;" title="Logout">
               <img class="img_logout" src="images/logout_icon.png" alt="logout_icon">
@@ -91,7 +94,35 @@ $linkCreatedAt = $linkData['created_at'] ? date('Y-m-d', strtotime($linkData['cr
         </section>
 
         <section class="edit-right">
-            <h2>Statistics</h2>
+            <div class="stats-header">
+                <h2>Statistics</h2>
+                <div class="download-buttons">
+                    <button class="btn-download" onclick="downloadPDF()" title="Download as PDF">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        PDF
+                    </button>
+                    <button class="btn-download" onclick="downloadCSV()" title="Download as CSV">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        CSV
+                    </button>
+                    <button class="btn-download" onclick="downloadExcel()" title="Download as Excel">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Excel
+                    </button>
+                </div>
+            </div>
             
             <div id="loading-stats" style="text-align: center; padding: 2rem;">
                 <p>Loading statistics...</p>
