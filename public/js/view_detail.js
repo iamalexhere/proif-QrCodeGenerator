@@ -385,10 +385,22 @@ async function downloadPDF() {
         const periods = getAllPeriodsData();
         let yPos = 20;
 
-        // Header
+        // Load and add logo
+        const logo = new Image();
+        logo.src = './images/logo-aaaro.png';
+
+        await new Promise((resolve, reject) => {
+            logo.onload = resolve;
+            logo.onerror = reject;
+        });
+
+        // Add logo (adjust size and position as needed)
+        doc.addImage(logo, 'PNG', 20, yPos - 5, 15, 15);
+
+        // Header text next to logo
         doc.setFontSize(20);
         doc.setTextColor(82, 183, 136);
-        doc.text('AAARO QR Code Statistics', 20, yPos);
+        doc.text('AAARO QR Code Statistics', 38, yPos + 5);
 
         yPos += 10;
         doc.setFontSize(10);
