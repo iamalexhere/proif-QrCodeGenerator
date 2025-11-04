@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS links (
     custom_url VARCHAR(255),
     logo_path VARCHAR(500),
     qr_color VARCHAR(7) DEFAULT '#000000',
+    qr_bg_color VARCHAR(7) DEFAULT '#FFFFFF',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

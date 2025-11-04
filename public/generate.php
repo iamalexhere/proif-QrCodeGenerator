@@ -1,5 +1,4 @@
 <?php
-
 // Pastikan tidak ada output sebelum JSON response
 ini_set('display_errors', 0);
 error_reporting(0);
@@ -108,7 +107,8 @@ try {
         
         // --- MENGAMBIL DATA DARI FORM ---
         $longUrl = trim($_POST['url-input']);
-        $qrColor = $_POST['qr_color'] ?? '#000000'; // Warna dari color picker, default hitam
+        $qrColor = $_POST['qr_color'] ?? '#000000'; // Warna foreground dari color picker
+        $qrBgColor = $_POST['qr_bg_color'] ?? '#FFFFFF'; // Warna background dari color picker
         $format = $_POST['format'] ?? 'png'; // Format output: png, svg, pdf
         $logoPathForDb = null;
         $logoToUse = null;
@@ -197,7 +197,8 @@ try {
         $customUrlInput = ''; 
         try {
             $urlShortener = new UrlShortener();
-            $result = $urlShortener->createShortUrl($longUrl, $currentUser['id'], $customUrlInput, $logoPathForDb, $qrColor);
+            // UPDATE: Tambahkan parameter $qrBgColor
+            $result = $urlShortener->createShortUrl($longUrl, $currentUser['id'], $customUrlInput, $logoPathForDb, $qrColor, $qrBgColor);
             $shortUrl = $result['short_url'];
             $shortCode = $result['short_code'];
             $isExistingUrl = $result['existing'] ?? false;
@@ -228,7 +229,7 @@ try {
         $qrCode->setMargin(10);
         $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::High);
         $qrCode->setForegroundColor(hexToColor($qrColor));
-        $qrCode->setBackgroundColor(new Color(255, 255, 255));
+        $qrCode->setBackgroundColor(hexToColor($qrBgColor)); // Set background color
         
         // --- MENENTUKAN WRITER BERDASARKAN FORMAT ---
         switch ($format) {

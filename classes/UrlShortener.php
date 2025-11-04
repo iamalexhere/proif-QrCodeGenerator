@@ -72,10 +72,11 @@ class UrlShortener {
      * @param string $customUrl URL custom (opsional)
      * @param string $logoPath Path ke file logo untuk QR code (opsional)
      * @param string $qrColor Warna QR code dalam format hex (default: #000000)
+     * @param string $qrBgColor Warna background QR code dalam format hex (default: #FFFFFF)
      * @return array Data URL pendek yang berhasil dibuat
      * @throws Exception Jika gagal menyimpan ke database
      */
-    public function createShortUrl($originalUrl, $userId, $customUrl = '', $logoPath = '', $qrColor = '#000000') {
+    public function createShortUrl($originalUrl, $userId, $customUrl = '', $logoPath = '', $qrColor = '#000000', $qrBgColor = '#FFFFFF') {
         // === CEK APAKAH URL SUDAH ADA UNTUK USER INI (exclude soft-deleted) ===
         $stmt = $this->db->prepare("SELECT id, short_url, original_url FROM links WHERE original_url = ? AND user_id = ? AND deleted_at IS NULL LIMIT 1");
         $stmt->bind_param("si", $originalUrl, $userId);
@@ -120,9 +121,9 @@ class UrlShortener {
         $shortUrl = (strpos($baseUrl, 'http') === 0 ? '' : 'http://') . $baseUrl . '/' . $shortCode;
         
         // === SIMPAN KE DATABASE ===
-        $sql = "INSERT INTO links (user_id, original_url, short_url, custom_url, logo_path, qr_color) VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO links (user_id, original_url, short_url, custom_url, logo_path, qr_color, qr_bg_color) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("isssss", $userId, $originalUrl, $shortCode, $customUrl, $logoPath, $qrColor);
+        $stmt->bind_param("issssss", $userId, $originalUrl, $shortCode, $customUrl, $logoPath, $qrColor, $qrBgColor);
         
         if ($stmt->execute()) {
             $insertId = $this->db->insert_id;
@@ -202,6 +203,12 @@ class UrlShortener {
         return null;
     }
 
+    /**
+     * Mendapatkan data link lengkap berdasarkan kode pendek
+     * 
+     * @param string $shortCode Kode pendek URL
+     * @return array|null Data link jika ditemukan, null jika tidak ada
+     */
     public function getLinkDataByShortCode($shortCode){
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("

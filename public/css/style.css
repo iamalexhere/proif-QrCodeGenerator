@@ -8,13 +8,12 @@
 
 /* Body */
 body {
-    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     background-color: #e8eef3
 }
-
 
 /* Container */
 .container {
@@ -25,7 +24,6 @@ body {
     margin-right: auto;
     margin-left: auto;
 }
-
 
 /* Content */
 .content {
@@ -44,7 +42,6 @@ body {
     margin-right: 0.667%;
 }
 
-
 /* Navbar */
 .navbar {
     display: flex;
@@ -55,7 +52,7 @@ body {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     position: relative;
     border-bottom-right-radius: 16px;
-    border-bottom-left-radius:  16px ;
+    border-bottom-left-radius: 16px;
 }
 
 .navbar-left {
@@ -166,6 +163,7 @@ input[type="checkbox"] {
     padding: 10px 20px;
     border-radius: 0.25rem;
     background: #5288B7;
+    transition: all 0.2s ease;
 }
 
 .btn:hover {
@@ -201,7 +199,7 @@ input[type="checkbox"] {
         flex-wrap: wrap;
         gap: 8px;
     }
-    
+
     #download-links-container .btn {
         flex: 1 1 auto;
         min-width: 0;
@@ -223,7 +221,6 @@ input[type="checkbox"] {
 #download-link>div {
     font-weight: 400;
     font-size: 20px;
-    /* padding: 7px 10px; */
 }
 
 .disabled {
@@ -231,57 +228,96 @@ input[type="checkbox"] {
     pointer-events: none;
 }
 
-/* Output Section */
+/* 🚀 PERBAIKAN UTAMA UNTUK KOTAK KANAN */
 .outputsection {
     flex: 0 0 33.33333%;
     max-width: 33.33333%;
     border: 1px solid rgb(222, 226, 230);
     border-left: none;
     border-radius: 16px;
+
+    /* PENTING: Gunakan flex column, dan JANGAN gunakan space-between */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+
+    /* BARU: Memastikan semua konten anak menempel di bagian atas kontainer */
+    align-items: flex-start;
+
     background-color: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.shortlinkcontainer {
-    margin-top: 15px;
-    text-align: center;
-    word-break: break-all;
 }
 
 h3 {
     padding: 20px;
     text-align: center;
     font-size: 25px;
+    width: 100%;
+    /* Pastikan elemen header mengambil lebar penuh */
 }
 
-#qrImage {
-    min-height: 250px;
-    min-width: 250px;
-    /*Sesuai ukuran Qr-code  */
-    max-width: 100%;
-    max-height: 100%;
-    opacity: 1;
-}
-
-/* Flex Utility Classes */
+/* Flex Utility Classes - REFINED */
 .outputsection>div {
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+    width: 100%;
+    /* Pastikan elemen anak mengambil lebar penuh */
+}
+
+#qr-output-container {
+    /* PENTING: Memastikan QR Code box mengambil semua ruang yang tersisa */
+    flex-grow: 1;
+    min-height: 300px;
+    padding-top: 30px !important;
+    padding-bottom: 0 !important;
+    /* Padding 0 di bagian bawah agar tautan pendek lebih dekat */
+
+    /* Terapkan Flexbox di sini untuk centering QR/Empty state */
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    padding: 30px;
+    width: 100%;
+    /* Pastikan mengisi lebar penuh */
 }
 
 #short-link-container {
     text-align: center;
-    min-height: 58.4px;
+    margin-top: 20px;
+    /* Tambahkan margin di sini untuk memisahkan dari QR Code */
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    word-break: break-all;
+    max-width: 100%;
+}
+
+#short-link-container a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    word-wrap: break-word;
+}
+
+#short-link-container a:hover {
+    text-decoration: underline;
 }
 
 .link-container {
+    /* Pastikan ini tidak membesar dan tetap di bawah */
+    flex-shrink: 0;
     height: auto;
     flex-direction: column;
-    margin-bottom: 30px;
+    margin-bottom: 0;
+
+    padding-top: 0 !important;
+    padding-bottom: 30px !important;
+    padding-left: 30px;
+    padding-right: 30px;
+    width: 100%;
+    /* Pastikan mengisi lebar penuh */
 }
 
 /* Main content area */
@@ -306,149 +342,9 @@ footer div {
     color: black;
 }
 
-
-
-/* for Responsive */
-
-/* Laptop View */
-@media (max-width: 992px) {
-    .inputsection {
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
-
-    .outputsection {
-        flex: 0 0 100%;
-        max-width: 100%;
-        margin-top: 20px;
-    }
-}
-
-/* Mobile View */
-@media (max-width: 768px) {
-    .container {
-        padding: 10px;
-    }
-    
-    .navbar {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-
-    .navbar>img {
-        margin-bottom: 10px;
-    }
-    
-    .navbar-right {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .content {
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .inputsection,
-    .outputsection {
-        max-width: 100%;
-        flex: 0 0 100%;
-        width: 100%;
-    }
-
-    h3 {
-        font-size: 20px;
-    }
-
-    #qrImage {
-        width: 200px;
-        max-width: 280px;
-        height: 200px;
-        max-height: 280px;
-    }
-    
-    #qr-output-container {
-        margin: 0 auto;
-    }
-    
-    #empty-state, #qr-result {
-        max-width: 280px;
-        margin: 0 auto;
-    }
-
-    .btn {
-        font-size: 18px;
-        min-height: 44px; /* iOS touch target size */
-    }
-    
-    .form-control {
-        font-size: 16px; /* Prevents zoom on iOS */
-    }
-    
-    input[type="color"] {
-        width: 100%;
-        height: 50px;
-        border-radius: 8px;
-    }
-    
-    .logo-options {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-        gap: 8px;
-        max-height: 200px;
-        overflow-y: auto;
-    }
-    
-    .logo-option img {
-        width: 40px;
-        height: 40px;
-    }
-    
-    #download-links-container {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 15px;
-    }
-    
-    #download-links-container .btn {
-        width: 100%;
-        max-width: none;
-        margin: 0;
-        text-align: center;
-        padding: 12px;
-        font-size: 16px;
-    }
-}
-
-/* Small Mobile View */
-@media (max-width: 576px) {
-    #qrImage {
-        width: 150px;
-        height: 150px !important;
-    }
-
-    .btn {
-        font-size: 16px;
-        padding: 8px 15px;
-    }
-    
-    #download-links-container .btn {
-        font-size: 14px;
-        padding: 8px 10px;
-    }
-}
-
-/* Medium screens - tablet landscape */
-@media (min-width: 768px) and (max-width: 1024px) {
-    #download-links-container .btn {
-        font-size: 13px;
-        padding: 8px 10px;
-        max-width: calc(33.333% - 5px);
-    }
-}
-
+/* ======================================================= */
+/* --- LOGO OPTIONS STYLES --- */
+/* ======================================================= */
 
 /* Container semua logo */
 .logo-options {
@@ -474,6 +370,7 @@ footer div {
     padding: 0 !important;
     margin: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .logo-option input[type="radio"] {
@@ -500,19 +397,23 @@ footer div {
     line-height: 0;
 }
 
-/* Efek hover pada kotak */
+/* Hover and Active effects */
 .logo-option:hover {
     border-color: #007BFF;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transform: translateY(-4px);
 }
 
-/* Efek hover pada icon di dalam kotak */
+.logo-option:active {
+    transform: scale(0.95);
+    transition: transform 0.1s;
+}
+
 .logo-option:hover img {
     transform: scale(1.2);
 }
 
-/* Efek ketika radio dipilih */
+/* Selected state */
 .logo-option input[type="radio"]:checked+img {
     transform: scale(1.2);
     filter: drop-shadow(0 0 4px #007BFF);
@@ -523,15 +424,94 @@ footer div {
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.7);
 }
 
-/* Tombol Pro di Navbar */
+
+/* ======================================================= */
+/* --- COLLAPSIBLE CUSTOMIZATION STYLES (NEW) --- */
+/* ======================================================= */
+
+.customization-container {
+    margin-top: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* General accordion item style */
+.accordion-item {
+    border-bottom: 1px solid #e9ecef;
+    width: 100%;
+}
+
+.accordion-item:last-child {
+    border-bottom: none;
+}
+
+.accordion-header {
+    width: 100%;
+    text-align: left;
+    background-color: #e9ecef;
+    color: #495057;
+    border: none;
+    padding: 12px 15px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.accordion-header:hover {
+    background-color: #dee2e6;
+}
+
+.accordion-header.active {
+    background-color: #e2e6ea;
+}
+
+.accordion-header .icon {
+    transition: transform 0.3s ease;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.accordion-header.active .icon {
+    transform: rotate(180deg);
+}
+
+/* The main collapsible body */
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+    padding: 0 15px;
+    background-color: white;
+}
+
+.accordion-content.active {
+    max-height: 1000px;
+    padding: 15px;
+    padding-bottom: 25px;
+}
+
+
+/* ======================================================= */
+/* --- NAV & PRO BUTTON STYLES --- */
+/* ======================================================= */
+
 .btn-pro {
     background: #52b788;
     color: #fff;
     padding: 10px 20px;
     border-radius: 8px;
     text-decoration: none;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     font-weight: 500;
+    font-size: 16px;
 }
 
 .btn-pro:hover {
@@ -540,16 +520,8 @@ footer div {
     background: #40916c;
 }
 
-/* Tombol Pro di bawah Output Section */
-.pro-link-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
 .btn-pro-secondary {
     background-color: #ffc107;
-    /* kuning */
     color: #000;
     padding: 10px 20px;
     font-size: 18px;
@@ -561,44 +533,197 @@ footer div {
 
 .btn-pro-secondary:hover {
     background-color: #e0a800;
-    /* kuning lebih gelap saat hover */
 }
 
-/* Responsive untuk tombol Pro */
-@media (max-width: 768px) {
-    .btn-pro {
-        margin-left: 0;
-        margin-top: 10px;
+/* ======================================================= */
+/* --- RESPONSIVE STYLES --- */
+/* ======================================================= */
+
+/* Laptop View (< 992px) */
+@media (max-width: 992px) {
+    .inputsection {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-right: 0;
     }
 
-    .btn-pro-secondary {
+    .outputsection {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-top: 20px;
+        border-left: 1px solid rgb(222, 226, 230);
+    }
+}
+
+/* Tablet Landscape/Medium screens (768px to 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    #download-links-container .btn {
+        font-size: 13px;
+        padding: 8px 10px;
+        max-width: calc(33.333% - 5px);
+    }
+}
+
+/* Mobile View (< 768px) */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .navbar {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .navbar-left a {
+        padding-left: 0 !important;
+    }
+
+    .navbar-right {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .content {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .inputsection,
+    .outputsection {
+        max-width: 100%;
+        flex: 0 0 100%;
+        width: 100%;
+    }
+
+    /* Output Section */
+    .outputsection {
+        /* Hapus justify-content: space-between; yang ada di sini */
+    }
+
+    .outputsection>div {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+
+    #qr-output-container {
+        flex-grow: 1;
+        padding-top: 20px !important;
+        padding-bottom: 10px !important;
+    }
+
+    #empty-state,
+    #qr-result {
+        max-width: 280px;
+        width: 280px;
+        margin: 0 auto;
+    }
+
+    #qrImage {
+        width: 250px;
+        height: 250px;
+        min-height: 250px;
+        min-width: 250px;
+    }
+
+    .btn {
+        font-size: 18px;
+        min-height: 44px;
+    }
+
+    .form-control {
+        font-size: 16px;
+    }
+
+    .accordion-content.active .logo-options {
+        max-height: 250px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .logo-option {
+        width: 55px;
+        height: 55px;
+    }
+
+    .logo-option img {
+        width: 30px !important;
+        height: 30px !important;
+    }
+
+    #download-links-container {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    #download-links-container .btn {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        text-align: center;
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .link-container {
+        flex-shrink: 0;
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-top: 0 !important;
+        padding-bottom: 20px !important;
+    }
+
+    #short-link-container {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    input[type="color"] {
+        width: 50px !important;
+        height: 35px !important;
+    }
+
+    .color-picker-row {
+        flex-wrap: wrap !important;
+    }
+}
+
+/* Small Mobile View (< 576px) */
+@media (max-width: 576px) {
+    #qrImage {
+        width: 150px;
+        height: 150px !important;
+        min-height: 150px;
+        min-width: 150px;
+    }
+
+    #empty-state,
+    #qr-result {
+        max-width: 180px;
+        width: 180px;
+    }
+
+    .btn {
         font-size: 16px;
         padding: 8px 15px;
     }
-    
-    /* Success notification for mobile */
-    .success-notification {
-        position: fixed !important;
-        top: 10px !important;
-        left: 10px !important;
-        right: 10px !important;
-        max-width: none !important;
-        margin: 0 !important;
+
+    #download-links-container .btn {
+        font-size: 14px;
+        padding: 8px 10px;
     }
 }
 
-
 /* Touch-friendly improvements */
-.logo-option {
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.logo-option:active {
-    transform: scale(0.95);
-    transition: transform 0.1s;
-}
-
 .btn:active {
     transform: scale(0.98);
     transition: transform 0.1s;
