@@ -216,7 +216,7 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
             id="searchInput"
             name="search"
             class="search-input"
-            placeholder="Search QRCodes..."
+            placeholder="Search QRCodes...(press Enter)"
             value="<?php echo htmlspecialchars($search_query); ?>"
           >
         </form>

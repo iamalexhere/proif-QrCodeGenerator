@@ -1366,6 +1366,12 @@ body {
     }
 }
 
-.img_logout{
+.img_logout {
     height: 25px;
+}
+
+.search-input::placeholder {
+    font-size: 11.8px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 300;
 }

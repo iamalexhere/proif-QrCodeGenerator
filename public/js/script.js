@@ -247,14 +247,18 @@ function updateStatus(shortUrl, newStatus) {
                     'success'
                 );
 
-                // Redirect sesuai status baru
+                // Redirect sesuai status baru dengan preserve search parameter
                 setTimeout(() => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const searchParam = urlParams.get('search');
+                    const searchQuery = searchParam ? '?search=' + encodeURIComponent(searchParam) : '';
+
                     if (newStatus === 'paused') {
-                        window.location.href = 'dashboardPause.php';
+                        window.location.href = 'dashboardPause.php' + searchQuery;
                     } else {
-                        window.location.href = 'dashboardActive.php';
+                        window.location.href = 'dashboardActive.php' + searchQuery;
                     }
-                }, 2000); // 2 detik delay seperti contoh Anda
+                }, 2000);
             } else {
                 showNotification(data.message || 'Failed to update status', 'error');
             }
@@ -355,47 +359,7 @@ function showNotification(msg, type) {
     }, 3000);
 }
 
-// Fungsi pencarian QR Code di dashboard
-function searchQRCodes() {
-    const input = document.getElementById('searchInput');
-    const filter = input.value.toLowerCase().trim();
-    const cards = document.querySelectorAll('.qr-card:not(.create-card)');
-    let visibleCount = 0;
-
-    // Filter card qr berdasarkan judul
-    cards.forEach(card => {
-        const titleEl = card.querySelector('.card-title h3');
-        const title = titleEl ? titleEl.textContent.toLowerCase() : '';
-
-        if (title.includes(filter)) {
-            card.style.display = '';
-            visibleCount++;
-        } else {
-            card.style.display = 'none';
-        }
-    });
-
-    // Tampilkan pesan jika tidak ada hasil
-    const dashboard = document.querySelector('.dashboard');
-    let noResultMsg = document.getElementById('no-search-result');
-
-    if (visibleCount === 0 && filter !== '') {
-        if (!noResultMsg) {
-            noResultMsg = document.createElement('div');
-            noResultMsg.id = 'no-search-result';
-            noResultMsg.className = 'empty-state';
-            noResultMsg.innerHTML = `
-        <h3>No QR Codes Found</h3>
-        <p>No results match your search "<b>${filter}</b>"</p>
-      `;
-            dashboard.appendChild(noResultMsg);
-        }
-    } else if (noResultMsg) {
-        noResultMsg.remove();
-    }
-}
-
-// reload halaman
+// Clear search - reload page without search parameter
 function clearSearch() {
-    window.location.href = '<?php echo $current_page_name; ?>';
+    window.location.href = window.location.pathname;
 }
