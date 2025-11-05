@@ -97,6 +97,9 @@ try {
             // Commit the quota reservation
             $db->commit();
             
+            // Get updated quota for response
+            $newUsed = $used + 1;
+            
         } catch (Exception $e) {
             $db->rollback();
             ob_clean();
@@ -107,20 +110,18 @@ try {
         
         // --- MENGAMBIL DATA DARI FORM ---
         $longUrl = trim($_POST['url-input']);
-        $qrColor = $_POST['qr_color'] ?? '#000000'; // Warna foreground dari color picker
-        $qrBgColor = $_POST['qr_bg_color'] ?? '#FFFFFF'; // Warna background dari color picker
-        $format = $_POST['format'] ?? 'png'; // Format output: png, svg, pdf
+        $qrColor = $_POST['qr_color'] ?? '#000000';
+        $qrBgColor = $_POST['qr_bg_color'] ?? '#FFFFFF';
+        $format = $_POST['format'] ?? 'png';
         $logoPathForDb = null;
         $logoToUse = null;
 
         // --- LOGIKA PEMILIHAN LOGO (DENGAN PRIORITAS) ---
-
-        // Priority 1: Check if custom logo is uploaded with validation
         if (isset($_FILES['custom-logo']) && $_FILES['custom-logo']['error'] === UPLOAD_ERR_OK) {
             $uploadedFile = $_FILES['custom-logo'];
             
             // Validate file size (max 5MB)
-            $maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+            $maxFileSize = 5 * 1024 * 1024;
             if ($uploadedFile['size'] > $maxFileSize) {
                 ob_clean();
                 header('Content-Type: application/json; charset=utf-8');
@@ -142,7 +143,7 @@ try {
                 exit;
             }
             
-            // Validate that it's actually an image by trying to get image info
+            // Validate that it's actually an image
             $imageInfo = getimagesize($uploadedFile['tmp_name']);
             if ($imageInfo === false) {
                 ob_clean();
@@ -151,7 +152,7 @@ try {
                 exit;
             }
             
-            // Additional security: check image dimensions (reasonable limits)
+            // Check image dimensions
             $maxWidth = 2000;
             $maxHeight = 2000;
             if ($imageInfo[0] > $maxWidth || $imageInfo[1] > $maxHeight) {
@@ -172,45 +173,37 @@ try {
             $uploadPath = $uploadDir . $fileName;
 
             if (move_uploaded_file($uploadedFile['tmp_name'], $uploadPath)) {
-                $logoPathForDb = $uploadPath; // Save custom logo path
+                $logoPathForDb = $uploadPath;
             } else {
                 ob_clean();
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(['error' => 'Failed to upload logo file.']);
                 exit;
             }
-        } 
-        // Prioritas 2: Jika tidak ada logo kustom, cek apakah ada logo bawaan yang dipilih
-        else if (isset($_POST['default-logo']) && !empty($_POST['default-logo'])) {
+        } else if (isset($_POST['default-logo']) && !empty($_POST['default-logo'])) {
             $defaultLogoName = basename($_POST['default-logo']);
-            // Pastikan path ini sesuai dengan lokasi logo bawaan Anda
             $logoPathForDb = 'images/' . $defaultLogoName; 
         }
 
-        // Jika ada path logo yang terpilih dan filenya ada, siapkan objek Logo
         if ($logoPathForDb !== null && file_exists($logoPathForDb)) {
-            $logoToUse = Logo::create($logoPathForDb)
-                             ->setResizeToWidth(100);
+            $logoToUse = Logo::create($logoPathForDb)->setResizeToWidth(100);
         }
 
         // --- LOGIKA SHORT LINK DENGAN CUSTOM URL SHORTENER ---
         $customUrlInput = ''; 
         try {
             $urlShortener = new UrlShortener();
-            // UPDATE: Tambahkan parameter $qrBgColor
             $result = $urlShortener->createShortUrl($longUrl, $currentUser['id'], $customUrlInput, $logoPathForDb, $qrColor, $qrBgColor);
             $shortUrl = $result['short_url'];
             $shortCode = $result['short_code'];
             $isExistingUrl = $result['existing'] ?? false;
             
-            // Quota already incremented atomically above
-            // If URL already exists for this user, give back the quota slot since no new QR was created
-            // This is the ONLY valid use case for decrementing quota
+            // If URL already exists for this user, give back the quota slot
             if ($isExistingUrl) {
-                Auth::decrementQRCodeUsage($currentUser['id'], true); // true = allow decrement for existing URL
+                Auth::decrementQRCodeUsage($currentUser['id'], true);
+                $newUsed = $newUsed - 1; // Adjust the quota count for response
             }
         } catch (Exception $e) {
-            // Fallback ke URL asli jika gagal
             $shortUrl = $longUrl;
             error_log('URL shortener error: ' . $e->getMessage());
         }
@@ -229,7 +222,7 @@ try {
         $qrCode->setMargin(10);
         $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::High);
         $qrCode->setForegroundColor(hexToColor($qrColor));
-        $qrCode->setBackgroundColor(hexToColor($qrBgColor)); // Set background color
+        $qrCode->setBackgroundColor(hexToColor($qrBgColor));
         
         // --- MENENTUKAN WRITER BERDASARKAN FORMAT ---
         switch ($format) {
@@ -243,26 +236,20 @@ try {
                 
             case 'pdf':
                 try {
-                    // Generate PNG first untuk PDF
                     $pngWriter = new PngWriter();
                     $pngResult = $pngWriter->write($qrCode, logo: $logoToUse);
                     
-                    // Create PDF with TCPDF
                     $pdf = new TCPDF();
                     $pdf->AddPage();
                     $pdf->SetFont('helvetica', 'B', 16);
                     $pdf->Cell(0, 10, 'QR Code', 0, 1, 'C');
                     
-                    // Add QR code image to PDF with proper cleanup
                     $tempFile = null;
                     try {
-                        // Try direct image embedding first
                         $pdf->Image('@' . $pngResult->getString(), 55, 30, 100, 100, 'PNG');
                     } catch (Exception $directImageError) {
-                        // Fallback to temporary file method with guaranteed cleanup
                         $tempDir = sys_get_temp_dir();
                         if (empty($tempDir) || !is_writable($tempDir)) {
-                            // Fallback to uploads directory
                             $tempDir = __DIR__ . '/uploads';
                             if (!is_dir($tempDir)) {
                                 mkdir($tempDir, 0755, true);
@@ -276,20 +263,17 @@ try {
                             throw new Exception('Could not write QR code image to temporary file');
                         }
                         
-                        // Verify file exists and has content
                         if (!file_exists($tempFile) || filesize($tempFile) === 0) {
                             @unlink($tempFile);
                             throw new Exception('Temporary QR code file is empty or not created');
                         }
                         
-                        // Add image to PDF
                         $pdf->Image($tempFile, 55, 30, 100, 100, 'PNG');
                     }
                     
-                    // Add URL info
                     $pdf->SetFont('helvetica', '', 10);
-                    $pdf->Cell(0, 10, '', 0, 1); // spacing
-                    $pdf->Cell(0, 150, '', 0, 1); // spacing
+                    $pdf->Cell(0, 10, '', 0, 1);
+                    $pdf->Cell(0, 150, '', 0, 1);
                     $pdf->Cell(0, 10, 'URL: ' . $shortUrl, 0, 1, 'C');
                     
                     $imageData = $pdf->Output('', 'S');
@@ -297,14 +281,12 @@ try {
                     $fileExtension = 'pdf';
                     
                 } catch (Exception $pdfError) {
-                    // Log the error and return it
                     @error_log('PDF generation error: ' . $pdfError->getMessage());
                     ob_clean();
                     header('Content-Type: application/json; charset=utf-8');
                     echo json_encode(['error' => 'PDF generation failed: ' . $pdfError->getMessage()]);
                     exit;
                 } finally {
-                    // Always cleanup temporary file if it was created
                     if ($tempFile && file_exists($tempFile)) {
                         @unlink($tempFile);
                     }
@@ -321,11 +303,9 @@ try {
         }
 
         // === MENYIMPAN GAMBAR QR KE DATABASE ===
-        // Always ensure we have a PNG QR image stored in database for fallback
         try {
             $db = Database::getInstance()->getConnection();
             
-            // Check if QR image already exists for this short code
             $checkStmt = $db->prepare("SELECT qr_image FROM links WHERE short_url = ?");
             $checkStmt->bind_param("s", $shortCode);
             $checkStmt->execute();
@@ -333,18 +313,15 @@ try {
             $existingData = $checkResult->fetch_assoc();
             $checkStmt->close();
             
-            // If no QR image exists or if we're generating PNG, save it
             if (empty($existingData['qr_image']) || $format === 'png') {
                 $pngImageData = $imageData;
                 
-                // If current format is not PNG, generate PNG for database storage
                 if ($format !== 'png') {
                     $pngWriter = new PngWriter();
                     $pngResult = $pngWriter->write($qrCode, logo: $logoToUse);
                     $pngImageData = $pngResult->getString();
                 }
                 
-                // Save PNG image to database
                 $stmt = $db->prepare("UPDATE links SET qr_image = ? WHERE short_url = ?");
                 $stmt->bind_param("bs", $null, $shortCode);
                 $stmt->send_long_data(0, $pngImageData);
@@ -352,14 +329,12 @@ try {
                 $stmt->close();
             }
         } catch (Exception $e) {
-            // Log error but don't fail the request
             error_log("Failed to save QR image to database: " . $e->getMessage());
         }
         
         // --- MENGIRIM RESPONSE KE FRONTEND ---
         $base64Image = base64_encode($imageData);
 
-        // Bersihkan buffer dan set header
         ob_clean();
         header('Content-Type: application/json; charset=utf-8');
         
@@ -368,7 +343,12 @@ try {
             'short_link' => $shortUrl,
             'format' => $format,
             'mime_type' => $mimeType,
-            'file_extension' => $fileExtension
+            'file_extension' => $fileExtension,
+            'quota_info' => [
+                'used' => $newUsed,
+                'limit' => $limit,
+                'plan' => $currentUser['plan']
+            ]
         ]);
         exit;
 
