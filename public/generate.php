@@ -123,6 +123,8 @@ try {
             // Validate file size (max 5MB)
             $maxFileSize = 5 * 1024 * 1024;
             if ($uploadedFile['size'] > $maxFileSize) {
+                // Rollback quota reservation
+                Auth::decrementQRCodeUsage($currentUser['id'], true);
                 ob_clean();
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(['error' => 'Logo file too large. Maximum size is 5MB.']);
@@ -137,6 +139,8 @@ try {
             $fileExtension = strtolower(pathinfo($uploadedFile['name'], PATHINFO_EXTENSION));
             
             if (!in_array($fileMimeType, $allowedMimeTypes) || !in_array($fileExtension, $allowedExtensions)) {
+                // Rollback quota reservation
+                Auth::decrementQRCodeUsage($currentUser['id'], true);
                 ob_clean();
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(['error' => 'Invalid file type. Only PNG and JPG files are allowed.']);
@@ -146,6 +150,8 @@ try {
             // Validate that it's actually an image
             $imageInfo = getimagesize($uploadedFile['tmp_name']);
             if ($imageInfo === false) {
+                // Rollback quota reservation
+                Auth::decrementQRCodeUsage($currentUser['id'], true);
                 ob_clean();
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(['error' => 'Invalid image file. File appears to be corrupted.']);
@@ -156,6 +162,8 @@ try {
             $maxWidth = 2000;
             $maxHeight = 2000;
             if ($imageInfo[0] > $maxWidth || $imageInfo[1] > $maxHeight) {
+                // Rollback quota reservation
+                Auth::decrementQRCodeUsage($currentUser['id'], true);
                 ob_clean();
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(['error' => "Image dimensions too large. Maximum size is {$maxWidth}x{$maxHeight} pixels."]);
@@ -175,6 +183,8 @@ try {
             if (move_uploaded_file($uploadedFile['tmp_name'], $uploadPath)) {
                 $logoPathForDb = $uploadPath;
             } else {
+                // Rollback quota reservation
+                Auth::decrementQRCodeUsage($currentUser['id'], true);
                 ob_clean();
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(['error' => 'Failed to upload logo file.']);
@@ -202,10 +212,32 @@ try {
             if ($isExistingUrl) {
                 Auth::decrementQRCodeUsage($currentUser['id'], true);
                 $newUsed = $newUsed - 1; // Adjust the quota count for response
+                
+                // RETURN RESPONSE FOR EXISTING URL - SHOW POPUP
+                ob_clean();
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'already_exists' => true,
+                    'short_link' => $shortUrl,
+                    'original_url' => $longUrl,
+                    'quota_info' => [
+                        'used' => $newUsed,
+                        'limit' => $limit,
+                        'plan' => $currentUser['plan']
+                    ],
+                    'message' => 'This URL has already been generated. You can view it on your dashboard.'
+                ]);
+                exit;
             }
         } catch (Exception $e) {
+            // Rollback quota if URL shortener fails
+            Auth::decrementQRCodeUsage($currentUser['id'], true);
             $shortUrl = $longUrl;
             error_log('URL shortener error: ' . $e->getMessage());
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'URL shortener error: ' . $e->getMessage()]);
+            exit;
         }
 
         // --- PEMBUATAN QR CODE ---
